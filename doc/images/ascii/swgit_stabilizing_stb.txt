@@ -1,0 +1,37 @@
+
+::
+
+     1/0/0/0/andreav/INT/develop           1/0/0/0/andreav/INT/stable
+              |                                      |                  |
+              V                                      V                  | time
+                                                                        v
+              |                                      |
+              |                                      | 
+              | INT/develop/STB/Drop.A               | 
+              +------>>------->>--------->>----------+ INT/stable/STB/Drop.A
+              |                                      | INT/stable/LIV/Drop.A
+              |                                      |
+          .---+                                      |
+         /    |                                      |
+        X     |                                      |
+        |     |                                      |
+        |     |                                      |
+        X     |                                      |
+         \    | INT/develop/STB/Drop.B               | INT/stable/STB/Drop.B
+          '---+------>>------->>--------->>----------+----.
+              |                                      |     \ 
+              |                                      |      |
+              |                                      |      X
+              |                                      |      |
+          .---+                                      |     /
+         /    |                                      +----'
+        X     |                                    / | INT/stable/LIV/Drop.B
+         \    |                                   /  |
+          '---+                                  /   |
+              |                                 /    |
+              |                                /     |
+              +------<<-------<<--------<<----'      |
+              |                                      |
+              |                                      |
+
+

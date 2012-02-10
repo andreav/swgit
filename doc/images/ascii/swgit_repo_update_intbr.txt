@@ -1,0 +1,46 @@
+::
+
+         ''''''''''''''''''''''''''
+          Before pull from develop
+         ..........................
+
+
+    origin/develop         local develop branch
+          |                       |
+          v                       v
+
+                                        FTR branch
+                                          |
+          |                       |       V
+                                   
+      .-<-X                       X -->--.                
+     '                                    '            
+    |     |                               |     Before pull, your local branch
+    c     |                               A     is here, after pull, 
+    |     |                                     it will be untouched
+    .                                                 
+     '--> Y                            
+                                   
+
+         '''''''''''''''''''''''''
+          After pull from develop
+         .........................
+
+
+    origin/develop         local develop branch
+          |                       |
+          v                       v
+          
+
+          |                       |
+                                   
+      .-<-X                  .-<- X -->--.                
+     '                      '             '            
+    |     |     pull       |      |       |     Before pull, your local branch
+    c     |     --->       c      |       A     is here, after pull, 
+    |     |                |      |             it will be untouched
+    .                      .                          
+     '--> Y                 '-->  Y    
+                                   
+                                   
+

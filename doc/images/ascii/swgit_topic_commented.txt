@@ -1,0 +1,40 @@
+
+::
+
+                                 *************************************
+    1/0/0/0/andreav/INT/develop  ** branch shared by all developers **
+       |                         *************************************
+       V                                       
+                                             
+       |                                     
+       |  1/0/0/0/user/FTR/topic/NEW/BRANCH 
+                                             
+       A ----->---.            ******************************** 
+                   \          * Topic branch was created here, *
+       |            \         * NEW/BRANCH marks this commit   *
+       |             \         ********************************
+       |              X
+       |              |         
+       |              |         
+       |              |       ******************************
+       |              |      * FIX: this tag declares an    *
+       |              |      * issue has been resolved here *
+       |              |       ******************************
+       |              |         
+       |              Y  1/0/0/0/user/FTR/topic/FIX/1234567
+       |              |
+       |              |       
+       |              Z  1/0/0/0/user/FTR/topic/DEV/000
+       |              |  1/0/0/0/user/FTR/topic
+       |              |                                       
+       |              |        ***************************************
+       |              |       * DEV: develop declares hos contribute  *
+       |              .       *      is ready to be merged into       *
+       |             /        *      INT/develop and pushed to origin *
+       |            /          ***************************************
+                   /                                        
+       B -----<---'                                         
+                                           
+       |                                
+       |                                
+

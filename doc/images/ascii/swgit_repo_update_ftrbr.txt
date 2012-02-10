@@ -1,0 +1,48 @@
+::
+
+         '''''''''''''''''''''''''''''
+          Before pull from FTR branch
+         .............................
+
+
+    origin/develop         local develop branch
+          |                       |
+          v                       v
+
+                                        FTR branch
+                                          |
+          |                       |       V
+                                   
+      .-<-X                       X -->--.                
+     '                                    '            
+    |     |                               |     Before pull, your local branch
+    c     |                               A     is here, after pull, 
+    |     |                                     it will be merge with develop
+    .                                           contributes
+     '--> Y                            
+                                   
+
+         ''''''''''''''''''''''''''''
+          After pull from FTR branch
+         ............................
+
+
+    origin/develop         local develop branch
+          |                       |
+          v                       v
+          
+
+          |                       |
+                                   
+      .-<-X                  .-<- X -->--.                
+     '                      '             '            
+    |     |     pull       |      |       | 
+    c     v     --->       c      v       A 
+    |     |                |      |       | 
+    |     |                |      |       v 
+    .                      .              |     'B' is the merge commit generated
+     '--> Y                 '-->  Y --->  B     in order to update your local 
+                                                brannch with contributes from
+                                                origin/develop
+                                   
+                                   

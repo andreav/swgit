@@ -1,0 +1,1 @@
+../infocmd.rst

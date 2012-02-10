@@ -1,0 +1,14 @@
+#!/bin/bash
+
+export PS1="\[\e[1;32m\]\u\[\e[m\]@\h \[\e[1;34m\]\w\[\e[m\] \[\e[1;32m\](\$( git rev-parse --show-toplevel 1>/dev/null 2>&1 && git rev-parse --abbrev-ref HEAD 2>/dev/null || echo -n ""))\[\e[m\] > "
+
+export SWGIT_HOME=$( dirname $( readlink -e "${BASH_SOURCE[0]}" ) )
+
+#ADD PATH OF SCRIPT AT ENV PATH 
+export PATH=$SWGIT_HOME:$PATH
+
+#SWGIT BASH AUTOCOMPLETION
+SWCFG_METAVAR_EXPAND="YES"
+SWCFG_GITNATIVE_AUTOCOMPLETE="YES"
+[ -f $SWGIT_HOME/scripts/swgit-completion.bash ] && . $SWGIT_HOME/scripts/swgit-completion.bash
+

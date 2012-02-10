@@ -1,0 +1,75 @@
+::
+
+         ''''''''''''''''''''''''''
+          Before push from develop
+         ..........................
+
+
+    origin/develop         local develop branch
+          |                       |
+          v                       v
+
+                                        FTR branch
+                                          |
+          |                       |       V
+                                   
+     .-<- X                       X -->--.                
+    '                                     '            
+   |      |                       |       |     
+   c      v                       v       A     
+   |      |                       |       |     
+   .                                      .
+    '-->  Y                       B <----'
+
+
+         '''''''''''''''''''''''''
+          After push from develop
+         .........................
+
+
+                                local develop branch
+                                       |
+        *********                      v
+       * PHASE 1 *
+        *********                            FTR branch
+                                               |
+                                       |       V
+                                        
+        First pull form       .-<----- X ----->--.                
+          origin and         '      /    \        '            
+           update           |      |      |       |     
+          -------->         c      |      |       A     
+           local            |      |      |       |     
+          repository        .                     .
+                             '-->  Y      B <----'
+                                    
+                                   |      |
+                                   |      |
+                                   '      '
+                                    \    /
+                                       Z 
+
+
+
+       origin develop branch
+              |
+              v                      *********
+                                    * PHASE 2 *
+                    FTR branch       *********
+                      |
+              |       V
+               
+     .-<----- X ----->--.        Then actually 
+    '      /    \        '        push on origin
+   |      |      |       |         result from your
+   c      |      |       A     <-----------
+   |      |      |       |          local repository
+   .                     .
+    '-->  Y      B <----'
+           
+          |      |
+          |      |
+          '      '
+           \    /
+              Z 
+

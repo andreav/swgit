@@ -1,0 +1,29 @@
+
+::
+
+       1/0/0/0/andreav/INT/stable         1/0/0/0/user/CST/acustomer
+                 |                                  |                 
+                 V                                  V               |     
+                                                                    | time  
+                 |                                 |                v     
+                 | INT/stable/STB/Drop.A           | 
+                 | INT/stable/LIV/Drop.A           | 
+   -->>----------+---------------.                 |
+                /|                '------->>-------X  CST/acustomer/LIV/Drop.A
+               / |                                 |
+              /  |                                 |
+   ----<<----'   |                                 |
+                 |                                 |                                       
+                 |                                 |
+                 |                                 |
+                 | INT/stable/STB/Drop.B           |
+                 | INT/stable/LIV/Drop.B           |
+   -->>----------+---------------.                 |
+                /|                '------->>-------X CST/acustomer/LIV/Drop.B
+               / |                                 | 
+              /  |                                 |
+   ----<<----'   |                                 |
+                 |                                 |
+                                                   |
+
+

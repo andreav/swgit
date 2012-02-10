@@ -1,0 +1,34 @@
+
+::
+
+    1/0/0/0/andreav/INT/develop
+             |                                          |
+             V                                          | time
+                                                        v
+             |                        
+             |   1/0/0/0/user/FTR/topic/NEW/BRANCH
+                                                                             
+             A ----->---.
+                         \
+             |            \
+             |             \
+             |              X
+             |              |         
+             |              |
+             |              Y  1/0/0/0/user/FTR/topic/FIX/1234567
+             |              |
+             |              |       
+   origin    |              Z  1/0/0/0/user/FTR/topic/DEV/000
+      \      |              |  1/0/0/0/user/FTR/topic
+       \                    |                                       
+        '->> B              |                                    
+                            |
+             |              .
+    origin   |             /                                       
+       \     |            /                                       
+        \                /                                        
+         '<< C -----<---'                                         
+                                                 
+             |                                
+             |                                
+   

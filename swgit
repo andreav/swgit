@@ -1,0 +1,318 @@
+#!/usr/bin/env python
+
+# Copyright (C) 2012 Andrea Valle
+#
+# This file is part of swgit.
+#
+# swgit is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# swgit is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with swgit.  If not, see <http://www.gnu.org/licenses/>.
+
+import string
+import sys,os,datetime
+import subprocess
+import core.MyCmd
+
+def checkVersions():
+
+  if sys.version_info <  (2, 4, 3):
+    print "Mininum python version supported is: 2.4.3"
+    return 1
+
+  cmd = "git version | cut -d ' ' -f 3"
+  out, errCode = core.MyCmd.myCommand_fast( cmd )
+  if errCode != 0:
+    print "\tERROR: Not a clone repository"
+    print "FAILED - not critical"
+    return 1
+
+  gitVer = map(int, out[:-1].split('.'))
+  if gitVer < [1,7,1]:
+    print "Mininum git version supported is: 1.7.1"
+    return 1
+
+  return 0
+
+
+#
+# IMPORTANT
+#
+ret = checkVersions()
+if ret != 0:
+  sys.exit(0)
+
+
+import core.Defines
+import core.Common
+import core.ObjEnv
+import core.GitBranch
+import core.GitClone
+import core.GitCommit
+import core.GitLock
+import core.GitMerge
+import core.GitPull
+import core.GitPush
+import core.GitStabilize
+import core.GitTag
+import core.ObjKey
+import core.GitInit
+import core.GitUndo
+import core.GitInfo
+import core.GitCheckout
+import core.GitProj
+
+
+command2script = {
+  "branch"    : [ core.GitBranch,    "Manage branches" ],
+  "clone"     : [ core.GitClone,     "Clone repository" ],
+  "commit"    : [ core.GitCommit,    "Commit your work" ],
+  "lock"      : [ core.GitLock,      "Manually Lock/Unlock \"origin\" repository" ],
+  "merge"     : [ core.GitMerge,     "Merge reference on current branch" ],
+  "pull"      : [ core.GitPull,      "Pull others contributes from \"origin\"" ],
+  "push"      : [ core.GitPush,      "Push your contributes on \"origin\"" ],
+  "stabilize" : [ core.GitStabilize, "Stabilize work and evaluates changelogs" ],
+  "tag"       : [ core.GitTag,       "Tagging management" ],
+  "key"       : [ core.ObjKey,       "SSH key management" ],
+  "init"      : [ core.GitInit,      "Create new swgit repository, convert git native to swgit repository or create CST branch" ],
+  "undo"      : [ core.GitUndo,      "Undo file modifications" ],
+  "info"      : [ core.GitInfo,      "Retrieve many useful infos about files, label,changelogs ... " ],
+  "checkout"  : [ core.GitCheckout,  "Create branch, change Working Dir, Undo files, resolve merge conflicts" ],
+  "proj"      : [ core.GitProj,      "Manage swgit projects" ],
+}
+
+g_readmes = [
+    "references.txt",
+    "arch.txt",
+    "init.txt",
+    "devel.txt",
+    "update.txt",
+    "stabilize.txt",
+    "customtags.txt",
+    "mailcfg.txt",
+    "snapshot.txt",
+    "info.txt",
+    "proj.txt",
+    ]
+
+
+def log( msg, noSlim=False ):
+
+  log_base = "%s/%s/%s" % ( core.ObjEnv.Env.getLocalRoot( fexit = False ), core.Defines.SWDIR_LOG, core.ObjEnv.Env.getCurrUser() )
+  logSlim        = "%s_slim.log" % log_base
+  logFull        = "%s_full.log" % log_base
+
+  now = datetime.datetime.now()
+  msg="%s - %-8s - %s" % ( now.strftime("%Y-%m-%d %H:%M:%S"), "INFO", msg )
+  msg=msg.replace("'","")
+  msg=msg.replace("$","\$")
+  msg=msg.replace("\"","\\\"")
+
+  cmdlogSlim = "echo \"%s\" >> %s ;" % ( msg, logSlim )
+  cmdlogFull = "echo \"%s\" >> %s ;" % ( msg, logFull )
+
+  if noSlim == False:
+    out, errCode = core.MyCmd.myCommand_fast( cmdlogSlim )
+  out, errCode = core.MyCmd.myCommand_fast( cmdlogFull )
+
+
+def myCommandPrintLog( cmd ):
+  log(cmd)
+  out, retcode = core.MyCmd.myCommand_fast( cmd )
+
+  print out[:-1]
+  
+  log("\n"+core.Common.indentOutput(out[:-1],1),noSlim=True)
+  if retcode != 0:
+    log("FAILED")
+  else:
+    log("DONE")
+
+  return ( out, retcode )
+ 
+
+def update( base ):
+  print "Updating Scripts repository ..."
+  cmd = "cd %s && git config --get remote.origin.url" % base
+  
+  out, errCode = core.MyCmd.myCommand_fast( cmd )
+  if errCode != 0:
+    print "\tERROR: Not a clone repository"
+    print "FAILED - not critical"
+    sys.exit(0)
+
+ 
+  currUser = pwd.getpwuid( os.getuid() )[0]
+  cmd = "cd %s && stat -c %%U %s/.git" % ( base, base )
+  out, errCode = core.MyCmd.myCommand_fast( cmd )
+  scriptUser = out[ : -1 ]
+
+  if scriptUser !=  currUser: 
+    print "\tError: User issueing --update must be the owner of this repository" 
+    print "FAILED"
+    sys.exit(1)    
+
+  str_err = "Cannot update this swgit repository. Please contact andrea.valle@alcatel-lucent.com or nicola.capano@alcatel-lucent.com"
+  #use swgit itself
+  out, errCode = core.MyCmd.myCommand_fast( "swgit branch -i" )
+  print out[:-1]
+  if errCode != 0:
+    print str_err
+    sys.exit(1)
+
+  out, errCode = core.MyCmd.myCommand_fast( "swgit pull" )
+  print out[:-1]
+  if errCode != 0:
+    print str_err
+    sys.exit(1)
+
+  out, errCode = core.MyCmd.myCommand_fast( "swgit info -t LIV | grep upstream | cut -f 2" )
+  if errCode != 0:
+    print str_err
+    sys.exit(1)
+
+  out, errCode = core.MyCmd.myCommand_fast( "swgit branch -s %s" % out[:-1] )
+  print out[:-1]
+  if errCode != 0:
+    print str_err
+    print out
+    sys.exit(1)
+
+  return 0
+
+    
+def version( base ):
+  # tags/1.0/0.0/hudson/INT/stable/LIV/DROP.AA
+  # sometimes does not work...boh...
+  #cmd = "git name-rev --tags HEAD --refs '*/LIV/*'"
+  cmd = "cd %s && git describe --long HEAD --tags  --match '*/LIV/*'" % base
+  out, errCode = core.MyCmd.myCommand_fast( cmd )
+  if out.find("HEAD undefined") != -1:
+    print "Error: retrive version failed"  
+    sys.exit(1)
+
+  if out.rfind('~') != -1:
+    out = out[ : out.rfind('~') ]
+  if out.rfind('^') != -1:
+    out = out[ : out.rfind('^') ]
+
+
+  out = out[ : out.find("-") +1 ]
+  out = out[ : out.find("-")  ]
+
+  values = out.split( '/' )
+
+  print "swgit version R%s.%s.%s.%s-%s" % (values[0],values[1],values[2],values[3],values[8])
+  print "Configuration Control Toolkit git-based"
+
+
+
+def usage():
+  print "\nConfiguration Control Toolkit git-based\n"
+
+  for r in g_readmes:
+    print "  swgit --tutorial-" + r
+
+  print """
+  swgit --version
+  swgit --update
+  
+  swgit <subcommand> <options>
+
+<subcommand> is one among (and any <subcommand> has its on help)
+"""
+  out = ""
+  for c in command2script.keys():
+    out += "  " + c.ljust( 15 ) + command2script[c][1] + "\n"
+  print out
+  sys.exit(0)
+
+
+def main():
+  
+  if len( sys.argv ) == 1:
+    usage()
+    sys.exit(0)
+
+  base = os.path.abspath( os.path.dirname(sys.argv[0] ) ) + "/"
+  subcmd = sys.argv[1]
+
+  if sys.argv[1][0] == "-":
+
+    #tut management
+    readme_list =  []
+    for r in g_readmes:
+      readme_list.append( "--tutorial-%s" % r )
+    for t in readme_list:
+      if t in sys.argv :
+        base = sys.argv[0][0:sys.argv[0].rfind("/")+1] 
+        ret = os.system( "cat %s/doc/readme/_build/text/readme.%s" % ( base, t[ t.rfind('-') +1 : ] ) )
+        sys.exit(0)
+
+    if sys.argv[1] in ["--help", "-h"]:
+      usage()
+      sys.exit(0)
+
+    if "--update" in sys.argv :
+      update( base )
+      sys.exit(0)
+    
+    if "--version" in sys.argv :
+      version( base )
+      sys.exit(0)
+
+    print "Arguments error, unknow option " + sys.argv[1]
+    sys.exit(1) 
+
+  #
+  # exe command
+  #
+  git_ssh = "%s/scripts/ssh-wrapper.sh" % base
+  os.environ['GIT_SSH'] = git_ssh
+
+  del sys.argv[0]
+
+  if subcmd in command2script.keys():
+
+    #this avoids invoking interpreter on file.py
+    ret = command2script[subcmd][0].main()
+    if( ret != 0 ):
+      sys.exit( 1 )
+    sys.exit( 0 )
+
+  else:
+
+    fwd_args = [ 'git' ] + sys.argv
+
+    log( "%s" % " ".join(fwd_args) )
+
+    out, ret = core.MyCmd.myCommand_fast( fwd_args, shell = False )
+    print out[:-1]
+    
+    log("\n"+out[:-1],noSlim=True)
+
+    if ret != 0:
+      log("FAILED")
+      sys.exit( 1 )
+    log("DONE")
+
+  sys.exit(0)
+
+
+if __name__ == "__main__":
+  main()
+
+
+
+
+
+
+

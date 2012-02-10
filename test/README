@@ -1,0 +1,36 @@
+1.  In order to Launch everithing, execute
+
+  all_tests_runner.py
+
+
+2. In order to execute all tests from one kind, execute (for instance)
+
+  test_branch.py
+
+3. In order to execute 1 special test inide a suite, execute
+
+  python test_branch.py -v Test_Branch.test_Branch_02_00_Create
+  python test_branch.py -v Test_Branch.test_Branch_02_00_Create --debug
+  ./test_branch.py -v Test_Branch.test_Branch_02_00_Create --debug
+
+  or
+
+  all_tests_runner.py -l <testnum>
+   and cut&paste desired line.
+
+4. Profiling
+
+  python -m cProfile core/GitBranch.py -l
+  python -m cProfile  -s time  core/GitBranch.py -l
+
+  Values for -s (sort) option are:
+    'calls' 	    call count
+    'cumulative' 	cumulative time
+    'file' 	      file name
+    'module' 	    file name
+    'pcalls' 	    primitive call count
+    'line' 	      line number
+    'name' 	      function name
+    'nfl' 	      name/file/line
+    'stdname' 	  standard name
+    'time' 	      internal time

@@ -1,0 +1,18 @@
+#
+# common
+#
+.swdir/log/*
+!.swdir/log/.placeholder
+*~
+*.swp
+*.pyc
+!.gitattributes
+
+#
+# project specific
+#
+test/SANDBOX/*
+test/LOGS/*
+test/SANDBOX_777/*
+doc/_build/*
+doc/readme/_build/doctrees/*
