@@ -37,16 +37,8 @@ class ObjKey:
     self.user_         = user
     self.addr_         = addr
 
-    # HOME DIRECOTRY => use ~
-    #   because 
-    #     $HOME depends only on UID
-    #   but
-    #     when UID != EUID => ~ looks on the right direcotry (that of EUID)
-    euid_home = "~%s" % pwd.getpwuid( os.geteuid() )[0]
-    euid_home = os.path.expanduser( euid_home )
-
-    self.ssh_key_priv_ = "%s/.ssh/%s" % (euid_home, SWGIT_SSHKEY )
-    self.ssh_key_pub_  = self.ssh_key_priv_ + ".pub"
+    self.ssh_key_priv_ = SWGIT_SSH_IDENTITY_NOPASS_PRIV
+    self.ssh_key_pub_  = SWGIT_SSH_IDENTITY_NOPASS_PUB
 
   def get_user( self ):
     return self.user_

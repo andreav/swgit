@@ -114,3 +114,46 @@ DEVELOP
 
 
 * init --git-user resotra il vecchio user alla fine del comando (non lo setta in locale)
+
+* ssh:
+
+    1. toglierlo dalla clone
+
+    2. ssh -i posso metterne piu' di una??Direi di si.
+       cosi' se ho piu' repo posso caricare le identita' per tutti i remote
+
+    3. ssh-wrapper.sh controlla che ci sia qualche git config swgit.ssh.identity.1 .2 ...
+       da usare.
+
+         * ssh.identity.*
+
+            per ognuna, ssh-wrapper crea un'opzione "-i <identita'>" da passare all'exec
+
+         * ssh.identity.default true/false 
+
+            decide se  appendo anche quella li
+
+            se non la trova, default e' true => 
+            dal momento che la creo la uso senza dover fare altro
+
+         .. note::
+            se l'identita' non esiste, viene semplicemente ignorata
+
+    4. swgit key:
+
+         :-i: mi dice se ho l'identita' di default creata.
+
+              come e' configurato l'ssh => stampa quali chiavi sta usando tipo:
+               ssh -i .....
+
+         :-c: crea le chiavi come c'e' gia' oggi
+
+         :-t: testa l'accesso a quel repo
+              Cosa vuol dire??
+
+              | se mi dici user host => provo un exit 0?
+              | se mi dici repo      => provo tipo git rev-parse HEAD?
+
+              Questa opizione e' un po piu' difficile da fare...da capire!
+
+

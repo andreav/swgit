@@ -32,29 +32,27 @@ class ObjMailBase( ObjCfgMail ):
 #   swgit --tutorial-mailcfg
 # for more informations
 #
-#[STABILIZE]
-#MAILSERVER-SSHUSER = 
-#MAILSERVER-SSHADDR = 
-#FROM               = 
-#TO                 = 
-#TO                 = 
-#CC                 = 
-#BCC                = 
-#SUBJECT            = 
-#BODY-HEADER        = 
-#BODY-FOOTER        = 
+#[stabilize]
+#mailserver-sshuser = 
+#mailserver-sshaddr = 
+#from               = 
+#to                 = 
+#cc                 = 
+#bcc                = 
+#subject            = 
+#body-header        = 
+#body-footer        = 
 #
-#[PUSH]
-#MAILSERVER-SSHUSER = 
-#MAILSERVER-SSHADDR = 
-#FROM               = 
-#TO                 = 
-#TO                 = 
-#CC                 = 
-#BCC                = 
-#SUBJECT            = 
-#BODY-HEADER        = 
-#BODY-FOOTER        = 
+#[push]
+#mailserver-sshuser = 
+#mailserver-sshaddr = 
+#from               = 
+#to                 = 
+#cc                 = 
+#bcc                = 
+#subject            = 
+#body-header        = 
+#body-footer        = 
 """
 
   def __init__( self, file, section ):
@@ -125,7 +123,7 @@ class ObjMailBase( ObjCfgMail ):
 ################
 class ObjMailStabilize( ObjMailBase ):
   def __init__( self ):
-    super(ObjMailStabilize, self ).__init__( SWFILE_MAILCFG, SWFILE_MAILCFG_STABILIZE_SECT )
+    super(ObjMailStabilize, self ).__init__( SWFILE_MAILCFG, SWCFG_MAIL_STABILIZE_SECT )
     self.load_cfg()
 
 #############
@@ -133,10 +131,10 @@ class ObjMailStabilize( ObjMailBase ):
 #############
 class ObjMailPush( ObjMailBase ):
   def __init__( self ):
-    super(ObjMailPush, self ).__init__( SWFILE_MAILCFG, SWFILE_MAILCFG_PUSH_SECT )
+    super(ObjMailPush, self ).__init__( SWFILE_MAILCFG, SWCFG_MAIL_PUSH_SECT )
 
     #override "to"
-    self.fields_mandatory_[1] = [self.set_to, self.get_to, "to" , SWFILE_MAILCFG_TO, GITCFG_USERMAIL ]
+    self.fields_mandatory_[1] = [self.set_to, self.get_to, "to" , SWCFG_MAIL_TO, GITCFG_USERMAIL ]
 
     self.load_cfg()
 

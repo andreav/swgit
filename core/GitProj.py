@@ -159,10 +159,10 @@ def write_snapshotfile_addindex( proot, reponame, url, branch ):
 
   #create section
   #config.add_section( reponame )
-  #config.set( reponame, SWFILE_SNAPCFG_URL   ,    url     )
-  #config.set( reponame, SWFILE_SNAPCFG_BRANCH,    branch  )
-  #config.set( reponame, SWFILE_SNAPCFG_ALWAYSUPD, "False" )
-  new_cont = "[%s]\n%s = %s\n%s = %s\n" % ( reponame, SWFILE_SNAPCFG_URL, url, SWFILE_SNAPCFG_BRANCH, branch )
+  #config.set( reponame, SWCFG_SNAP_URL   ,    url     )
+  #config.set( reponame, SWCFG_SNAP_BRANCH,    branch  )
+  #config.set( reponame, SWCFG_SNAP_ALWAYSUPD, "False" )
+  new_cont = "[%s]\n%s = %s\n%s = %s\n" % ( reponame, SWCFG_SNAP_URL, url, SWCFG_SNAP_BRANCH, branch )
   cmd_echo = "echo '%s' >> %s" % (new_cont, filename)
   ret = os.system( cmd_echo )
   if ret != 0:

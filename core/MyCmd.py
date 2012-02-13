@@ -23,8 +23,10 @@
 import subprocess
 import os,time,sys,pwd,socket,re
 
-from Defines import *
 import OldPython
+
+from Defines import *
+import ObjCfg
 
 #general purpose command.
 def myCommand_fast( cmd, shell = True ):
@@ -123,16 +125,12 @@ def myCommand_fast_longoutput( cmd, shell = True ):
 
 
 
-def mySSHCommand_fast( cmd, user, address ):
-  # HOME DIRECOTRY => use ~
-  #   because 
-  #     $HOME depends only on UID
-  #   but
-  #     when UID != EUID => ~ looks on the right direcotry (that of EUID)
-  euid_home = "~%s" % pwd.getpwuid( os.geteuid() )[0]
-  euid_home = os.path.expanduser( euid_home )
-  ssh_key = "%s/.ssh/swgit_sshKey" % euid_home
-  cmd = "ssh -i %s %s@%s ' %s '" % ( ssh_key, user, address, cmd )
+def mySSHCommand_fast( cmd, user, address, options = "" ):
+
+  objSsh = ObjCfg.ObjCfgSsh()
+
+  cmd = "%s -T %s %s@%s ' %s '" % ( objSsh.eval_git_ssh_envvar_str(), options, user, address, cmd )
+  #print cmd
   out, errCode = myCommand_fast( cmd )
   return (out, errCode)
   

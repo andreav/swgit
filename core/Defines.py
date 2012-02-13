@@ -17,13 +17,32 @@
 # You should have received a copy of the GNU General Public License
 # along with swgit.  If not, see <http://www.gnu.org/licenses/>.
 
-import time, sys, os
+import time, sys, os, pwd
+
+# HOME DIRECOTRY => use ~
+#   because 
+#     $HOME depends only on UID
+#   but
+#     when UID != EUID => ~ looks on the right direcotry (that of EUID)
+EUID_NAME = "%s" % pwd.getpwuid( os.geteuid() )[0]
+EUID_HOME = "~%s" % EUID_NAME
+EUID_HOME = os.path.expanduser( EUID_HOME )
+
+SWGIT_SSH_IDENTITY_NOPASS_NAME = "swgit_sshid_nopass"
+SWGIT_SSH_IDENTITY_NOPASS_PRIV = "%s/.ssh/%s" % (EUID_HOME, SWGIT_SSH_IDENTITY_NOPASS_NAME)
+SWGIT_SSH_IDENTITY_NOPASS_PUB  = "%s.pub"     % (SWGIT_SSH_IDENTITY_NOPASS_PRIV)
+
+#Ssh
+SWCFG_SSH_SECT             = "ssh"
+SWCFG_SSH_BIN              = "bin"
+SWCFG_SSH_IDENTITY         = 'identity'
+SWCFG_SSH_USE_NOPASS_ID    = "use-nopassw-id"
+SWCFG_SSH_TESTACCESS_TIMEOUT   = 10
 
 #script files
 SWGIT = os.path.abspath( os.path.dirname( os.path.abspath( __file__ ) ) + "/../swgit" )
 SWGIT_DIR = os.path.abspath( os.path.dirname( os.path.abspath( __file__ ) ) + "/.." )
 
-SWGIT_SSHKEY = "swgit_sshKey"
 
 #repo files
 SWREPODIR               = ".swdir/"
@@ -43,8 +62,10 @@ SWFILE_BRANCH_LAST      = SWDOTGIT + "swgit_last_br"
 SWFILE_DEFBR            = SWDIR_CFG + "default_int_branches.cfg"
 SWFILE_TAGDESC          = SWDIR_CFG + "custom_tags.cfg"
 SWFILE_SNAPCFG          = SWDIR_CFG + "snapshot_repos.cfg"
+SWFILE_MAILCFG          = SWDIR_CFG + "mail.cfg"
 SWFILE_SNAPCFG_CURRVER  = ".swgit_curr_ver.sha"
 SWFILE_SNAPCFG_GOTFNAME = ".swgit_expand_this"
+SWFILE_GENERICCFG       = SWDIR_CFG + "generic.cfg"
 
 SWNAME_ORIGIN_REMOTE = "origin"
 
@@ -84,28 +105,27 @@ SWCFG_TAG_NEWREGEXP      = "^BRANCH$"
 SWCFG_TAG_LIVREGEXP      = '^Drop\.[A-Z]{1,3}(_[0-9]{1,3})?$'
 
 #mailcfg
-SWFILE_MAILCFG                    = SWDIR_CFG + "mail.cfg"
-SWFILE_MAILCFG_STABILIZE_SECT     = "STABILIZE"
-SWFILE_MAILCFG_PUSH_SECT          = "PUSH"
-SWFILE_MAILCFG_MAILSERVER_SSHUSER = "MAILSERVER-SSHUSER"
-SWFILE_MAILCFG_MAILSERVER_SSHADDR = "MAILSERVER-SSHADDR"
-SWFILE_MAILCFG_FROM               = "FROM"
-SWFILE_MAILCFG_TO                 = "TO"
-SWFILE_MAILCFG_CC                 = "CC"
-SWFILE_MAILCFG_BCC                = "BCC"
-SWFILE_MAILCFG_SUBJ               = "SUBJECT"
-SWFILE_MAILCFG_BODY_HEADER        = "BODY-HEADER"
-SWFILE_MAILCFG_BODY_FOOTER        = "BODY-FOOTER"
+SWCFG_MAIL_STABILIZE_SECT     = "stabilize"
+SWCFG_MAIL_PUSH_SECT          = "push"
+SWCFG_MAIL_MAILSERVER_SSHUSER = "mailserver-sshuser"
+SWCFG_MAIL_MAILSERVER_SSHADDR = "mailserver-sshaddr"
+SWCFG_MAIL_FROM               = "from"
+SWCFG_MAIL_TO                 = "to"
+SWCFG_MAIL_CC                 = "cc"
+SWCFG_MAIL_BCC                = "bcc"
+SWCFG_MAIL_SUBJ               = "subject"
+SWCFG_MAIL_BODY_HEADER        = "body-header"
+SWCFG_MAIL_BODY_FOOTER        = "body-footer"
 
-#snapcfg
-SWFILE_SNAPCFG_URL       = "URL"
-SWFILE_SNAPCFG_BRANCH    = "BRANCH"
-SWFILE_SNAPCFG_AR_FORMAT = "AR-TYPE"
-SWFILE_SNAPCFG_AR_TOOL   = "AR-TOOL"
-#SWFILE_SNAPCFG_ALWAYSUPD = "ALWAYS-UPDATE"
+#SNAPCfg
+SWCFG_SNAP_URL       = "url"
+SWCFG_SNAP_BRANCH    = "branch"
+SWCFG_SNAP_AR_FORMAT = "ar-type"
+SWCFG_SNAP_AR_TOOL   = "ar-tool"
 
 #sw cfg defines
 SWCFG_PREFIX           = "swgit"
+SWCFG_LIST_REGEXP      = "\(-[0-9]+\)?"
 SWCFG_UNSET            = "swgit_unset_cfg"
 SWCFG_INTBR            = SWCFG_PREFIX + ".intbranch"
 SWCFG_STABILIZE_ANYREF = SWCFG_PREFIX + ".stabilize-anyref"
@@ -113,7 +133,6 @@ SWENV_PREFIX           = "SWGIT_"
 
 
 #sw custom tags defines
-SWCFG_KEY_TAGDSC_LIST_DELIMITER = " &@& "
 #these are only config options
 SWCFG_KEY_TAGDSC_TAGTYPE                 = ".tagtype."
 #these are all file or config options

@@ -409,7 +409,7 @@ class TagFIXDsc( TagDsc ):
     super(TagFIXDsc, self ).__init__( self.type_, loadcfg = False )
 
     self.set_fields_mandatory( [] )
-    self.set_fields_optional( self.get_regexp_optional_field( "^Issue[0-9]{5}$%s^[0-9]{7}$" % SWCFG_KEY_TAGDSC_LIST_DELIMITER ) +
+    self.set_fields_optional( self.get_regexp_optional_field( ["^Issue[0-9]{5}$", "^[0-9]{7}$" ] ) +
                               self.get_hook_optional_field_default() )
 
     self.load_cfg()
