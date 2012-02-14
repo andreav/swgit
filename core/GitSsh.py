@@ -32,7 +32,7 @@ DEFAULT_SSH_CFG = """\
 #
 #[ssh]
 #bin            = (default: ssh)
-#identity-1     = An private identity to be provided
+#identity-1     = A private identity to be provided
 #identity-2     =      "              "
 # ... 
 #use-nopassw-id = True/False: use default no-passw identity, if created

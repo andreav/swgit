@@ -21,7 +21,6 @@ import string
 from optparse import OptionParser
 import sys,os,stat
 
-from ObjKey import *
 from Utils_Submod import *
 
 dbg = False
@@ -67,78 +66,23 @@ Usage: swgit clone [-b <intbr>] [--integrator] [-recurse] <src-url> [<dst-path>]
     print "ERROR: Too many arguments."
     sys.exit( 1 )
 
-  #src
   src_url = args[0]
-  src_obj_remote = create_remote_byurl( src_url )
-  if not src_obj_remote.isValid():
-    print src_obj_remote
-    sys.exit( 1 )
-  if src_obj_remote.getType() != "ssh" and src_obj_remote.getType() != "fs" :
-    print "ERROR: at the moment, only ssh (ssh://user@addr/path/to/repo) or fs (/path/to/repo) urls supported"
-    sys.exit( 1 )
 
-  #dest
   if len( args ) == 1:
-    dest = os.path.basename( src_obj_remote.getRoot() )
+    dest = os.path.basename( src_url )
   else:
     dest = args[1]
-  dest = os.path.abspath( dest )
 
-  #branch
   branch = ""
   if options.branch != None:
     branch = options.branch
 
   dbg = options.debug
 
-  log_clone( "Cloning repository " + src_obj_remote.getUrl() + " into " + dest + " ... " )
-  log_clone_dbg( "src_user        : %s" % (src_obj_remote.getUser()) )
-  log_clone_dbg( "src_addr        : %s" % (src_obj_remote.getAddress()) )
-  log_clone_dbg( "src_path        : %s" % (src_obj_remote.getRoot()) )
+  log_clone( "Cloning repository " + src_url + " into " + dest + " ... " )
   log_clone_dbg( "branch          : %s" % (branch) )
   log_clone_dbg( "dest            : %s" % (dest) )
   log_clone_dbg( "integrator_repo : %s" % (options.integrator_repo) )
-
-  #
-  # Dest exists
-  #
-  if os.path.exists( dest ) == True :
-    if len(os.listdir(dest)) > 0 :
-      log_clone( "  ERROR: \n    The directory " + dest + " already exists" )
-      log_clone( "FAILED" )
-      sys.exit( 1 )
-
-  #
-  # ssh key management
-  #
-  if src_obj_remote.getType() == "ssh":
-
-    objKey = ObjKey( src_obj_remote.getUser(), src_obj_remote.getAddress() )
-
-    out, errCode = objKey.is_reachable()
-    if errCode != 0:
-      log_clone( indentOutput( out, 1 ) )
-      log_clone( "FAILED" )
-      sys.exit( 1 )
-
-    if objKey.create_and_copy() != 0:
-      strerr  = "FAILED: cannot create/copy swgit pub key onto host \"%s\" with user \"%s\" via ssh.\n" % \
-                         ( src_obj_remote.getAddress(), src_obj_remote.getUser() )
-      strerr += "        Please use 'swgit key %s %s' command to investigate" % ( src_obj_remote.getUser(), src_obj_remote.getAddress() )
-      log_clone( indentOutput( strerr, 1 ) )
-      sys.exit( 1 )
-    
-#    #check remote user,
-#    # very important for push
-#    # not allowed clone with users != repo owner.
-#    chk_param = "\"\""
-#    cmd_remote_checkes = "%s/scripts/checkRemote_skel.py %s %s %s %s | ssh %s@%s 'exec python' " % \
-#        ( SWGIT_DIR , src_obj_remote.getRoot(), src_obj_remote.getUser(), branch, chk_param, src_obj_remote.getUser(), src_obj_remote.getAddress() )
-#    out, errCode = myCommand_fast( cmd_remote_checkes )
-#    if errCode != 0:
-#      log_clone( out  )
-#      log_clone( "FAILED" )
-#      sys.exit( 1 )
 
   #
   # Clone
@@ -147,8 +91,7 @@ Usage: swgit clone [-b <intbr>] [--integrator] [-recurse] <src-url> [<dst-path>]
   if branch != "":
     opt_branch = "-b " + branch
 
-
-  cmd_clone="\tgit clone %s %s %s" % ( src_obj_remote.getUrl(), opt_branch, dest )
+  cmd_clone="\tgit clone %s %s %s" % ( src_url, opt_branch, dest )
   log_clone( cmd_clone )
 
   out, retcode = myCommand_fast( cmd_clone )

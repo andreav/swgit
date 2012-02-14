@@ -20,7 +20,6 @@
 import ConfigParser
 
 from Common import *
-from ObjKey import * 
 from ObjStatus import * 
 #from ObjLog import help_mac
 from ObjBranch import *
@@ -52,41 +51,6 @@ def check_BRexists_and_WDclean( dir ):
     return 1, errstr
 
   return 0, ""
-
-
-def checkRepo( url, branch, chk=None ):
-  src_obj_remote = create_remote_byurl( url )
-  if not src_obj_remote.isValid():
-    GLog.f( GLog.E, str(src_obj_remote) )
-    return 1
-  if src_obj_remote.getType() != "ssh" and src_obj_remote.getType() != "fs" :
-    GLog.f( GLog.E, "ERROR: at the moment, only ssh (ssh://user@addr/path/to/repo) or fs (/path/to/repo) urls supported " )
-    return 1
-
-  errCode = 0
-
-  #
-  # ssh key management
-  #
-  if src_obj_remote.getType() == "ssh":
-
-    GLog.s( GLog.S, "Remote login password maybe asked during this operation ... " )
-
-    objKey = ObjKey( src_obj_remote.getUser(), src_obj_remote.getAddress() )
-
-    out, errCode = objKey.is_reachable()
-    if errCode != 0:
-      GLog.f( GLog.E, indentOutput( out, 1 ) )
-      return 1
-
-    if objKey.create_and_copy() != 0:
-      strerr  = "FAILED: cannot create/copy swgit pub key onto host \"%s\" with user \"%s\" via ssh." % \
-                         ( src_obj_remote.getAddress(), src_obj_remote.getUser() )
-      strerr += "        Please use 'swgit key %s %s' command to investigate" % ( src_obj_remote.getUser(), src_obj_remote.getAddress() )
-      GLog.f( GLog.E, indentOutput( strerr, 1 ) )
-      return 1
-
-  return errCode
 
 
 def write_swdefbr_addindex_config( proot, reponame, branch ):
@@ -515,10 +479,6 @@ Usage: swgit proj --add-repo [-b branch] [--snapshot] <url> [<localname>]
     ret, errstr = check_BRexists_and_WDclean( Env.getLocalRoot() )
     if ret != 0:
       GLog.f( GLog.E, errstr )
-      sys.exit( 1 )
-
-    ret = checkRepo( proj_url, options.proj_branch )
-    if ret != 0:
       sys.exit( 1 )
 
     GLog.s( GLog.S, "Adding section %s to project %s" % ( repo_name , Env.getLocalRoot() ) )
