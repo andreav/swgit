@@ -21,8 +21,12 @@ import ConfigParser
 from Defines import *
 import MyCmd
 
+_list_str_true_bool = ("yes", "true", "t", "1" )
+_list_str_false_bool = ( "no", "false", "f", "0")
+def strISbool(v):
+  return v.lower() in _list_str_true_bool or v.lower() in _list_str_false_bool
 def str2bool(v):
-  return v.lower() in ("yes", "true", "t", "1")
+  return v.lower() in _list_str_true_bool
 
 ##########
 # OBJCFG #
@@ -54,7 +58,7 @@ class ObjCfg( object ):
     self.config_  = ConfigParser.RawConfigParser()
     try:
       cmd = "git rev-parse --show-toplevel"
-      rroot, errCode = myCommand_fast( cmd )
+      rroot, errCode = MyCmd.myCommand_fast( cmd )
       if errCode != 0:
         rroot = ""
       rroot = rroot[:-1]
@@ -90,7 +94,8 @@ class ObjCfg( object ):
       #print ">> OPION: ", d, self.section_
       ret = self.load_field( False, ms, mg, k, hpa )
       if ret != 0:
-        ms( df )
+        if df != None:
+          ms( df )
 
 
   def isValid( self ):
@@ -167,16 +172,33 @@ class ObjCfg( object ):
     #print "read_cfg_field:", key, mandatory, fglobal
 
     val, errCode = MyCmd.get_repo_cfg( key, fglobal = fglobal )
+    if errCode != 0:
+      return "No config present", 1
 
-    if errCode == 0:
-      if val[:-1] == "":
-        if mandatory:
-          raise Exception( "Empty value not allowed for mandatory field %s in section %s" % ( key, self.section_ ) )
-        else:
-          return "Empty config present", 1
+    if val[:-1] == "":
+      if mandatory:
+        raise Exception( "Empty value not allowed for mandatory field %s in section %s" % ( key, self.section_ ) )
       else:
-        return val[:-1], 0
-    return "No config present", 1
+        return "Empty config present", 1
+
+    return val[:-1], 0
+
+
+  def read_cfg_field_bool( self, key, mandatory, fglobal = False ):
+
+    #print "read_cfg_field_bool:", key, mandatory, fglobal
+
+    val, errCode = self.read_cfg_field( key, mandatory, fglobal )
+    if errCode != 0:
+      return val, errCode
+
+    if not strISbool( val ):
+      if mandatory:
+        raise Exception( "Not valid bool value, please choose among: %s or %s" % (_list_str_true_bool, _list_str_false_bool) )
+      else:
+        return "Config not valid", 1
+
+    return str2bool( val ), 0
 
   def read_cfg_field_list( self, key, mandatory, fglobal = False ):
 
@@ -185,19 +207,26 @@ class ObjCfg( object ):
     # swgit.sect.key(-[0-9]+)?
     val, errCode = MyCmd.get_repo_cfg_regexp( "^%s%s$" % (key,SWCFG_LIST_REGEXP), fglobal = fglobal )
 
-    ret_list = []
-    if errCode == 0:
-      for line in val.splitlines():
-        (curr_key, curr_val) = line.split(' ')
-        if curr_val[:-1] == "":
-          if mandatory:
-            raise Exception( "Empty value not allowed for mandatory field %s in section %s" % ( curr_key, self.section_ ) )
-          else:
-            return "Empty config present", 1
-        ret_list.append( curr_val )
-      return ret_list, 0
+    if errCode != 0:
+      return "No config present", 1
 
-    return "No config present", 1
+    ret_list = []
+    for line in val.splitlines():
+      (curr_key, curr_val) = line.split(' ')
+      if curr_val[:-1] == "":
+        continue
+
+      ret_list.append( curr_val )
+
+    if len( ret_list ) == 0:
+      if mandatory:
+        raise Exception( "Empty value not allowed for mandatory field %s in section %s" % ( curr_key, self.section_ ) )
+      else:
+        return ret_list, 1
+
+    return ret_list, 0
+
+
 
   #
   # File methods
@@ -210,16 +239,34 @@ class ObjCfg( object ):
       val =  self.config_.get( self.section_, key ) #this will raise exception if not exists
       if val == "":
         if mandatory:
-          raise Exception( "Empty value not allowed in file, for mandatory field %s-x in section %s" % ( key, self.section_ ) )
+          raise Exception( "Empty value not allowed in file, for mandatory field %s in section %s" % ( key, self.section_ ) )
         else:
           return "Empty config present", 1
     except Exception, e:
       if mandatory:
-        raise Exception( "Not found mandatory value in file, for field %s-x in section %s" % ( key, self.section_ ) )
+        #print e
+        raise Exception( "Not found mandatory value in file, for field %s in section %s" % ( key, self.section_ ) )
       else:
         return "No config present", 1
 
     return val, 0
+
+  def read_file_field_bool( self, key, mandatory ):
+
+    #print "read_file_field_bool:", key, mandatory
+    val, errCode = self.read_file_field( key, mandatory )
+    if errCode != 0:
+      return val, errCode
+
+    if not strISbool( val ):
+      if mandatory:
+        raise Exception( "Not valid bool value, please choose among: %s or %s" % (_list_str_true_bool, _list_str_false_bool) )
+      else:
+        return "Config not valid", 1
+
+    return str2bool( val ), 0
+
+
 
 
   def read_file_field_list( self, key, mandatory ):
@@ -231,7 +278,7 @@ class ObjCfg( object ):
     except Exception, e:
       return "No config present", 1
 
-    list_values=[]
+    ret_list=[]
     for option in list_options:
 
       try:
@@ -241,81 +288,89 @@ class ObjCfg( object ):
 
       if v == "":
         continue
-      list_values.append(self.config_.get(self.section_, option))
+      ret_list.append(self.config_.get(self.section_, option))
 
-    if len( list_values ) == 0:
+    if len( ret_list ) == 0:
       if mandatory:
-        raise Exception( "Empty value not allowed in file, for mandatory field %s-x in section %s" % ( key, self.section_ ) )
+        raise Exception( "Empty value not allowed in file, for mandatory field %s-n in section %s" % ( key, self.section_ ) )
+      else:
+        return ret_list, 1
 
-    return list_values, 0
+    return ret_list, 0
 
 
   #
   # This method loads a field:
-  #  1. look among hp_config as is (high prio)
-  #  2. look among config swgit.section.key
-  #  3. look among file/section/key
+  #  1. look inside alias config (alias)
+  #  2. look inside config swgit.section.key
+  #  3. look inside file/section/key
   #
-  #  mandatory => raises exception if not found
-  #  optional  => just return "" if not found
+  #  mandatory:
+  #    raise exception is no field found at all
+  #  optional  => return 1 if not found, 
+  #               default val will be used instead
   #
-  #  some hp_cfg_alias example: user.name or user.email
+  #  some alias example: user.email
   #
   def load_field( self, mandatory, ms, mg, key, alias ):
     try:
 
       #print mandatory, ms.__name__, mg.__name__, key, alias
 
-      #1.1 local
-      if alias != "":
-        if isinstance( mg(), list ):
-          val, errCode = read_cfg__field_list( alias, mandatory )
-        elif isinstance( mg(), bool ):
-          val, errCode = self.read_cfg_field( alias, mandatory )
-          val = str2bool( val )
-        else:
-          val, errCode = self.read_cfg_field( alias, mandatory )
-        if errCode == 0:
-          ms( val )
-          return 0
-
-
-        #1.2 global
-        if isinstance( mg(), list ):
-          val, errCode = self.read_cfg_field_list( alias, mandatory, fglobal = True )
-        elif isinstance( mg(), bool ):
-          val, errCode = self.read_cfg_field( alias, mandatory, fglobal = True )
-          val = str2bool( val )
-        else:
-          val, errCode = self.read_cfg_field( alias, mandatory, fglobal = True )
-        if errCode == 0:
-          ms( val )
-          return 0
-
-      #2.
+      #
+      #1. high prio to swgit config
+      #
       config_key = "%s.%s.%s" % ( SWCFG_PREFIX, self.section_, key )
       if isinstance( mg(), list ):
         val, errCode = self.read_cfg_field_list( config_key, mandatory )
       elif isinstance( mg(), bool ):
-        val, errCode = self.read_cfg_field( config_key, mandatory )
-        val = str2bool( val )
+        val, errCode = self.read_cfg_field_bool( config_key, mandatory )
       else:
         val, errCode = self.read_cfg_field( config_key, mandatory )
       if errCode == 0:
         ms( val )
         return 0
 
-      #3.
+      #
+      #2. Then to swgit file
+      #
       if isinstance( mg(), list ):
         val, errCode =  self.read_file_field_list( key, mandatory ) #this will raise exception if not exists
       elif isinstance( mg(), bool ):
-        val, errCode = self.read_file_field( key, mandatory )
-        val = str2bool( val )
+        val, errCode = self.read_file_field_bool( key, mandatory )
       else:
         val, errCode =  self.read_file_field( key, mandatory ) #this will raise exception if not exists
       if errCode == 0:
         ms( val )
         return 0
+
+      #
+      #3.1 local
+      #    if not found either swgit config or file: look into local aliases
+      if alias != "":
+        if isinstance( mg(), list ):
+          val, errCode = self.read_cfg_field_list( alias, mandatory )
+        elif isinstance( mg(), bool ):
+          val, errCode = self.read_cfg_field_bool( alias, mandatory )
+        else:
+          val, errCode = self.read_cfg_field( alias, mandatory )
+        if errCode == 0:
+          ms( val )
+          return 0
+
+
+        #3.2 global
+        #    if not found either swgit config or file: look into local aliases
+        if isinstance( mg(), list ):
+          val, errCode = self.read_cfg_field_list( alias, mandatory, fglobal = True )
+        elif isinstance( mg(), bool ):
+          val, errCode = self.read_cfg_field_bool( alias, mandatory, fglobal = True )
+        else:
+          val, errCode = self.read_cfg_field( alias, mandatory, fglobal = True )
+        if errCode == 0:
+          ms( val )
+          return 0
+
 
     except Exception, e:
       #print e
@@ -376,9 +431,9 @@ class ObjCfgMail( ObjCfg ):
     self.sshuser_ = ObjCfg.NOT_INIT
     self.sshaddr_ = ObjCfg.NOT_INIT
     self.from_    = ObjCfg.NOT_INIT
-    self.to_      = ObjCfg.NOT_INIT
-    self.cc_      = ObjCfg.NOT_INIT
-    self.bcc_     = ObjCfg.NOT_INIT
+    self.to_      = [ ObjCfg.NOT_INIT ]
+    self.cc_      = []
+    self.bcc_     = []
     self.subj_    = ObjCfg.NOT_INIT
     self.bodyH_   = ObjCfg.NOT_INIT
     self.bodyF_   = ObjCfg.NOT_INIT
@@ -391,8 +446,8 @@ class ObjCfgMail( ObjCfg ):
     self.fields_optional_ = [ 
         [self.set_sshuser, self.get_sshuser, "sshuser"    , SWCFG_MAIL_MAILSERVER_SSHUSER, "", "" ],
         [self.set_sshaddr, self.get_sshaddr, "sshaddr"    , SWCFG_MAIL_MAILSERVER_SSHADDR, "", "" ],
-        [self.set_cc     , self.get_cc     , "cc"         , SWCFG_MAIL_CC                , "", "" ],
-        [self.set_bcc    , self.get_bcc    , "bcc"        , SWCFG_MAIL_BCC               , "", "" ],
+        [self.set_cc     , self.get_cc     , "cc"         , SWCFG_MAIL_CC                , "", [] ],
+        [self.set_bcc    , self.get_bcc    , "bcc"        , SWCFG_MAIL_BCC               , "", [] ],
         [self.set_subj   , self.get_subj   , "subject"    , SWCFG_MAIL_SUBJ              , "", "" ],
         [self.set_bodyH  , self.get_bodyH  , "body header", SWCFG_MAIL_BODY_HEADER       , "", "" ],
         [self.set_bodyF  , self.get_bodyF  , "body footer", SWCFG_MAIL_BODY_FOOTER       , "", "" ],
@@ -479,13 +534,13 @@ class ObjCfgTag( ObjCfg ):
     self.fields_optional_ = [ 
           [ self.set_regexp, 
             self.get_regexp,
-            "Tag argument regexp"        , SWCFG_KEY_TAGDSC_REGEXP              , "", "" ],
+            "Tag argument regexp"        , SWCFG_KEY_TAGDSC_REGEXP              , "", [] ],
           [ self.set_allowed_brtypes, 
             self.get_allowed_brtypes,
-            "Allowed branch types"       , SWCFG_KEY_TAGDSC_ALLOWED_BRTYPES     , "", "" ],
+            "Allowed branch types"       , SWCFG_KEY_TAGDSC_ALLOWED_BRTYPES     , "", [] ],
           [ self.set_denied_brtypes, 
             self.get_denied_brtypes,
-            "Denied  branch types"       , SWCFG_KEY_TAGDSC_DENIED_BRTYPES      , "", "" ],
+            "Denied  branch types"       , SWCFG_KEY_TAGDSC_DENIED_BRTYPES      , "", [] ],
           [ self.set_tag_in_past, 
             self.get_tag_in_past,
             "Allow tagging in past"      , SWCFG_KEY_TAGDSC_TAG_IN_PAST, "", "False" ],

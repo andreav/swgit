@@ -37,8 +37,14 @@ class ObjMailBase( ObjCfgMail ):
 #mailserver-sshaddr = 
 #from               = 
 #to                 = 
+#to-1               = 
+#to-2               = 
 #cc                 = 
+#cc-1               = 
+#cc-2               = 
 #bcc                = 
+#bcc-1              = 
+#bcc-2              = 
 #subject            = 
 #body-header        = 
 #body-footer        = 
@@ -48,8 +54,14 @@ class ObjMailBase( ObjCfgMail ):
 #mailserver-sshaddr = 
 #from               = 
 #to                 = 
+#to-1               = 
+#to-2               = 
 #cc                 = 
+#cc-1               = 
+#cc-2               = 
 #bcc                = 
+#bcc-1              = 
+#bcc-2              = 
 #subject            = 
 #body-header        = 
 #body-footer        = 
@@ -84,11 +96,11 @@ class ObjMailBase( ObjCfgMail ):
 
     cc_opt = "" 
     if self.cc_ != "":
-      cc_opt = " -c \"%s\" " % ( self.cc_ )
+      cc_opt = " -c \"%s\" " % ( ",".join(self.cc_) )
 
     bcc_opt = "" 
     if self.bcc_ != "":
-      bcc_opt = " -b \"%s\" " % ( self.bcc_ )
+      bcc_opt = " -b \"%s\" " % ( ",".join(self.bcc_) )
 
     allbody = self.sanitize_message( self.bodyH_ )
     if self.bodyH_ != "":
@@ -99,7 +111,7 @@ class ObjMailBase( ObjCfgMail ):
 
     cmd_send_mail = "echo -e \"%s\" | /bin/mail \"%s\" -s \"%s\" %s %s %s" % \
                     ( allbody,
-                      self.to_,
+                      ",".join(self.to_),
                       self.subj_,
                       cc_opt,
                       bcc_opt,
@@ -150,6 +162,7 @@ def main():
     print "Sending mail"
 
     out, errCode = obj.sendmail( "body\nbody", debug = True )
+    print out
     #out, errCode = obj.sendmail( "body\nbody", debug = False )
 
 

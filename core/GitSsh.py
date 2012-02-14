@@ -103,7 +103,7 @@ Usage: swgit ssh --create-nopassw-id
        swgit ssh --copy-identity [--identity <identity>] [<user>] <address> """
 
   parser = OptionParser( usage = usagestr,
-                         description='>>>>>>>>>>>>>> swgit - Ssh identities management <<<<<<<<<<<<<<' )
+                         description='>>>>>>>>>>>>>> swgit - ssh management <<<<<<<<<<<<<<' )
 
   gitkey_group = OptionGroup( parser, "Input options" )
   load_command_options( gitkey_group, gitkey_options )

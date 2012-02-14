@@ -426,9 +426,9 @@ def execute( options ):
   opt_past_tags = "refs/tags/%s/*:refs/tags/*" % SWCFG_TAG_NAMESPACE_PAST
 
   cmd_push = "git push %s %s %s" % ( g_remote, " ".join( ref_push_list ), opt_past_tags )
-  out,errCode = myCommand( cmd_push )
+  pushOut,errCode = myCommand( cmd_push )
   if options.noStat == False :
-    GLog.f( GLog.E, indentOutput( out[:-1], 2 ) )
+    GLog.f( GLog.E, indentOutput( pushOut[:-1], 2 ) )
   if errCode != 0:
     GLog.f( GLog.E, "\t\tPush contributes, branches and labels \n\t\t\t" + "\n\t\t\t".join( ref_push_list ) + "\n\t\tFAILED (not critical)" )
 

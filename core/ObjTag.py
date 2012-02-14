@@ -215,11 +215,17 @@ class TagDsc( ObjCfgTag ):
 #
 #[LABEL-TYPE]            =
 #regexp                  =
+#regexp-1                =
+#regexp-2                =
 #push-on-origin          =
 #one-x-commit            =
 #only-on-integrator-repo =
 #allowed-brtypes         =
+#allowed-brtypes-1       =
+#allowed-brtypes-2       =
 #denied-brtypes          =
+#denied-brtypes-1        =
+#denied-brtypes-2        =
 #tag-in-past             =
 #hook-pretag-script      =
 #hook-pretag-sshuser     =
@@ -332,7 +338,7 @@ class TagLIVDsc( TagDsc ):
     super(TagLIVDsc, self ).__init__( self.type_, loadcfg = False )
 
     self.set_fields_mandatory( [] )
-    self.set_fields_optional( self.get_regexp_optional_field( SWCFG_TAG_LIVREGEXP ) + 
+    self.set_fields_optional( self.get_regexp_optional_field( [SWCFG_TAG_LIVREGEXP] ) + 
                               self.get_hook_optional_field_default() )
 
     self.load_cfg()
@@ -360,7 +366,7 @@ class TagSTBDsc( TagDsc ):
     super(TagSTBDsc, self ).__init__( self.type_, loadcfg = False )
 
     self.set_fields_mandatory( [] )
-    self.set_fields_optional( self.get_regexp_optional_field( SWCFG_TAG_LIVREGEXP ) + 
+    self.set_fields_optional( self.get_regexp_optional_field( [SWCFG_TAG_LIVREGEXP] ) + 
                               self.get_hook_optional_field_default() )
 
     self.load_cfg()
@@ -458,7 +464,7 @@ class TagNGTDsc( TagDsc ):
     super(TagNGTDsc, self ).__init__( self.type_, loadcfg = False )
 
     self.set_fields_mandatory( [] )
-    self.set_fields_optional( self.get_regexp_optional_field( SWCFG_TAG_LIVREGEXP ) +
+    self.set_fields_optional( self.get_regexp_optional_field( [SWCFG_TAG_LIVREGEXP] ) +
                               self.get_hook_optional_field_default() )
 
     self.load_cfg()
@@ -482,7 +488,7 @@ class TagNEWDsc( TagDsc ):
     super(TagNEWDsc, self ).__init__( self.type_, loadcfg = False )
 
     self.set_fields_mandatory( [] )
-    self.set_fields_optional( self.get_regexp_optional_field( SWCFG_TAG_NEWREGEXP ) +
+    self.set_fields_optional( self.get_regexp_optional_field( [SWCFG_TAG_NEWREGEXP] ) +
                               self.get_hook_optional_field_default() )
 
     self.load_cfg()
