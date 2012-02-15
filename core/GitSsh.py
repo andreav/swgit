@@ -46,7 +46,7 @@ def create_git_key():
     return 1
 
   print "Creating swgit nopassw identity ... "
-  cmd = "ssh-keygen -f %s -t dsa -N \"\"" % Defines.SWGIT_SSH_IDENTITY_NOPASS_PRIV
+  cmd = "ssh-keygen -f %s -t rsa -N \"\"" % Defines.SWGIT_SSH_IDENTITY_NOPASS_PRIV
   out, errCode = MyCmd.myCommand_fast( cmd )
   if errCode != 0:
     print out
