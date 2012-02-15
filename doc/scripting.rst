@@ -31,7 +31,7 @@ Key concept here is:
   **let git do what git is best able to do**
 
 So swgit *intercepts* only a subset of git commands, in order to add 
-swgit funcionalities and implement swgit workflows.
+swgit functionalities and implement swgit workflows.
 
 So, for instance, ``git log`` or ``git diff`` are left untouched.
 
@@ -72,7 +72,7 @@ swgit introduces also any new commands:
       ssh management
 
   .. * lock
-      No more used, was intende to lock remote repositories during push
+      No more used, was intended to lock remote repositories during push
 
   * proj
       This is a ``git submodule`` friend. By this command, user should 

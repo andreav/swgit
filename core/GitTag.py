@@ -157,8 +157,8 @@ def check( options ):
 
   tagDsc = create_tag_dsc( g_tag_type )
   if not tagDsc.isValid():
-    strerr  = "FAILED - Tag \"%s\" is not well defined.\n" % tbdTag.getType()
-    strerr += "         Try issueing 'swgit tag --custom-tag-show-cfg %s'." % tbdTag.getType()
+    strerr  = "FAILED - Tag \"%s\" is not well defined.\n" % tagDsc.getType()
+    strerr += "         Try issueing 'swgit tag --custom-tag-show-cfg %s'." % tagDsc.getType()
     GLog.f( GLog.E, strerr )
     return 1
 

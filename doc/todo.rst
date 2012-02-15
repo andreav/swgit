@@ -28,11 +28,6 @@ TODOs
 DOCUMENTATION
 -------------
 
-* scrivere che supporta solo ssh ed fs
-
-* IN architecture scrivere che il modello utilizzato e' push 
-  e che le push sono rese sempre fastforward facendo prima una pull
-
 * scrivere che i progetti si prestano bene a far fare le commit solo a uno
 
   * Project-like-contaner workflow:
@@ -73,11 +68,6 @@ DOCUMENTATION
 
 * Licenza
 
-* Scrivere che per un integrator repo devo anche settare il booleano:
-
-    git config --bool swgit.integrator 
-
-* immagini side push pull merge
 
 DEVELOP
 -------
@@ -90,6 +80,9 @@ DEVELOP
   Chi la mette la LIV??
   Bisognerebbe distinguere tra STB e LIV come si fa nell'altro caso => 
   aggiungere l'opzione --cst sia a stb che a liv
+
+* la stabilize si deve settare a mano gli integartion branches
+  e devo esigere che l'intbr sia stable se faccio --stb, stable se faccio --liv
 
 
 * le variabili per autocompletion sono scritte li dentro, ma commentate.
@@ -114,3 +107,4 @@ DEVELOP
 
 
 * init --git-user resotra il vecchio user alla fine del comando (non lo setta in locale)
+

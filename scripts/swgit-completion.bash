@@ -18,7 +18,7 @@ swgitcommand2script=(
   "stabilize:GitStabilize.py"
   "tag:GitTag.py"
   "undo:GitUndo.py"
-  "key:ObjKey.py"
+  "ssh:GitSsh.py"
   "init:GitInitOneCommit.py"
   "info:GitInfo.py"
   "checkout:GitBranch.py"

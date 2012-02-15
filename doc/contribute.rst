@@ -70,7 +70,7 @@ are several ways in which you can contribute:
 
 #.  **Monetary Contributions**: I am not currently accepting any donations.
     I work on swgit for the love of it.
-    | However i would be interested in new job opportunities.
-    | I'm young (quite young...) and motivated.
-    | If you are looking for a new collegue, please take me in account!
+    However i would be interested in new job opportunities.
+    I'm young (quite young...) and motivated.
+    If you are looking for a new colleague, please take me in account!
     

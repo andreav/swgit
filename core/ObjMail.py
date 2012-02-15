@@ -32,29 +32,39 @@ class ObjMailBase( ObjCfgMail ):
 #   swgit --tutorial-mailcfg
 # for more informations
 #
-#[STABILIZE]
-#MAILSERVER-SSHUSER = 
-#MAILSERVER-SSHADDR = 
-#FROM               = 
-#TO                 = 
-#TO                 = 
-#CC                 = 
-#BCC                = 
-#SUBJECT            = 
-#BODY-HEADER        = 
-#BODY-FOOTER        = 
+#[stabilize]
+#mailserver-sshuser = 
+#mailserver-sshaddr = 
+#from               = 
+#to                 = 
+#to-1               = 
+#to-2               = 
+#cc                 = 
+#cc-1               = 
+#cc-2               = 
+#bcc                = 
+#bcc-1              = 
+#bcc-2              = 
+#subject            = 
+#body-header        = 
+#body-footer        = 
 #
-#[PUSH]
-#MAILSERVER-SSHUSER = 
-#MAILSERVER-SSHADDR = 
-#FROM               = 
-#TO                 = 
-#TO                 = 
-#CC                 = 
-#BCC                = 
-#SUBJECT            = 
-#BODY-HEADER        = 
-#BODY-FOOTER        = 
+#[push]
+#mailserver-sshuser = 
+#mailserver-sshaddr = 
+#from               = 
+#to                 = 
+#to-1               = 
+#to-2               = 
+#cc                 = 
+#cc-1               = 
+#cc-2               = 
+#bcc                = 
+#bcc-1              = 
+#bcc-2              = 
+#subject            = 
+#body-header        = 
+#body-footer        = 
 """
 
   def __init__( self, file, section ):
@@ -86,11 +96,11 @@ class ObjMailBase( ObjCfgMail ):
 
     cc_opt = "" 
     if self.cc_ != "":
-      cc_opt = " -c \"%s\" " % ( self.cc_ )
+      cc_opt = " -c \"%s\" " % ( ",".join(self.cc_) )
 
     bcc_opt = "" 
     if self.bcc_ != "":
-      bcc_opt = " -b \"%s\" " % ( self.bcc_ )
+      bcc_opt = " -b \"%s\" " % ( ",".join(self.bcc_) )
 
     allbody = self.sanitize_message( self.bodyH_ )
     if self.bodyH_ != "":
@@ -101,7 +111,7 @@ class ObjMailBase( ObjCfgMail ):
 
     cmd_send_mail = "echo -e \"%s\" | /bin/mail \"%s\" -s \"%s\" %s %s %s" % \
                     ( allbody,
-                      self.to_,
+                      ",".join(self.to_),
                       self.subj_,
                       cc_opt,
                       bcc_opt,
@@ -125,7 +135,7 @@ class ObjMailBase( ObjCfgMail ):
 ################
 class ObjMailStabilize( ObjMailBase ):
   def __init__( self ):
-    super(ObjMailStabilize, self ).__init__( SWFILE_MAILCFG, SWFILE_MAILCFG_STABILIZE_SECT )
+    super(ObjMailStabilize, self ).__init__( SWFILE_MAILCFG, SWCFG_MAIL_STABILIZE_SECT )
     self.load_cfg()
 
 #############
@@ -133,10 +143,10 @@ class ObjMailStabilize( ObjMailBase ):
 #############
 class ObjMailPush( ObjMailBase ):
   def __init__( self ):
-    super(ObjMailPush, self ).__init__( SWFILE_MAILCFG, SWFILE_MAILCFG_PUSH_SECT )
+    super(ObjMailPush, self ).__init__( SWFILE_MAILCFG, SWCFG_MAIL_PUSH_SECT )
 
     #override "to"
-    self.fields_mandatory_[1] = [self.set_to, self.get_to, "to" , SWFILE_MAILCFG_TO, GITCFG_USERMAIL ]
+    self.fields_mandatory_[1] = [self.set_to, self.get_to, "to" , SWCFG_MAIL_TO, GITCFG_USERMAIL ]
 
     self.load_cfg()
 
@@ -152,6 +162,7 @@ def main():
     print "Sending mail"
 
     out, errCode = obj.sendmail( "body\nbody", debug = True )
+    print out
     #out, errCode = obj.sendmail( "body\nbody", debug = False )
 
 

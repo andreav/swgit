@@ -28,6 +28,7 @@ from ObjMail import *
 from ObjSnapshotRepo import *
 from ObjLog import *
 from Utils_Submod import *
+import GitSsh
 
 g_newrepo = False
 
@@ -467,6 +468,15 @@ Usage: swgit init -r <x.y.z.t> [-u <user>] [-l <label>] [-c <int-br-name>]
     os.mkdir( cfgdir )
     add_and_commit = True
 
+  # generic cfg
+  genericcfg_file = "%s/%s" % (root, SWFILE_GENERICCFG)
+  if os.path.exists( genericcfg_file ) == False:
+    GLog.s( GLog.S, "\tCreating file %s" % genericcfg_file )
+    file = open( genericcfg_file, 'w+' )
+    file.write( GitSsh.DEFAULT_SSH_CFG )
+    file.close()
+    add_and_commit = True
+
   # custom tags
   custom_tags_file = "%s/%s" % (root, SWFILE_TAGDESC)
   if os.path.exists( custom_tags_file ) == False:
@@ -546,7 +556,7 @@ Usage: swgit init -r <x.y.z.t> [-u <user>] [-l <label>] [-c <int-br-name>]
       sys.exit( 1 )
 
     GLog.logRet(0)
-    strerr= "\nPLEASE VERIFY EVERITHING IS OK, THEN:\n"
+    strerr= "\nPLEASE VERIFY EVERYTHING IS OK, THEN:\n"
     strerr += "       If you are on your origin repository, that's all.\n"
     strerr += "       If you are on a clone, push it on origin with 'swgit push'"
     GLog.s( GLog.S, strerr )
@@ -606,7 +616,7 @@ Usage: swgit init -r <x.y.z.t> [-u <user>] [-l <label>] [-c <int-br-name>]
 
   GLog.logRet(0)
 
-  strerr= "\nPLEASE VERIFY EVERITHING IS OK, THEN:\n"
+  strerr= "\nPLEASE VERIFY EVERYTHING IS OK, THEN:\n"
   strerr += "       If you are on your origin repository, that's all.\n"
   strerr += "       If you are on a clone, push it on origin with:\n"
   strerr += "         swgit branch -s %s\n" % eval_dev_br( options )

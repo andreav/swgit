@@ -439,6 +439,8 @@ class swgit__utils:
   customtag_template = Template("""
 [$tagtype]
 regexp                  = $regexp
+regexp-1                = $regexp_1
+regexp-2                = $regexp_2
 push-on-origin          = $push_on_origin
 one-x-commit            = $one_x_commit
 only-on-integrator-repo = $only_on_integrator_repo

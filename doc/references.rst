@@ -25,7 +25,7 @@ Every reference (branches_ or tags_) inside a swgit repository has a well define
 
 *SwReferences* present a nested informations structure built by git namespaces.
 
-By this way, all standard git commands can work with them trasparently.
+By this way, all standard git commands can work with them transparently.
 
 .. only:: text
 
@@ -72,7 +72,7 @@ A branch reference has this configuration:
           product delivery.
           This kind of branch starts from *stable* branches.
           Their contributes should be reported on *develop* branches as soon as possible 
-          (better if by patch mechanis, in order to avoid merging *develop* and *stable* histroies)
+          (better if by patch mechanism, in order to avoid merging *develop* and *stable* histories)
 
       * CST:
           This branch takes care about special customers and their needs.
@@ -99,7 +99,7 @@ A branch reference has this configuration:
 Tags
 ****
 
-A *swTag* is always created srarting from a *swBranch*.
+A *swTag* is always created starting from a *swBranch*.
 
 So its name is composed by the complete branch name, followed by a TagType and TagName:
 
@@ -112,26 +112,26 @@ So its name is composed by the complete branch name, followed by a TagType and T
       swgit provides any built-in tag types.
 
       However, user can customize tags according to its needs,
-      both slightly modifying built-in tags behaviour, or completly defining 
-      new tags and its behaviour as described at :doc:`custom_tags`
+      both slightly modifying built-in tags behavior, or completely defining 
+      new tags and its behavior as described at :doc:`custom_tags`
 
       * Management tag types:
 
         * LIV:
-            This tag is used to mark a sofware delivery. It is placed on *stable* 
+            This tag is used to mark a software delivery. It is placed on *stable* 
             branches. User cannot manually create it, only ``swgit stabilize --liv``
             command can create it.
   
         * STB:
-            This tag is used to mark a sofware ready to be delivered. 
-            Hoever, it differs from LIV tag because we can mark many times a
+            This tag is used to mark a software ready to be delivered. 
+            However, it differs from LIV tag because we can mark many times a
             software as 'stable' before deciding to deliver it (and tag with LIV).
             STB labels indicate a commit ready to be delivered.
             User cannot manually create it, only ``swgit stabilize --stb``
             command can.
   
         * NGT:
-            This tag is used to mark a sofware having passed 'nightly tests'.
+            This tag is used to mark a software having passed 'nightly tests'.
             This tag is very useful inside agile project.
             If your project foresee automatic tests, after every passed session
             you can tag current commit with this label.
@@ -140,7 +140,7 @@ So its name is composed by the complete branch name, followed by a TagType and T
       * Development tag types:
 
         * DEV:
-            | This is the most commom label.
+            | This is the most common label.
             | It indicates work if finished and ready to be integrated.
             | In order for a developer to push her contributes on 'origin', she must 
               tag last work commit with a DEV label.
@@ -180,8 +180,8 @@ So its name is composed by the complete branch name, followed by a TagType and T
         | For instance:
 
           | FIX labels must declare which issue they fix. Its name depends on the context.
-          | STB/LIV labels take the delivery name. This also will be choosed by the user.
-          | To customize tags, please refere to :doc:custom_tags
+          | STB/LIV labels take the delivery name. This also will be choosen by the user.
+          | To customize tags, please refer to :doc:custom_tags
 
 
   Examples::

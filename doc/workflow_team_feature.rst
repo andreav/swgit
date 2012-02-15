@@ -17,9 +17,9 @@
 
 .. include:: globals.rst
 
-######################
-Wokflow - Team Feature
-######################
+#######################
+Workflow - Team Feature
+#######################
 
 Scenario:
 
@@ -63,11 +63,11 @@ Now Integrator can choose two solutions:
      * Every developer will merge and push on *FTR/feature* branch.
       
      * When feature is finished, inside temporary 'origin' repository.
-       someone will merge this brach on INT/develop.
+       someone will merge this branch on INT/develop.
 
      .. note:
         If you choose this method, remember moving away HEAD from *FTR/feature*
-        otherwise every pull from cloned repsository will fail with git error:
+        otherwise every pull from cloned repository will fail with git error:
         (refusing to update checked out branch)::
 
           swgit branch -s <anywhere>
@@ -79,7 +79,7 @@ Now Integrator can choose two solutions:
         :align: center
 
 
-     * Set *FTR/feature* as default integartion branch::
+     * Set *FTR/feature* as default integration branch::
        
          swgit branch --set-integration-br 1/0/0/0/andreav/FTR/feature
        
@@ -97,13 +97,13 @@ Now Integrator can choose two solutions:
        
          swgit pull
 
-     * Every developer will set *FTR/feature* as default integartion branch::
+     * Every developer will set *FTR/feature* as default integration branch::
 
          swgit branch --set-integration-br 1/0/0/0/andreav/FTR/feature
 
      * When feature is finished from any repository, someone will:
        
-        * restore *INT/develop* as integartion branch::
+        * restore *INT/develop* as integration branch::
 
            swgit branch --set-integration-br 1/0/0/0/andreav/INT/develop
 
@@ -111,7 +111,7 @@ Now Integrator can choose two solutions:
 
            swgit tag dev -m "ready to merge feature inside main stream"
 
-        * merge *FTR/feature* on just restored integartion branch::
+        * merge *FTR/feature* on just restored integration branch::
 
            swgit merge -I
            swgit push
@@ -145,7 +145,7 @@ This solution is best suited for big features.
 
     * run validation tests
 
-This is accompished by this command (on origin):
+This is accomplished by this command (on origin):
 
   ::
 
@@ -169,7 +169,7 @@ Every developer can:
 
          swgit  pull
 
-      * set it as integartiorn branch:
+      * set it as integration branch:
 
          swgit  branch --set-integration-br 1/0/0/0/andreav/INT/feature_develop
 
@@ -180,13 +180,13 @@ Every developer can:
   
   4. When feature is finished from any repository, someone will:
        
-      * restore *INT/develop* as integartion branch::
+      * restore *INT/develop* as integration branch::
 
          swgit branch --set-integration-br 1/0/0/0/andreav/INT/develop
 
       * merge last LIV label::
 
-         swgit branch -i          # swith on integartion branch
+         swgit branch -i          # switch on integration branch
          swgit merge  1/0/0/0/andreav/INT/feature_stable/LIV/Drop.3
          swgit push
 

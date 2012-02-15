@@ -21,7 +21,7 @@
 Download
 ########
 
-You can download last stable verison at:
+You can download last stable version at:
 
   |subst_txt_latest_stb_url|_
 

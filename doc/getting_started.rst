@@ -31,7 +31,7 @@ Getting Started
     * **swgit-env**
         Bash specific file. If you source it, it will provide:
 
-          * swgit command <TAB> autocompletion
+          * swgit command <TAB> auto-completion
 
           * $PATH adjustment, you will find swgit in your PATH from now on
 
@@ -47,7 +47,7 @@ Getting Started
 
 If you want to taste swgit, take a look at other  :doc:`workflows`
 
-If you are interested in a deeper docuentation feature-by-feature, please 
+If you are interested in a deeper documentation feature-by-feature, please 
 refer to :doc:`features`
 
 

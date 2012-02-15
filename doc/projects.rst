@@ -73,12 +73,12 @@ This command:
         above all during merge conflicts. (:ref:`lbl_proj_diffing`)
 
     * | Supports single repo workflows to gain in efficiency.
-      | :doc:`intbr`, for instace, has a key role inside
+      | :doc:`intbr`, for instance, has a key role inside
         projects.
-      | Please refere to :ref:`integartion branch inside projects <lbl_proj_dev_cst_repos>`
+      | Please refer to :ref:`integration branch inside projects <lbl_proj_dev_cst_repos>`
       
     * | Try minimizing conflicts when using submodules.
-      | I'm referring to this annoyng problem: 
+      | I'm referring to this annoying problem: 
       | when committing a project 
         you are potentially creating a conflict, despite the 
         content is not conflicting with others contributes. This happens due to 
@@ -94,20 +94,20 @@ This command:
     * | Creates :ref:`lbl_proj_snapshot_repositories`. This is a client-side response to
         big binaries repositories git problem.
       | When a repository is too large, and history is not meaningful, user can choose to 
-        convert it in a snapshot reposiory, thus downloading only 1 commit instead of
+        convert it in a snapshot repository, thus downloading only 1 commit instead of
         entire history.
 
 
 .. note:: 
   At the moment, swgit let the user adding to the project only 
-  repositries with shell access (ssh or fs), with this form:
+  repositories with shell access (ssh or fs), with this form:
 
     ::
 
       ssh://user@addr/path/to/repo
       /path/to/repo
 
-  This limitation will be better explained when analizing :ref:`lbl_proj_local_submodules`.
+  This limitation will be better explained when analyzing :ref:`lbl_proj_local_submodules`.
 
 
 .. _lbl_proj_composing:
@@ -117,7 +117,7 @@ Creating
 
 Command used to add a submodule is very similar to `git submodule` mate::
 
-  swgit proj --add-repo <ssh or fs url> [-b <integartion branch>] [<local name>]
+  swgit proj --add-repo <ssh or fs url> [-b <integration branch>] [<local name>]
 
 This command behaves in this way:
 
@@ -140,7 +140,7 @@ When first repository is added, a new file is created under the project root:
       break compatibility with native submodules.
     | User can choose working with `git submodule` command as usual,
       or trying to leverage `swgit proj` command taking advantage of this 
-      addtional information.
+      additional information.
 
 
 .. _lbl_proj_dev_cst_repos:
@@ -153,7 +153,7 @@ repository to the project.
 
 `-b` not only forces swgit to clone that branch and set HEAD on it,
 (like submodule command does),
-but also configures default integartion branch for that subrepository.
+but also configures default integration branch for that subrepository.
 
 This information will be used by ``swgit proj --update`` in order to 
 decide in which way to update every sub-repository. 
@@ -170,7 +170,7 @@ According to this branch kind, subrepository will be considered as:
 
           * as :doc:`intbr` into that repository
 
-          * as `default integartion branch` into project containing it.
+          * as `default integration branch` into project containing it.
 
       To create a *developer repository*, default integration branch provided 
       must be any subrepository valid :ref:`INT branch <lbl_references_branches>`.
@@ -208,8 +208,8 @@ According to this branch kind, subrepository will be considered as:
 
 .. _lbl_proj_initializing:
 
-Initilizing
-===========
+Initializing
+============
 
 Initializing submodules has a key difference with `git submodules`:
 
@@ -222,7 +222,7 @@ This is done to accomplish a task:
 
   * :ref:`lbl_proj_local_submodules` in a nutshell:
   
-      When initializig a *local repository*, url inside `.gitmodules` is ignored, 
+      When initializing a *local repository*, url inside `.gitmodules` is ignored, 
       instead a repository local to 'origin' project, in the same relative position 
       as the one you are initializing, is attended to be found.
   
@@ -232,7 +232,7 @@ This is done to accomplish a task:
   
   * Remote submodules behave exactly as default git submodules:
   
-      When initializig a *remote repository*, url inside `.gitmodules` is used.
+      When initializing a *remote repository*, url inside `.gitmodules` is used.
  
 | Moreover, ``swgit --init`` also downloads repository from right url.
 | No other command is needed (i.e. no `git submodule update`)
@@ -256,7 +256,7 @@ If you prefer combining both behaviors simply choose:
 
       swgit clone --recurse
 
-But this will intialize (and download) ALL repositories contained 
+But this will initialize (and download) ALL repositories contained 
 under your project.
 
 
@@ -277,7 +277,7 @@ Key concepts during update, are:
   #. User works inside `Developer repositories`, no detached-head 
      is welcome.
 
-     | Inside signle-repo workflow, after a pull I start developing 
+     | Inside single-repo workflow, after a pull I start developing 
        from INT/develop HEAD.
      | To speed up my work, same must be when using projects.
 
@@ -285,7 +285,7 @@ Key concepts during update, are:
      detached-head after update is the right choice, fast and reliable.
 
      It is very uncommon to develop inside that repositories, and if 
-     I need to upgrade them, I must esplicitly commit their upgrade 
+     I need to upgrade them, I must explicitly commit their upgrade 
      (see :ref:`Committing Projects <lbl_proj_committing>`)
 
 Following, three update possibilities are presented.
@@ -370,7 +370,7 @@ Following, three update possibilities are presented.
 
 
     .. note::
-      Differently from others methos, this one does not 
+      Differently from others methods, this one does not 
       automatically pulls project repository.
 
 
@@ -393,14 +393,14 @@ This is realized following this principle:
 
 This choice is taken to minimize a usual `git submodule` problem:
 
-  | When committing inside a project, every :term:`commit file` strores its 
+  | When committing inside a project, every :term:`commit file` stores its 
     corresponding submodule HEAD.
   | These `commit` files often causes a conflict during merge, also when 
     submodule content is not conflicting.
 
-So, without implicitly committing those files, you work around this behaviour.
+So, without implicitly committing those files, you work around this behavior.
 
-When workig with swProjects, you can follow one among two schemas:
+When working with swProjects, you can follow one among two schemas:
 
   #. | **Project repository is just a container**.
      | Its main (quite unique) goal is to register 'magical' alignments 
@@ -467,7 +467,7 @@ Diffing submodules content is also somehow cumbersome from a project point of vi
 | What about submodules? 
 | You need to understand at which submodule commit, project stored them in both instants.
 
-This is exactly wath ``swgit --diff`` does::
+This is exactly what ``swgit --diff`` does::
 
   swgit proj -D/--diff [ref1] [ref2] [<A_SUBREPO>...]
 
@@ -538,7 +538,7 @@ The former is better explained with an output example:
                 CurrBr         : 7/0/0/0/swgittestuser/INT/develop
 
 
-this simple commad immedeately shows project situation.
+this simple command immediately shows project situation.
 
 It reports many interesting informations, directly from the project directory.
 
@@ -553,7 +553,7 @@ An output example is:
       TEST_PROJ_REPO_APP:45fc08a0478b36804db78d1d2a9fdebba36e81c
       TEST_PROJ_REPO_FS:a8bf589b323d0be01715c36d7a00a9cfd85a8b
 
-Referring to the same exmaple above.
+Referring to the same example above.
 
 
 
@@ -571,28 +571,28 @@ Local submodules
     :scale: 65 %
     :align: center
 
-    default behaviour for clone of clone with single repo
+    default behavior for clone of clone with single repo
 
 
   .. figure:: images/static/swgit_project_clone_of_clo_example.gif
     :scale: 65 %
     :align: center
 
-    default behaviour for clone of clone with projects.
+    default behavior for clone of clone with projects.
 
-While projects repositories mantain same relative relationship 
+While projects repositories maintain same relative relationship 
 like previous single-repo example,
 submodules repositories, by default, always refer to a common 'origin' repository. 
 
 Submodules do not maintain their own projects relative relationship, 
 thus making difficult respecting intuitive single repository contribute chain.
 
-This is because submodules are primarly intended to be used with 
+This is because submodules are primarily intended to be used with 
 third party repositories, with libraries.
-In that sceanario, could be better referencing the common, original, library repository.
+In that scenario, could be better referencing the common, original, library repository.
 
 | But when you split your repository into submodules, and you want
-  to develop inside all of them, single-repo behaviour is preferred.
+  to develop inside all of them, single-repo behavior is preferred.
 | Of course submodules support it, but another time, it has been not 
   so easy to understand *HOW*.
 | Response is this: at `git submodule init` time, manually configure
@@ -609,7 +609,7 @@ Given a submodule, two possibilities exist:
 
       | A **Remote submodule** will be initialized inside my project clone,
       | i.e. 
-      |   .gitmodules url will be used during initilization.
+      |   .gitmodules url will be used during initialization.
 
   #. 'origin' project has a local clone for that submodule:
 
@@ -620,37 +620,37 @@ Given a submodule, two possibilities exist:
           in order to let my subrepo pointing to submodule local clone 
           under 'origin' project.
 
-| An image will hopefully calrify.
-| Please compare git default behaviour vs swgit default behaviour:
+| An image will hopefully clarify.
+| Please compare git default behavior vs swgit default behavior:
 
   .. figure:: images/static/swgit_project_clone_of_clo_gitnative.gif
     :scale: 75 %
     :align: center
 
-    git defautl behaviour when cloning 'cloned projects'
+    git default behavior when cloning 'cloned projects'
 
   .. figure:: images/static/swgit_project_clone_of_clo_swgit.gif
     :scale: 75 %
     :align: center
 
-    swgit defautl behaviour when cloning 'cloned projects'
+    swgit default behavior when cloning 'cloned projects'
 
 
-This is why ``swgit proj --add`` only let the user add repositories with shell acces:
+This is why ``swgit proj --add`` only let the user add repositories with shell access:
 
   **`swgit init` need to contact 'origin' project to check if we are cloning
   a local or remote subrepository.**
 
-To sum up, when you need a library-like behaviour, you will configure 'origin' project 
-without a local clone under it by issueing a command like this on 'origin' repository:
+To sum up, when you need a library-like behavior, you will configure 'origin' project 
+without a local clone under it by issuing a command like this on 'origin' repository:
 
   ::
 
      swgit proj --un-init <REMOTE_SUBREPO_DIR>
 
-Instead when you need a single-repo-like clone-of-clone behaviour, 
+Instead when you need a single-repo-like clone-of-clone behavior, 
 you will configure 'origin' project with a local clone under it by
-issueing a command like this on 'origin' repository:
+issuing a command like this on 'origin' repository:
 
   ::
 
@@ -659,10 +659,10 @@ issueing a command like this on 'origin' repository:
 
 .. _lbl_proj_snapshot_repositories:
 
-Snaphost repositories
+Snapshot repositories
 =====================
 
-A common feature among Distributed Version Control Systems is they must strore
+A common feature among Distributed Version Control Systems is they must store
 entire history inside every clone.
 
 | This is a problem when you need to store big binaries, because they cannot be 
@@ -709,7 +709,7 @@ entire history inside every clone.
         binary. (default is `tar`)
   
   
-  * You can always transform you snapshot submodule into a regual one, just isseuing::
+  * You can always transform you snapshot submodule into a regular one, just issuing::
     
       swgit proj --init <SNAP_REPO>
   

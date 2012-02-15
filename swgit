@@ -63,7 +63,7 @@ import core.GitPull
 import core.GitPush
 import core.GitStabilize
 import core.GitTag
-import core.ObjKey
+import core.GitSsh
 import core.GitInit
 import core.GitUndo
 import core.GitInfo
@@ -81,7 +81,7 @@ command2script = {
   "push"      : [ core.GitPush,      "Push your contributes on \"origin\"" ],
   "stabilize" : [ core.GitStabilize, "Stabilize work and evaluates changelogs" ],
   "tag"       : [ core.GitTag,       "Tagging management" ],
-  "key"       : [ core.ObjKey,       "SSH key management" ],
+  "ssh"       : [ core.GitSsh,       "SSH management" ],
   "init"      : [ core.GitInit,      "Create new swgit repository, convert git native to swgit repository or create CST branch" ],
   "undo"      : [ core.GitUndo,      "Undo file modifications" ],
   "info"      : [ core.GitInfo,      "Retrieve many useful infos about files, label,changelogs ... " ],
@@ -275,7 +275,7 @@ def main():
   #
   # exe command
   #
-  git_ssh = "%s/scripts/ssh-wrapper.sh" % base
+  git_ssh = "%s/core/ssh-wrapper.py" % base
   os.environ['GIT_SSH'] = git_ssh
 
   del sys.argv[0]
