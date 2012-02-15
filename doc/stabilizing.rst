@@ -40,18 +40,18 @@ These requirements are met by swgit by introducing **INT/stable** branch.
 
 Main branch goals are:
 
-  #. storing all delivered stable software versions, labelled with
+  #. storing all delivered stable software versions, labeled with
      :ref:`LIV <lbl_references_tags>` tag.
 
-  #. storing candidates software for next drop, labelled with
+  #. storing candidates software for next drop, labeled with
      :ref:`STB <lbl_references_tags>` tag.
 
-  #. | letting the integartor shift aside from the :doc:`develop process <developing>` 
-       (tourning around *INT/develop* branch).
+  #. | letting the integrator shift aside from the :doc:`develop process <developing>` 
+       (turning around *INT/develop* branch).
      | On *INT/stable* he/she cat take necessary time for preparing,
        and in case  fixing, next delivery.
 
-In this context `Integrator` referes to project maintainer, who reports 
+In this context `Integrator` refers to project maintainer, who reports 
 contributes on `INT/stable`.
 
 .. _lbl_stabilizing_ngt:
@@ -61,17 +61,17 @@ NGT tag
 
   This tag is a :ref:`built-in swgit tag <lbl_references_tags>`.
 
-  It is used by the Integrator, and is put only on *INT/develop* worthful commits.
+  It is used by the Integrator, and is put only on *INT/develop* worth commits.
 
   `NGT` refers to 'nightly tests'. The idea here is:
  
     | At night, a test suite will check if repository HEAD is valuable.
     | If so, a NGT tag will mark that reference
 
-  Day after, when integartor arrives at his/her desk, a NGT tag will 
+  Day after, when integrator arrives at his/her desk, a NGT tag will 
   be a good candidate to be stabilized.
 
-  Of course, Integartor will decide, according to feature list, if it's time
+  Of course, Integrator will decide, according to feature list, if it's time
   for preparing a new delivery.
 
 
@@ -80,7 +80,7 @@ NGT tag
 Reporting on *INT/stable*
 -------------------------
 
-  Periodically Integartor will report a worthful *INT/develop* commit onto 
+  Periodically Integrator will report a worth *INT/develop* commit onto 
   *INT/stable* by::
 
       swgit stabilize --stb Drop.A --src <reference>
@@ -94,7 +94,7 @@ Reporting on *INT/stable*
 
           ^Drop\.[A-Z]{1,3}(_[0-9]{1,3})?$
 
-    If you want to change `STB` regexp, please refere to 
+    If you want to change `STB` regexp, please refer to 
     :ref:`lbl_tags_analyzing` and :ref:`lbl_tags_setting`.
 
     .. note::
@@ -113,18 +113,18 @@ Reporting on *INT/stable*
    	* 1/0/0/0/andreav/INT/stable/STB/Drop.A  - This mark *INT/stable* arrival point.
 
   .. note::
-    | In order to strengthen concept that only Integartor can issue this command, 
+    | In order to strengthen concept that only Integrator can issue this command, 
       swgit will deny this operation on any repository but :term:`integrator repository`
-    | This is a weak, easely workaroundable, limit. However this avoids accidental 
+    | This is a weak, easily workaroundable, limit. However this avoids accidental 
       command execution on a Developer repository.
  
 
-.. _lbl_stabilizing_craeting_liv:
+.. _lbl_stabilizing_creating_liv:
 
 Creating a delivery
 -------------------
 
-  Integartor decides to release a delivery.
+  Integrator decides to release a delivery.
 
   #. He/She will go into an :term:`integrator repository`, 
 
@@ -150,7 +150,7 @@ Creating a delivery
         and he/she will merge on *INT/stable* branch that label.
         Like any developer should do, except for merging on *INT/stable*.
 
-  In the end, when everithing is ok, Integartor will issue::
+  In the end, when everything is ok, Integrator will issue::
 
     swgit stabilize --liv Drop.A
 
@@ -160,11 +160,11 @@ Creating a delivery
 
       ${REPO_ROOT}/.swdir/changelog/<REL>/
 
-    * **Changelog**: containiinig all DEV labels from last repository LIV till now.
+    * **Changelog**: containing all DEV labels from last repository LIV till now.
 
     * **Fixlog**: containing all FIX labels from last repository LIV till now.
 
-    * **Ticketlog**: a machine readable file, containing only Tickect numbers. 
+    * **Ticketlog**: a machine readable file, containing only Ticket numbers. 
       (i.e. tagName for every FIX label)
 
   2. Add everything to the index and committing
@@ -175,16 +175,16 @@ Creating a delivery
 
   4. Merge */INT/stable* on */INT/develop*
 
-  5. Push everithing on 'origin'
+  5. Push everything on 'origin'
 
   .. todo::
     An option must be implemented to avoid automatic merge from *INT/stable*
     to *INT/develop*.
 
   .. note::
-    | In order to strengthen concept that only Integartor can issue this command, 
+    | In order to strengthen concept that only Integrator can issue this command, 
       swgit will deny this operation on any repository but :term:`integrator repository`
-    | This is a weak, easely workaroundable, limit. However this avoids accidental 
+    | This is a weak, easily workaroundable, limit. However this avoids accidental 
       command execution on a Developer repository.
 
 .. _lbl_stabilizing_reporting_cst:
@@ -202,13 +202,13 @@ Reporting on CST/customer
   .. image:: images/static/swgit_stabilizing_cst.gif
     :scale: 70 %
 
-  When Integartor defines a :ref:`repository customer <lbl_role_customer>` by creating
+  When Integrator defines a :ref:`repository customer <lbl_role_customer>` by creating
   a CST branch, he/she is responsible for releasing stable software versions to him.
 
   This operation is another stabilization.
   CST target branch must be both integration branch and current branch.
 
-    swgit branch --set-integartion-br 1/0/0/0/andreav/CST/google
+    swgit branch --set-integration-br 1/0/0/0/andreav/CST/google
     swgit branch -s 1/0/0/0/andreav/CST/google
     swgit stabilize --cst Drop.A --src <reference>
 

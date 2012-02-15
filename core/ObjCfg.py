@@ -76,11 +76,11 @@ class ObjCfg( object ):
     #
     # Mandatory
     #
-    for (ms, mg, d, k, hpa) in self.fields_mandatory_:
+    for (ms, mg, d, k, al) in self.fields_mandatory_:
       #print ">> MANDAT: ", d, self.section_
       v = "@@ Mandatory field not set @@"
       try:
-        self.load_field( True, ms, mg, k, hpa )
+        self.load_field( True, ms, mg, k, al )
       except Exception, e:
         #print ">> EXCEPTION MANDAT: ", d
         self.isValid_ = False
@@ -90,9 +90,9 @@ class ObjCfg( object ):
     #
     # Optional
     #
-    for (ms, mg, d, k, hpa, df) in self.fields_optional_:
+    for (ms, mg, d, k, al, df) in self.fields_optional_:
       #print ">> OPION: ", d, self.section_
-      ret = self.load_field( False, ms, mg, k, hpa )
+      ret = self.load_field( False, ms, mg, k, al )
       if ret != 0:
         if df != None:
           ms( df )
@@ -104,9 +104,9 @@ class ObjCfg( object ):
   def dump( self ):
     j = self.justify_
     retstr = "Is valid".ljust(j) + "%s" % self.isValid_
-    for (ms, mg, d, k, hpa) in self.fields_mandatory_:
+    for (ms, mg, d, k, al) in self.fields_mandatory_:
       retstr += "\n" + ("%s" % d).ljust(j) + "%s" % mg()
-    for (ms, mg, d, k, hpa, df) in self.fields_optional_:
+    for (ms, mg, d, k, al, df) in self.fields_optional_:
       retstr += "\n" + ("%s" % d).ljust(j) + "%s" % mg()
 
     if len( self.error_fields_ ) > 0:
@@ -118,28 +118,29 @@ class ObjCfg( object ):
     return retstr + "\n"
 
 
-  def show_config_options_byfield_int( self, mg, d, k, hpa ):
+  def show_config_options_byfield_int( self, mg, d, k, al ):
     j = self.justify_
     retstr = ("\n * %s" % d).ljust( j )
 
-    if hpa != "":
-      retstr += "by \"git config %s <val>\"" % (hpa)
-      retstr += "\n ".ljust(j)
     if isinstance( mg(), list ):
       retstr += "by \"git config %s.%s.%s(-1, -2, ...) <val>\"" % (SWCFG_PREFIX, self.section_, k)
       retstr += "\n ".ljust( j ) + "or by file:   %s, section %s, key %s(-01, -02, ...)" % (self.file_,self.section_,k)
     else:
       retstr += "by \"git config %s.%s.%s <val>\"" % (SWCFG_PREFIX, self.section_, k)
       retstr += "\n ".ljust( j ) + "or by file:   %s, section %s, key %s" % (self.file_,self.section_,k)
+    if al != "":
+      retstr += "\n ".ljust( j )
+      retstr += "by \"git config %s <val>\"" % (al)
+      retstr += "\n ".ljust(j)
     return retstr
 
   def show_config_options_byfield( self, key ):
-    for (ms, mg, d, k, hpa) in self.fields_mandatory_:
+    for (ms, mg, d, k, al) in self.fields_mandatory_:
       if k == key:
-        return self.show_config_options_byfield_int( mg, d, k, hpa )
-    for (ms, mg, d, k, hpa, df) in self.fields_optional_:
+        return self.show_config_options_byfield_int( mg, d, k, al )
+    for (ms, mg, d, k, al, df) in self.fields_optional_:
       if k == key:
-        return self.show_config_options_byfield_int( mg, d, k, hpa )
+        return self.show_config_options_byfield_int( mg, d, k, al )
 
 
   def show_config_options( self ):
@@ -148,12 +149,12 @@ class ObjCfg( object ):
 
     if len( self.fields_mandatory_ ) > 0:
       retstr += "\nMandatory fields:\n"
-      for (ms, mg, d, k, hpa) in self.fields_mandatory_:
+      for (ms, mg, d, k, al) in self.fields_mandatory_:
           retstr += self.show_config_options_byfield( k )
 
     if len( self.fields_optional_ ) > 0:
       retstr += "\nOptional fields:\n"
-      for (ms, mg, d, k, hpa, df) in self.fields_optional_:
+      for (ms, mg, d, k, al, df) in self.fields_optional_:
           retstr += self.show_config_options_byfield( k )
 
     return retstr
@@ -301,9 +302,9 @@ class ObjCfg( object ):
 
   #
   # This method loads a field:
-  #  1. look inside alias config (alias)
-  #  2. look inside config swgit.section.key
-  #  3. look inside file/section/key
+  #  1. look inside config swgit.section.key
+  #  2. look inside file/section/key
+  #  3. look inside alias config (alias)
   #
   #  mandatory:
   #    raise exception is no field found at all
@@ -383,28 +384,6 @@ class ObjCfg( object ):
       #not found optional field, not an error
       return 1
 
-
-
-  def load_optional_field( self, key, alias, defval ):
-    #1.
-    val, errCode = MyCmd.get_repo_cfg( "%s" % ( alias ) )
-    if errCode == 0:
-      return val[:-1]
-
-    #2.
-    val, errCode = MyCmd.get_repo_cfg( "%s.%s.%s" % ( SWCFG_PREFIX, self.section_, key ) )
-    if errCode == 0:
-      return val[:-1]
-
-    #3.
-    try:
-      val = self.config_.get( self.section_, key ) #this will raise exception if not exists
-      return val
-    except Exception, e:
-      #not found optional field, not an error
-      pass
-
-    return defval
 
   def set_fields_mandatory( self, v ):
     self.fields_mandatory_ = v

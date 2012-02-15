@@ -15,7 +15,7 @@
    You should have received a copy of the GNU General Public License
    along with swgit.  If not, see <http://www.gnu.org/licenses/>.
 
-.. _todo list: http://github.com/andreav/swgit/blob/1/0/0/0/andreav/INT/stable/notes.txt
+.. _todo list: http://github.com/andreav/swgit/blob/1/0/0/0/swgit/INT/develop/notes.txt
 
 .. |subs_img_todo| image:: images/static/todo.png
 

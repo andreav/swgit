@@ -533,7 +533,7 @@ Usage: swgit proj --add-repo [-b branch] [--snapshot] <url> [<localname>]
     GLog.logRet( 0 )
 
     # work is finished, notify user about commit and push
-    GLog.s( GLog.S, "\nPLEASE VERIFY EVERITHING IS OK, THEN COMMIT with \"swgit commit --dev %s\", MERGE ON DEVELOP AND PUSH PROJECT DIRECTORY (%s)\n" % ( repo_name, Env.getLocalRoot() ) )
+    GLog.s( GLog.S, "\nPLEASE VERIFY EVERYTHING IS OK, THEN COMMIT with \"swgit commit --dev %s\", MERGE ON DEVELOP AND PUSH PROJECT DIRECTORY (%s)\n" % ( repo_name, Env.getLocalRoot() ) )
 
     sys.exit( 0 )
 
@@ -643,7 +643,7 @@ Usage: swgit proj --add-repo [-b branch] [--snapshot] <url> [<localname>]
         sys.exit( 1 )
 
       # work is finished, notify user about commit and push
-      GLog.s( GLog.S, "\nPLEASE VERIFY EVERITHING IS OK, THEN COMMIT with \"swgit commit --dev %s\" option set, MERGE ON DEVELOP AND PUSH PROJECT DIRECTORY (%s)\n" % ( rn, proot ) )
+      GLog.s( GLog.S, "\nPLEASE VERIFY EVERYTHING IS OK, THEN COMMIT with \"swgit commit --dev %s\" option set, MERGE ON DEVELOP AND PUSH PROJECT DIRECTORY (%s)\n" % ( rn, proot ) )
 
       GLog.logRet( 0 )
 

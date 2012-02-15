@@ -32,7 +32,7 @@ Configuration happens inside file:
 
     ${REPO_ROOT}/.swdir/cfg/mail.cfg
 
-Configuration can be checked by issueing:
+Configuration can be checked by issuing:
 
   ::
 
@@ -66,7 +66,7 @@ In order to send mails, a command must exists:
 
 
   .. note::
-    For push mail delivery, 'to' field will be choosed among::
+    For push mail delivery, 'to' field will be choosen among::
 
       1. git config --get --local user.email
       2. git config --get --global user.email

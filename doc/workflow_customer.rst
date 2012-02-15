@@ -17,9 +17,9 @@
 
 .. include:: globals.rst
 
-##################
-Wokflow - Customer
-##################
+###################
+Workflow - Customer
+###################
 
 Please refer to :ref:`lbl_stabilizing_reporting_cst`
 

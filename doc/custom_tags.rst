@@ -23,12 +23,12 @@ Custom tags
 
 Tags are an essential part of a well structured and info filled repository.
 
-swgit ships with a set of buil-in labels (see :ref:`lbl_references_tags`).
+swgit ships with a set of built-in labels (see :ref:`lbl_references_tags`).
 
 | These tags try to cover as many scenarios as possible.
 | Of course, however, every repository has its own history! ;)
 
-| swgit lets the user modify tags behaviour to better meet her needs.
+| swgit lets the user modify tags behavior to better meet her needs.
 | There are two levels of freedom in customizing tags.
 
   #. modifying hooks and regular expressions for built-in tags
@@ -38,10 +38,10 @@ swgit ships with a set of buil-in labels (see :ref:`lbl_references_tags`).
 
 .. _lbl_tags_analyzing:
 
-Analizig tags configuration
-===========================
+Analyzing tags configuration
+============================
 
-In order for the user to analyse a tag configuration, she can issue two command:
+In order for the user to analyze a tag configuration, she can issue two command:
 
   1. ``swgit tag --custom-tag-list``
 
@@ -76,7 +76,7 @@ In order to modify any allowed tag parameter, user can choose among:
 
   * Volatile way:
 
-     By issueing a ``swgit config`` command like this:
+     By issuing a ``swgit config`` command like this:
 
        ``swgit config swgit.FIX.regexp <val>``
 
@@ -86,7 +86,7 @@ In order to modify any allowed tag parameter, user can choose among:
 
 
 
-Modifying built-in tags behaviour
+Modifying built-in tags behavior
 =================================
 
 For every built-in tag, user can override its optional fields.
@@ -111,7 +111,7 @@ We will give it a `REL` type.
 
 #. Define new `REL` tag:
 
-   * Persisten way:
+   * Persistent way:
 
       Open file ``.swdir/cfg/custom_tags.cfg`` and create a section like this:
 
@@ -146,9 +146,9 @@ We will give it a `REL` type.
      or any sequence shorter that 15 characters.
 
 
-   * Persisten way:
+   * Persistent way:
 
-      immedeately under [REL] section, add this row:
+      immediately under [REL] section, add this row:
 
         ``regexp = ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ &@& ^[a-zA-Z]{0,15}$``
 
@@ -184,7 +184,7 @@ We will give it a `REL` type.
           (like LIV or STB tags)
 
 
-   * Persisten way:
+   * Persistent way:
 
       Under [REL] section, add these row:
 
@@ -210,11 +210,11 @@ We will give it a `REL` type.
 
      #. **allowed-brtypes**: (list)
           Allow tagging only on these branches.
-          Not valorized means: all branches are allowed.
+          Not assigned means: all branches are allowed.
 
      #. **denied-brtypes**: (list)
           Deny tagging only on these branches.
-          Not valorized means: never deny.
+          Not assigned means: never deny.
 
      #. **tag-in-past**:
           Let the tagger tag a commit already pushed on origin.
@@ -233,7 +233,7 @@ Pre- and post- tag hooks
 
   They are optional configurable fields.
   
-  Hook are denifed by specifying a scripts to be invoked locally or remotely.
+  Hook are defined by specifying a scripts to be invoked locally or remotely.
 
   In this second case, ssh user and address for remote machine must be specified too.
   
@@ -244,7 +244,7 @@ Pre- and post- tag hooks
         | Specify a script to be invoked before creating tag.
         | Arguments passed to the script:
         |   $1 = tag name to be created
-        |   $2 = commit on wich tag will be put
+        |   $2 = commit on which tag will be put
         | Script output will be used as tag comment, in addition to -m argument
           (if provided)
         | If the return value if different from 0, tag creation will fail.
@@ -259,16 +259,16 @@ Pre- and post- tag hooks
     
     * **hook-posttag-script**:
 
-        | Specify a script to be invoked aftre tag creation.
+        | Specify a script to be invoked after tag creation.
         | Arguments passed to the script:
         |   $1 = tag name just created
-        |   $2 = commit on wich tag has been put
+        |   $2 = commit on which tag has been put
         | Note: this hook will be triggered when tag is created locally.
         |       If you want a trigger when tag is pushed, use built-in git hooks.
 
     * **hook-posttag-sshuser**:
 
-        If specified, invok `hook-posttag-script` over ssh, with specified user
+        If specified, invoke `hook-posttag-script` over ssh, with specified user
 
     * **hook-posttag-sshaddr**:
 

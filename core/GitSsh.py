@@ -180,9 +180,6 @@ Usage: swgit ssh --create-nopassw-id
     if len( args ) == 1:
       user = Defines.EUID_NAME
       addr = args[0]
-    elif len( args ) == 2:
-      user = Defines.EUID_NAME
-      addr = args[0]
     else:
       user = args[0]
       addr = args[1]

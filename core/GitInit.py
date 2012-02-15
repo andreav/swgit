@@ -556,7 +556,7 @@ Usage: swgit init -r <x.y.z.t> [-u <user>] [-l <label>] [-c <int-br-name>]
       sys.exit( 1 )
 
     GLog.logRet(0)
-    strerr= "\nPLEASE VERIFY EVERITHING IS OK, THEN:\n"
+    strerr= "\nPLEASE VERIFY EVERYTHING IS OK, THEN:\n"
     strerr += "       If you are on your origin repository, that's all.\n"
     strerr += "       If you are on a clone, push it on origin with 'swgit push'"
     GLog.s( GLog.S, strerr )
@@ -616,7 +616,7 @@ Usage: swgit init -r <x.y.z.t> [-u <user>] [-l <label>] [-c <int-br-name>]
 
   GLog.logRet(0)
 
-  strerr= "\nPLEASE VERIFY EVERITHING IS OK, THEN:\n"
+  strerr= "\nPLEASE VERIFY EVERYTHING IS OK, THEN:\n"
   strerr += "       If you are on your origin repository, that's all.\n"
   strerr += "       If you are on a clone, push it on origin with:\n"
   strerr += "         swgit branch -s %s\n" % eval_dev_br( options )

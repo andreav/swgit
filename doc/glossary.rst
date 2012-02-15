@@ -30,7 +30,7 @@ Glossary
     Is a file present only into repositories containing submodules.
     One file exist for each submodule.
     They stores submodule HEAD when committing project repository.
-    Try issueing::
+    Try issuing::
 
       git ls-files HEAD
 
@@ -40,18 +40,18 @@ Glossary
   track-all repository
     | It is a repository crated to manage releases and execute builds or deliveries.
     | It is a repository with both INT/develop and INT/stable local branches.
-    | The most quickly way to obtain this, is cloning repoitory with option:
+    | The most quickly way to obtain this, is cloning repository with option:
 
-        ``--integartor``
+        ``--integrator``
 
-    | Otherwise you can track it locally by issueing:
+    | Otherwise you can track it locally by issuing:
 
-        ``swgit branch --track <.../INT/stable>``
-        ``swgit config --bool swgit.integrator True``
+        | ``swgit branch --track <.../INT/stable>``
+        | ``swgit config --bool swgit.integrator True``
 
 
   named tag
-    | A tag with `regexp` field valorized.
+    | A tag with `regexp` field set.
     | swgit will match user input against that/those regexp
     | When configuring a regexp list, a string must be provided where 
       entries are separed by this field:
@@ -59,5 +59,5 @@ Glossary
         |subs_txt_regexpseparator|
 
   numbered tag
-    | A tag without `regexp` field valorized.
+    | A tag without `regexp` field set.
     | swgit will evaluate tag name starting from 000 on.
