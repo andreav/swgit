@@ -829,7 +829,7 @@ class Test_Push( Test_Base ):
     #create tag
     out, errCode = self.swgitUtil_Clone_.tag_create( TAG_NUM_ECHO_NOPAST["tagtype"] )
     self.util_check_SUCC_scenario( out, errCode, 
-                                   "Tagging in past creates also tag PAST/",
+                                   "Tagging in past also creates tag PAST/",
                                    "tagging in past" )
 
     #come back on HEAD
@@ -929,11 +929,11 @@ class Test_Push( Test_Base ):
     #create tag
     out, errCode = self.swgitUtil_Clone_.tag_create( TAG_NUM_ECHO_NOPAST["tagtype"] )
     self.util_check_SUCC_scenario( out, errCode, 
-                                   "Tagging in past creates also tag PAST/",
+                                   "Tagging in past also creates tag PAST/",
                                    "tagging in past" )
     out, errCode = self.swgitUtil_Clone_.tag_create( TAG_NUM_ECHO_NOPAST["tagtype"] )
     self.util_check_SUCC_scenario( out, errCode, 
-                                   "Tagging in past creates also tag PAST/",
+                                   "Tagging in past also creates tag PAST/",
                                    "tagging in past" )
 
     #check labels not existence

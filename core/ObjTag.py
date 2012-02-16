@@ -350,7 +350,7 @@ class TagLIVDsc( TagDsc ):
     self.merge_on_stable_         = True
     self.merge_on_cst_            = True
     self.push_on_origin_          = True
-    self.one_x_commit_            = True
+    self.one_x_commit_            = False
     self.only_on_integrator_repo_ = True
     self.allowed_brtypes_         = [ SWCFG_BR_INT, SWCFG_BR_CST ]
     self.denied_brtypes_          = []
@@ -376,7 +376,7 @@ class TagSTBDsc( TagDsc ):
     self.merge_on_stable_         = True
     self.merge_on_cst_            = True
     self.push_on_origin_          = True
-    self.one_x_commit_            = True
+    self.one_x_commit_            = False
     self.only_on_integrator_repo_ = True
     self.allowed_brtypes_         = [ SWCFG_BR_INT, SWCFG_BR_CST ]
     self.denied_brtypes_          = []

@@ -295,7 +295,7 @@ def main():
     log( "%s" % " ".join(fwd_args) )
 
     out, ret = core.MyCmd.myCommand_fast( fwd_args, shell = False )
-    print out[:-1]
+    sys.stdout.write( out ); sys.stdout.flush()
     
     log("\n"+out[:-1],noSlim=True)
 

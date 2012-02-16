@@ -1007,25 +1007,51 @@ denied-brtypes          =
   #
   # stabilize
   #
-  def stabilize_stb( self, stb, src ):
+  def stabilize_stb( self, labelname, src, dstbr = None, force = False ):
     opt_src = ""
     if src != "":
       opt_src = "--src %s" % src
-    cmd = "cd %s && %s stabilize --stb %s %s" % ( self.repodir_, SWGIT, stb, opt_src )
+
+    opt_force = ""
+    if force:
+      opt_force = "--force"
+
+    opt_dstbr = ""
+    if dstbr != None:
+      opt_dstbr = dstbr
+
+    cmd = "cd %s && %s stabilize --stb %s %s %s %s" % ( self.repodir_, SWGIT, opt_force, labelname, opt_src, opt_dstbr )
     return myCommand( cmd )
 
-  def stabilize_liv( self, liv ):
-    cmd = "cd %s && %s stabilize --liv %s --no-interactive" % ( self.repodir_, SWGIT, liv )
+  def stabilize_liv( self, liv, dstbr = None, nomergeback = False ):
+    str_nomergeback = ""
+    if nomergeback:
+      str_nomergeback = "--no-merge-back"
+
+    opt_dstbr = ""
+    if dstbr != None:
+      opt_dstbr = dstbr
+
+    cmd = "cd %s && %s stabilize --batch --liv %s %s %s" % ( self.repodir_, SWGIT, liv, str_nomergeback, opt_dstbr )
     return myCommand( cmd )
+
+  def stabilize_both( self, labelname, src, dstbr = None, force = False ):
+    opt_src = ""
+    if src != "":
+      opt_src = "--src %s" % src
+
+    opt_force = ""
+    if force:
+      opt_force = "--force"
+
+    opt_dstbr = ""
+    if dstbr != None:
+      opt_dstbr = dstbr
+
+    cmd = "cd %s && %s stabilize --stb --liv --batch %s %s %s %s" % ( self.repodir_, SWGIT, opt_force, labelname, opt_src, opt_dstbr )
+    return myCommand( cmd )
+
   
-  def stabilize_cst( self, cst, src ):
-    opt_src = ""
-    if src != "":
-      opt_src = "--src %s" % src
-    cmd = "cd %s && %s stabilize --cst %s %s" % ( self.repodir_, SWGIT, cst, opt_src )
-    return myCommand( cmd )
-
-
 
 
   #

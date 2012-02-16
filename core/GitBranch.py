@@ -27,19 +27,6 @@ from ObjTag import *
 import Utils
 import Utils_All
 
-def isCurrBrStb():
-  cb = Branch.getCurrBr()
-  if cb.isValid() == False:
-    return False
-
-  genericStable = re.compile('/INT/.*stable$')
-  matches = genericStable.findall( cb.getShortRef() )
-  if len( matches ) > 0:
-    return True
-
-  return False
-
-
 def creaBranch( branch, type, ref ):
  
   currUser = Env.getCurrUser()
@@ -421,7 +408,7 @@ def check_track( value ):
 def evalBranchType( options ):
   type = SWCFG_BR_FTR
   cb = Branch.getCurrBr()
-  if isCurrBrStb() == True:
+  if cb.isStable():
     type = SWCFG_BR_FIX
   return type
 
@@ -481,7 +468,7 @@ def check_create( options ):
     if cb.isValid() == False:
       GLog.f( GLog.E, "ERROR: In 'detached head', plese specify --src while creating branch." )
       return 1
-    if ib.getShortRef() != cb.getShortRef() and isCurrBrStb() == False:
+    if ib.getShortRef() != cb.getShortRef() and not cb.isStable():
       GLog.f( GLog.E, "ERROR: Outside integration or stable branch, --src-reference is mandatory." )
       return 1
 

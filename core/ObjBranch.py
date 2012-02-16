@@ -93,18 +93,20 @@ class Branch:
   
   def dump( self ):
     ret = ""
-    ret += "  getFullRef:  [" + self.getFullRef() + "]\n"
-    ret += "  isValid:     [" + str( self.isValid() ) + "]\n"
-    ret += "  matches:     [" + "\n".join( self.getMatches() ) + "]\n"
-    ret += "  L matches:   [" + "\n".join( self.getLocalMatches() ) + "]\n"
-    ret += "  R matches:   [" + "\n".join( self.getRemoteMatches() ) + "]\n"
-    ret += "  getRepo:     [" + self.getRepo() + "]\n"
-    ret += "  getRel:      [" + self.getRel() + "]\n"
-    ret += "  getUser:     [" + self.getUser() + "]\n"
-    ret += "  getType:     [" + self.getType() + "]\n"
-    ret += "  getName:     [" + self.getName() + "]\n"
-    ret += "  getShortRef: [" + self.getShortRef() + "]\n"
-    ret += "  to_remote:   [" + self.branch_to_remote()[0] + "]\n"
+    ret += "  getFullRef:     [" + self.getFullRef() + "]\n"
+    ret += "  isValid:        [" + str( self.isValid() ) + "]\n"
+    if not self.isValid():
+      ret += "  notValidReason: [" + self.getNotValidReason() + "]\n"
+    ret += "  matches:        [" + "\n".join( self.getMatches() ) + "]\n"
+    ret += "  L matches:      [" + "\n".join( self.getLocalMatches() ) + "]\n"
+    ret += "  R matches:      [" + "\n".join( self.getRemoteMatches() ) + "]\n"
+    ret += "  getRepo:        [" + self.getRepo() + "]\n"
+    ret += "  getRel:         [" + self.getRel() + "]\n"
+    ret += "  getUser:        [" + self.getUser() + "]\n"
+    ret += "  getType:        [" + self.getType() + "]\n"
+    ret += "  getName:        [" + self.getName() + "]\n"
+    ret += "  getShortRef:    [" + self.getShortRef() + "]\n"
+    ret += "  to_remote:      [" + self.branch_to_remote()[0] + "]\n"
     return ret
 
   def isValid( self ):
@@ -259,6 +261,26 @@ class Branch:
       return self.getNotValidReason()
     return "%s/%s" % (self.getRepo(), self.getShortRef() )
 
+  def isDevelop( self ):
+    if not self.isValid_:
+      return False
+
+    genericDevelop = re.compile('/INT/.*develop$')
+    matches = genericDevelop.findall( self.getShortRef() )
+    if len( matches ) > 0:
+      return True
+
+    return False
+
+  def isStable( self ):
+    if not self.isValid_:
+      return False
+
+    genericStable = re.compile('/INT/.*stable$')
+    matches = genericStable.findall( self.getShortRef() )
+    if len( matches ) > 0:
+      return True
+    return False
 
   @staticmethod
   def list( repo="*", rel="*/*/*/*", user="*", typeB="*", nameB="*" ):
@@ -300,7 +322,7 @@ class Branch:
     outerr, errCode = myCommand_fast( "cd %s; git symbolic-ref -q HEAD" % root )
     if errCode != 0:
       #print "  Attention, you are in detached HEAD"
-      return NullBranch()
+      return NullBranch( "You are in detached head" )
     ref = outerr[:-1]
     #format: refs/heads/... remove this
     ref = ref [ findnth( ref, "/", 2 ) + 1 : ]
@@ -323,12 +345,12 @@ class Branch:
     if not ib.isValid():
       return NullBranch( ib.getNotValidReason() )
     
+    if not ib.isDevelop():
+      return NullBranch( "Integration branch is not 'develop', no 'stable' exists." )
+
     devFullName = ib.getShortRef()
     sbBase = devFullName[ 0 : devFullName.rfind( "/" ) ]
     sbName = devFullName[ devFullName.rfind( "/" ) + 1 : ]
-
-    if sbName.find( "develop" ) == -1:
-      return NullBranch( "integration branch is not 'develop', no 'stable' exists." )
 
     sbName = sbName.replace( "develop", "stable" )
     sb = Branch( sbBase + "/" + sbName )
@@ -337,10 +359,18 @@ class Branch:
        #startb.getType() == SWCFG_BR_INT or \
   @staticmethod
   def is_side_operation( startb, ib, sb ):
-    if startb.getShortRef() == ib.getShortRef() or \
-       startb.getShortRef() == sb.getShortRef() or \
-       startb.getType() == SWCFG_BR_CST:
+    #if startb.getShortRef() == ib.getShortRef() or \
+    #   startb.getShortRef() == sb.getShortRef() or \
+    #   startb.getType() == SWCFG_BR_CST:
+    #     return False
+
+    brtype = startb.getType()
+    if brtype == SWCFG_BR_INT or brtype == SWCFG_BR_CST:
          return False
+
+    if startb.getShortRef() == ib.getShortRef():
+         return False
+
     return True
 
 
@@ -372,6 +402,8 @@ def main():
   print "  getFullRef:         [" + b.getFullRef() + "]\n"
 
   print "  isValid:            [" + str( b.isValid() ) + "]\n"
+  if not b.isValid():
+    print "  notvalidReason:     [" + b.getNotValidReason() + "]\n"
   print "  matches:            [" + " ".join( b.getMatches() ) + "]\n"
   print "  local  matches:     [" + " ".join( b.getLocalMatches() ) + "]\n"
   print "  remote matches:     [" + " ".join( b.getRemoteMatches() ) + "]\n"

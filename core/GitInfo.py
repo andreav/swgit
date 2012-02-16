@@ -126,15 +126,11 @@ def info_is_pushed_on_origin( remote, ref ):
 
 
 
-def info_eval_changelog( upstream, downstream ):
-  cb = Branch.getCurrBr()
-  rel = cb.getRel()
+def info_eval_changelog( upstream, downstream, rel ):
 
   ret, out = info_eval_anylog( upstream, downstream, rel, SWCFG_TAG_DEV )
   if ret != 0:
-    GLog.f( GLog.E, "Error retrieving changelog between %s and %s" % (upstream,downstream) )
-    GLog.logRet(1)
-    sys.exit(1)
+    return out, 1
 
   cmd_show_commitmsg = " git for-each-ref \
   --format='From:    %(*authorname) %(*authoremail)\nDate:    %(*authordate)\nRef:     %(refname)\n\n    %(subject)\n\n'"
@@ -146,23 +142,16 @@ def info_eval_changelog( upstream, downstream ):
   else: 
     result, errCode = myCommand( "%s %s" % ( cmd_show_commitmsg, "refs/tags/"+" refs/tags/".join(devs) ) )
     if errCode != 0:
-      GLog.f( GLog.E, "\tError executing command retrieving changelog" )
-      GLog.logRet(errCode)
-      sys.exit(1)
+      return result, 1
+
+  return result[:-1], 0
 
 
-  print result[:-1]
-
-
-def info_eval_fixlog( upstream, downstream ):
-  cb = Branch.getCurrBr()
-  rel = cb.getRel()
+def info_eval_fixlog( upstream, downstream, rel ):
 
   ret, out = info_eval_anylog( upstream, downstream, rel, SWCFG_TAG_FIX )
   if ret != 0:
-    GLog.f( GLog.E, "Error retrieving fixlog between %s and %s" % (upstream,downstream) )
-    GLog.logRet(1)
-    sys.exit(1)
+    return out, 1
 
   cmd_show_commitmsg = " git for-each-ref \
   --format='From:    %(*authorname) %(*authoremail)\nDate:    %(*authordate)\nRef:     %(refname)\n\n    %(subject)\n\n'"
@@ -174,23 +163,16 @@ def info_eval_fixlog( upstream, downstream ):
   else: 
     result, errCode = myCommand( "%s %s" % ( cmd_show_commitmsg, "refs/tags/"+" refs/tags/".join(fixes) ) )
     if errCode != 0:
-      GLog.f( GLog.E, "\tError executing command retrieving changelog" )
-      GLog.logRet(errCode)
-      sys.exit(1)
+      return result, 1
+
+  return result[:-1], 0
 
 
-  print result[:-1]
-
-
-def info_eval_ticketlog( upstream, downstream ):
-  cb = Branch.getCurrBr()
-  rel = cb.getRel()
+def info_eval_ticketlog( upstream, downstream, rel ):
 
   ret, out = info_eval_anylog( upstream, downstream, rel, SWCFG_TAG_FIX )
   if ret != 0:
-    GLog.f( GLog.E, "Error retrieving ticketlog between %s and %s" % (upstream,downstream) )
-    GLog.logRet(1)
-    sys.exit(1)
+    return out, 1
 
   tickets = []
   for f in out.splitlines():
@@ -198,9 +180,9 @@ def info_eval_ticketlog( upstream, downstream ):
     tickets.append( f[ f.rfind("/")+1 : ] )
 
   if len( tickets ) == 0:
-      return
+      return "", 0
 
-  print "\n".join( tickets )
+  return "\n".join( tickets )
 
 
 def info_eval_diff( upstreamRef, downstreamRef, stat = False, file = "", cbc = False , onlyme = False ):
@@ -520,12 +502,18 @@ def main():
   #
   # log infos
   #
-  if options.chg == True:
-    info_eval_changelog( options.upstream, dw )
-  if options.fix == True:
-    info_eval_fixlog( options.upstream, dw )
-  if options.tkt == True:
-    info_eval_ticketlog( options.upstream, dw )
+  if options.chg or options.fix or options.tkt:
+    if options.chg == True:
+      out, err = info_eval_changelog( options.upstream, dw, cb.getRel() )
+    if options.fix == True:
+      out, err = info_eval_fixlog( options.upstream, dw, cb.getRel() )
+    if options.tkt == True:
+      out, err = info_eval_ticketlog( options.upstream, dw, cb.getRel() )
+
+    GLog.f( GLog.E, out )
+    if err != 0:
+      GLog.logRet(1)
+
 
   #
   # diff infos
@@ -551,18 +539,16 @@ def main():
     cb = Branch.getCurrBr()
     ib = Branch.getIntBr()
     sb = Branch.getStableBr()
-    if (cb.getShortRef() == ib.getShortRef() or cb.getShortRef() == sb.getShortRef()) and options.reference == None:
-      GLog.f( GLog.E, "You cannot issue --zero-diff/-z on both develop nor stable" )
-    else:
-      newbr = cb.getNewBrRef()
-      if options.reference != None:
-        newbr = find_new ( options.reference )
-      #print newbr
-      ref = "" #default is diff with working directory
-      if options.reference != None:
-        ref = options.reference
 
-      info_eval_diff( newbr, ref, options.stat, file = filename, cbc = options.cbc, onlyme = options.my )
+    newbr = cb.getNewBrRef()
+    if options.reference != None:
+      newbr = find_new ( options.reference )
+    #print newbr
+    ref = "" #default is diff with working directory
+    if options.reference != None:
+      ref = options.reference
+
+    info_eval_diff( newbr, ref, options.stat, file = filename, cbc = options.cbc, onlyme = options.my )
 
 
 def check_info_ref(option, opt_str, value, parser):

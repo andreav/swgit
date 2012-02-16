@@ -290,7 +290,7 @@ def execute( options ):
     # avoid pulling it
     if rem_ib.isValid():
 
-      GLog.s( GLog.S, "\tFirst update %s repository. Pulling %s from %s ... " % ( dumpRepoName("local"), rem_ib.getShortRef(), rem_ib.branch_to_remote()[0] ) )
+      GLog.s( GLog.S, "\tFirst update %s repository. Pulling all local branches ... " % ( dumpRepoName("local") ) )
 
       errCode = GitPull.pull( rem_ib.getShortRef(), options.noStat, GLog.tab+2 )
       GLog.logRet( errCode, indent="\t" )
