@@ -64,6 +64,7 @@ to simplify communication, leading to some advantages:
            swgit ssh --test-remote-access [<user>] <address>
            swgit ssh --copy-identity [--identity <identity>] [<user>] <address> 
 
+Please refer to :doc:`workflow_ssh` for any examples.
 
 Analyzing ssh configuration
 ---------------------------
@@ -235,11 +236,4 @@ he/she can try:
     swgit ssh --copy-identity --identity <a_public_id_half> [<user>] <remote_addr>
 
 
-
-
-
-
-
-
-
-
+Please refer to :doc:`workflow_ssh` for any examples.

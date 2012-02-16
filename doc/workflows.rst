@@ -27,6 +27,7 @@ Workflows
    :maxdepth: 2
 
    workflow_init.rst
+   workflow_ssh.rst
    Workflow - Develop <developing.rst>
    workflow_repo_update.rst
    Workflow - Stabilize <stabilizing.rst>
