@@ -36,8 +36,8 @@ so it is ideal:
   * when managing team work
 
 
-ssh identity management
-=======================
+Identity management
+===================
 
 User can configure ssh identities by modifying ~/.ssh/ssh_config file.
 
@@ -113,7 +113,8 @@ User can configure ssh identities by modifying ~/.ssh/ssh_config file.
 Main-User workflow
 ==================
 
-   |subs_img_todo| add image
+.. image:: images/static/swgit_ws_ssh_mainuser.gif
+  :scale: 75
 
 1.  Only one main-user account on server.
 
@@ -147,10 +148,11 @@ Main-User workflow
 
 
 
-One user-one accounts workflow
-==============================
+One user-one account workflow
+=============================
 
-   |subs_img_todo| add image
+.. image:: images/static/swgit_ws_ssh_oneuser_oneaccount.gif
+  :scale: 75
 
 1.  Each user can log into remote-addr with its own account.
 
