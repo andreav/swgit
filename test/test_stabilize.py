@@ -20,7 +20,7 @@
 from test_proj_util import *
 
 #TODO projects
-#TODO liv conflict
+#TODO more repos, ambiguous stable (or devevlopon mergeback)?
 
 
 class Test_Stabilize( Test_ProjBase ):
@@ -964,7 +964,6 @@ class Test_Stabilize( Test_ProjBase ):
     self.util_check_EQUAL( devbr_afterD_minus1_sha, devbr_afterC_sha, "develop not moved" )
     self.util_check_EQUAL( stbbr_afterD_minus1_sha, stbbr_afterC_sha, "stable not moved" )
     self.util_check_EQUAL( stbbr_afterD_sha,  stblivD_sha, "liv label not created" )
-
 
 
 

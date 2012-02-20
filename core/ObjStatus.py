@@ -142,7 +142,10 @@ class Status:
       return 1, errstr
       
     if len( fileChanged ) > 0:
-      errstr = "Locally modified file(s) detected. Please procede in this way:\n\tswgit commit -a\n\t\t"
+      errstr  = "Locally modified file(s) detected. Please procede in this way:\n"
+      errstr += "\tswgit stash\n"
+      errstr += "\tor\n"
+      errstr += "\tswgit commit -a\n\t\t"
       errstr = errstr + "\n\t\t".join( fileChanged )
       return 1, errstr
 

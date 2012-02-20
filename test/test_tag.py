@@ -2189,7 +2189,7 @@ class Test_Tag( Test_Base ):
 
     out, errCode = self.swgitUtil_Clone_.tag_create( TAG_NUM_ECHO_PAST["tagtype"] )
     self.util_check_DENY_scenario( out, errCode,
-                                   "You already have a",
+                                   "Only 1", #label per-commit allowed.
                                    "tagging in past a past label" )
 
     tag0_sha, errCode = self.gitUtil_Clone_.ref2sha( created_custtag_label_1 )

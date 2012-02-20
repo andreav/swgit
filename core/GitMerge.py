@@ -37,24 +37,21 @@ def merge( fullref_dev, options ):
   #if err != 0:
   #  return err, errstr
 
-  if options.squash == False :
-    cmd="git merge --no-ff " + fullref_dev
+  if not options.squash:
+    cmd="git merge --no-ff %s" % fullref_dev
   else:
-    cmd="git merge --squash " + fullref_dev
+    cmd="git merge --squash %s" % fullref_dev
  
   out,errCode = myCommand( cmd )
 
-  if options.noStat == False :
+  if not options.noStat:
     GLog.s( GLog.S, indentOutput( out[:-1], 1) )
   
-  if errCode != 0:
-    return errCode, out
-
   return errCode, out
 
 
 
-def check_merge( ref, cb, ib, sb ):
+def check_merge( ref, tb ):
   
   lb = Tag( ref )
   if lb.isValid():
@@ -66,46 +63,62 @@ def check_merge( ref, cb, ib, sb ):
     GLog.f( GLog.E, "Invalid ref : " + ref + " Please specify a valid label or branch to be merged in")
     return 1
 
-  if cb.getShortRef() != ib.getShortRef():
-    onDevelop = False
-  else:
-    onDevelop = True
-  if sb.isValid() and cb.getShortRef() == sb.getShortRef() :
-    onStable = True
-  else:
-    onStable = False
-  if onDevelop == True and br.isValid() == True:
-    GLog.f( GLog.E, "Cannot merge a branch into develop. Please specify a valid reference to be merged in")
+  logib = Branch.getLogicalIntBr()
+
+  onIntBr = False
+  if tb.getShortRef() == logib.getShortRef():
+    onIntBr = True
+
+  if onIntBr and br.isValid():
+    strerr  = "Cannot directly merge a branch into integration branch '%s'.\n" % tb.getShortRef()
+    strerr += "Please specify a valid label to be merged in."
+    GLog.f( GLog.E, strerr )
     return 1
-  if onStable == True and br.isValid() == True:
-    GLog.f( GLog.E, "Cannot merge a branch into stable. Please specify a valid reference to be merged in")
+
+  if tb.getType() == SWCFG_BR_CST and br.isValid():
+    strerr  = "Cannot directly merge a branch into CST branch '%s'.\n" % tb.getShortRef()
+    strerr += "Please specify a valid label to be merged in."
+    GLog.f( GLog.E, strerr )
     return 1
-  if onDevelop == True and lb.isValid() == True and tagDsc.get_merge_on_develop() == False:
-    GLog.f( GLog.E, "Cannot merge label %s into develop. Please specify valid label to be merged in" % lb.getType() )
+
+  if tb.isDevelop() and lb.isValid() and not tagDsc.get_merge_on_develop():
+    strerr  = "Cannot merge label %s into develop branch '%s'.\n" % (lb.getType(), tb.getShortRef())
+    strerr += "Please specify valid label to be merged in."
+    GLog.f( GLog.E, strerr )
     return 1
-  if onStable == True and lb.isValid() == True and not tagDsc.get_merge_on_stable():
-    GLog.f( GLog.E, "Cannot merge label %s into stable. Please specify valid label to be merged in" % lb.getType() )
+
+  if tb.isStable() and lb.isValid() and not tagDsc.get_merge_on_stable():
+    strerr  = "Cannot merge label %s into stable branch '%s'.\n" % (lb.getType(), tb.getShortRef())
+    strerr += "Please specify valid label to be merged in."
+    GLog.f( GLog.E, strerr )
     return 1
-  if cb.getType() == SWCFG_BR_CST and br.isValid() == True:
-    GLog.f( GLog.E, "Cannot merge a branch into CST branches. Please specify a valid reference to be merged in")
+
+  if tb.getType() == SWCFG_BR_CST and lb.isValid() and not tagDsc.get_merge_on_cst():
+    strerr  = "Cannot merge label %s into CST branch '%s'.\n" % (lb.getType(), tb.getShortRef())
+    strerr += "Please specify valid label to be merged in."
+    GLog.f( GLog.E, strerr )
     return 1
-  if cb.getType() == SWCFG_BR_CST and lb.isValid() == True and not tagDsc.get_merge_on_cst():
-    GLog.f( GLog.E, "Cannot merge label %s into CST branch. Please specify valid label to be merged in" % lb.getType() )
-    return 1
-#  TODO
-#  how to force never merge back CST branches?
-#  This is not ok because if you want to develop into CST repo, maybe you want to erge some CST upgrade onto your FTR branch ... 
+
+#  TODO: how to force never merge back CST branches?
+#  This is not ok because if you want to develop into CST repo, 
+#    maybe you want to merge some CST upgrade onto your FTR branch ... 
+#    But you could use a tag ... 
 #  if ref.find( "/CST/" ) != -1:
 #    GLog.f( GLog.E, "CST branches never can be used as sourece reference, use patches if you want a contribute from that branch" )
 #    return 0
-  if cb.getType() == SWCFG_BR_CST: #jump release checks
+
+  if tb.getType() == SWCFG_BR_CST: #jump release checks
     return 0
-  if br.isValid() == True and cb.getRel() != br.getRel():
-    GLog.f( GLog.E, "Cannot merge branch references from different realses (%s) vs (%s)" % ( cb.getShortRef(), br.getShortRef() ) )
-    return 1
-  if lb.isValid() == True and cb.getRel() != lb.getRel():
-    GLog.f( GLog.E, "Cannot merge label references from different realses (%s) vs (%s)" % ( cb.getShortRef(), lb.getTagShortRef() ) )
-    return 1
+
+  #TODO: make option to jump release checks during merge
+  for objRef in ( br, lb ):
+    if objRef.isValid() and tb.getRel() != objRef.getRel():
+      strerr  = "Cannot merge references from different realses."
+      strerr += " start-from release: %s" % objRef.getRel()
+      strerr += " merge-into release: %s" % tb.getRel()
+      GLog.f( GLog.E, strerr )
+      return 1
+
   return 0
 
 
@@ -123,26 +136,33 @@ def check( options ):
     GLog.f( GLog.E, errstr )
     return 1
 
-  cb = Branch.getCurrBr()
-  ib = Branch.getIntBr()
-  sb = Branch.getStableBr()
-
-  if len(g_args) == 0 and options.merge_on_int == False:
+  if len(g_args) == 0 and not options.merge_on_int:
       GLog.f( GLog.E, "FAILED - Without merge arguments, -I option is mandatory." )
       return 1
 
-  if options.merge_on_int == True:
-    if cb.getShortRef() == ib.getShortRef():
-      GLog.f( GLog.E, "FAILED - You already are on your current integration branch, please remote -I option" )
-      return 1
-
-
+  cb = Branch.getCurrBr()
   if not cb.isValid():
     if options.merge_on_int == False:
       strerr  = "FAILED - Cannot merge anything into detached-head.\n"
       strerr += "         You can specify -I to find any previous DEV and merge it on you current integration branch"
       GLog.f( GLog.E, strerr )
       return 1
+
+  logib = Branch.getLogicalIntBr()
+
+  if options.merge_on_int:
+
+    if not logib.isValid():
+      strerr  = "FAILED - Cannot merge without an integration branch set.\n"
+      strerr += "         Plase set it by 'swgit branch --set-integration-br'."
+      GLog.f( GLog.E, strerr )
+      return 1
+
+    if cb.getShortRef() == logib.getShortRef():
+      GLog.f( GLog.E, "FAILED - You already are on your current integration branch, please remove -I option" )
+      return 1
+
+
 
     cb_sr, cb_strerr = Utils.eval_curr_branch_shortref( "HEAD" )
     if cb_sr == "":
@@ -179,59 +199,58 @@ def check( options ):
 
 
   if options.merge_on_int == True:
-    return check_merge( g_reference, ib, ib, sb )
+    return check_merge( g_reference, logib )
   else:
-    return check_merge( g_reference, cb, ib, sb )
+    return check_merge( g_reference, cb )
 
 
 def execute( options ):
   
-  if options.quiet == True:
-    options.noStat = True
-  str_stat = ""
-  if options.noStat ==True:  
-    str_stat = " --no-stat "
+  logib = Branch.getLogicalIntBr()
 
-  if options.merge_on_int == True:
-    output_opt = getOutputOpt(options)
-    cmd_swto_int = "SWINDENT=%d %s branch -i %s" % ( GLog.tab, SWGIT, output_opt)
+  if options.merge_on_int:
+
+    cmd_swto_int = "SWINDENT=%d %s branch -s %s %s" % ( GLog.tab, SWGIT, logib.getShortRef(), getOutputOpt(options))
     errCode = os.system( cmd_swto_int )
     if errCode != 0 :
       GLog.logRet( errCode )
       return 1     
 
-  refer = ""
+  #after switching
+  cb = Branch.getCurrBr()
+
+  # stabilize invoke without checks and with a sha reference
+  refer = g_reference
+
   lb = Tag( g_reference )
-  if lb.isValid() == True:
+  if lb.isValid():
     refer = lb.getFullRef()
 
   br = Branch( g_reference )
-  if br.isValid() == True:
+  if br.isValid():
     refer = br.getFullRef()
 
-  cb = Branch.getCurrBr()
-  ib = Branch.getIntBr()
-  sb = Branch.getStableBr()
+  if cb.getShortRef() == logib.getShortRef():
 
-  if cb.getShortRef() == ib.getShortRef():
-
-    rem_ib = ib.branch_to_remote_obj()
-    if not rem_ib.isValid():
-      GLog.f( GLog.E, rem_ib.getNotValidReason() )
+    # Pull 
+    #  only if intbr is already pushed on origin.
+    #  But it can also happen you work locally with intbr,
+    #   and first time you will push, you will push also this intbr 
+    #   => jump pull if intbr not on remote
+    rem_logib = logib.branch_to_remote_obj()
+    if not rem_logib.isValid():
+      GLog.f( GLog.E, rem_logib.getNotValidReason() )
     else:
-      # Pull only if intbr is already pushed on origin.
-      # But it can also happen you work locally with intbr, and only when you push, 
-      #  you will push also this intbr => no pull available now
       GLog.s( GLog.S, "First update your local repository ..." )
-      errCode = GitPull.pull( ib.getShortRef(), options.noStat, GLog.tab+1 )
+      errCode = GitPull.pull( options.noStat, GLog.tab+1 )
       GLog.logRet( errCode )
       if errCode != 0:
         return 1
 
   #
-  #  merge on develop 
+  # merge
   #
-  GLog.s( GLog.S, "Merging " + refer + " into " + cb.getFullRef() + " ..." )
+  GLog.s( GLog.S, "Merging %s into %s ..." % (refer, cb.getShortRef()) )
   errCode, out = merge( refer, options  )
   GLog.logRet( errCode )
   if errCode != 0:
@@ -243,7 +262,8 @@ def execute( options ):
 
 def main():
   usagestr =  """\
-Usage: swgit merge <startpoint> [-I] [--squash] [--no-stat] """
+Usage: swgit merge [--squash] [--no-stat] <reference> 
+       swgit merge [--squash] [--no-stat] -I [<reference>]"""
 
   parser = OptionParser( usage = usagestr, 
                          description='>>>>>>>>>>>>>> swgit - Merge <<<<<<<<<<<<<<' )
@@ -263,8 +283,10 @@ Usage: swgit merge <startpoint> [-I] [--squash] [--no-stat] """
   GLog.initGitLogs( options )
   GLog.s( GLog.I, " ".join( sys.argv ) )
 
-  global g_args
+  global g_args, g_reference
   g_args = args
+  if len( g_args ) > 0:
+    g_reference = g_args[0]
 
 #  if options.all == True:
 #    ret = Utils_All.All( options )

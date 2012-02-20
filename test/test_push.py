@@ -1051,7 +1051,7 @@ class Test_Push( Test_Base ):
     remote = ""
     remote_h = self.sw_origrepo_h
     if modetest_morerepos():
-      remote   = "origin"
+      remote   = ORIG_REPO_AREMOTE_NAME
       remote_h = self.sw_aremoterepo_h
 
     #
@@ -1080,11 +1080,6 @@ class Test_Push( Test_Base ):
     #
     intdev, errCode = self.swgitUtil_Clone_.branch_switch_to_br( MYINT_STB )
     self.util_check_SUCC_scenario( intdev, errCode, "", "switch to %s" % MYINT_STB )
-    intdev, errCode = self.swgitUtil_Clone_.push( remote )
-    self.util_check_DENY_scenario( intdev, errCode, "Cannot directly push a develop branch.", "pushing from stable" )
-
-    out, errCode = self.swgitUtil_Clone_.int_branch_set( MYINT_STB )
-    self.util_check_SUCC_scenario( intdev, errCode, "", "pushing from stable" )
     intdev, errCode = self.swgitUtil_Clone_.push( remote )
     self.util_check_SUCC_scenario( intdev, errCode, "", "pushing from stable" )
 
@@ -1170,14 +1165,9 @@ class Test_Push( Test_Base ):
     remote = ""
     remote_h = self.sw_origrepo_h
     if modetest_morerepos():
-      remote   = "origin"
+      remote   = ORIG_REPO_AREMOTE_NAME
       remote_h = self.sw_aremoterepo_h
 
-    intdev, errCode = self.swgitUtil_Clone_.push( remote )
-    self.util_check_DENY_scenario( intdev, errCode, "Cannot directly push a develop branch", "pushing from stable" )
-
-    out, errCode = self.swgitUtil_Clone_.int_branch_set( MYINT_DEV )
-    self.util_check_SUCC_scenario( intdev, errCode, "", "pushing from stable" )
     intdev, errCode = self.swgitUtil_Clone_.push( remote )
     self.util_check_SUCC_scenario( intdev, errCode, "", "pushing from stable" )
 
@@ -1241,7 +1231,7 @@ class Test_Push( Test_Base ):
     remote = ""
     remote_h = self.sw_origrepo_h
     if modetest_morerepos():
-      remote   = "origin"
+      remote   = ORIG_REPO_AREMOTE_NAME
       remote_h = self.sw_aremoterepo_h
 
     #
@@ -1302,7 +1292,7 @@ class Test_Push( Test_Base ):
     remote = ""
     remote_h = self.sw_origrepo_h
     if modetest_morerepos():
-      remote   = "origin"
+      remote   = ORIG_REPO_AREMOTE_NAME
       remote_h = self.sw_aremoterepo_h
 
     #

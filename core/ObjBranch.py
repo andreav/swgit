@@ -338,6 +338,45 @@ class Branch:
     else:
       return NullBranch( str )
 
+  #
+  # getLogicalIntBr masks getIntBr
+  #
+  #  deduce intbr from current branch
+  #  usefull to avoid setting ib when it is obvious
+  #
+  #     cb      | inbr
+  #   ----------+-------
+  #    INT      |  cb
+  #    CST      |  cb
+  #   intbr     |  ib
+  #    FTR      |  ib
+  #    FIX      |  sb ??
+  #
+  @staticmethod
+  def getLogicalIntBr( dir = "." ):
+
+    cb = Branch.getCurrBr( dir )
+    ib = Branch.getIntBr( dir )
+
+    if not cb.isValid():
+      return ib
+
+    brtype = cb.getType()
+    if brtype == SWCFG_BR_INT or brtype == SWCFG_BR_CST:
+       return cb
+
+#    if brtype == SWCFG_BR_FIX:
+#      if ib.isDevelop():
+#        return Branch( id.getShortRef().replace( "develop", "stable" )
+#        #eval stable, if valid, return
+#      elif ib.isStable():
+#        return ib
+#      else:
+#        "Cannot deduce logical integartion branch starting from %s" % cb.getShortRef()
+
+    return ib
+
+
   @staticmethod
   def getStableBr():
     ib = Branch.getIntBr()
@@ -355,24 +394,6 @@ class Branch:
     sbName = sbName.replace( "develop", "stable" )
     sb = Branch( sbBase + "/" + sbName )
     return sb
-
-       #startb.getType() == SWCFG_BR_INT or \
-  @staticmethod
-  def is_side_operation( startb, ib, sb ):
-    #if startb.getShortRef() == ib.getShortRef() or \
-    #   startb.getShortRef() == sb.getShortRef() or \
-    #   startb.getType() == SWCFG_BR_CST:
-    #     return False
-
-    brtype = startb.getType()
-    if brtype == SWCFG_BR_INT or brtype == SWCFG_BR_CST:
-         return False
-
-    if startb.getShortRef() == ib.getShortRef():
-         return False
-
-    return True
-
 
 
 class NullBranch( Branch ):

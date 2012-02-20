@@ -171,11 +171,18 @@ class swgit__utils:
       if retcode != 0:
         return out, retcode
 
-      #lcoalize taht branch (so when adding this repo as remote, i will have a remote branch more)
+      #localize that branch (so when adding this repo as remote, i will have a remote branch more)
       cmd = "cd %s && %s branch -s %s" % ( aremote, SWGIT, ORIG_REPO_aBRANCH )
       out, retcode = myCommand( cmd )
       if retcode != 0:
         return out, retcode
+
+      #localize also stable (for stabilize tests)
+      cmd = "cd %s && %s branch -s %s" % ( aremote, SWGIT, ORIG_REPO_STABLE_BRANCH )
+      out, retcode = myCommand( cmd )
+      if retcode != 0:
+        return out, retcode
+
 
       shutil.copytree( aremote, aremote_bkp )
       shutil.copytree( aremote_bkp, aremote_dst )
@@ -304,6 +311,10 @@ class swgit__utils:
 
   def int_branch_set( self, ib, all = "" ):
     return swgit__utils.int_branch_set_dst( self.repodir_, ib, all )
+
+  def int_branch_UNset( self ):
+    cmd = "cd %s && %s branch --unset-integration-br" % ( self.repodir_, SWGIT )
+    return myCommand( cmd )
 
   @staticmethod
   def current_branch_dst( dst, all=""):

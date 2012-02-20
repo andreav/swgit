@@ -566,19 +566,18 @@ def stabilize( lblType, lblName, src_str, mergeOntoBr = None ):
   #
   # Merge ref label
   #
-  cmd_merge_stblbl = "git merge --no-ff %s" % startref
-
   GLog.s( GLog.S, "\tMerging reference %s into branch %s" % ( startref, cb.getShortRef() ) )
 
-  out, errCode = myCommand( cmd_merge_stblbl )
+  #Jump swgit merge checks.
+  # Here swgit merge should deny because no label is provided (sha instead).
+  # We cannot tag before issuing merge, in order to the let user resolving conflicts.
+  # We will create INT/develop/STB label only once, after successful merge
+  cmd_merge_stblbl = "SWINDENT=%d SWCHECK=NO %s merge %s" % ( GLog.tab+2, SWGIT, startref )
+  errCode = os.system( cmd_merge_stblbl )
   if errCode != 0:
-    GLog.f( GLog.E, "\tError while merging %s into branch %s" % ( startref, cb.getShortRef() ) )
-    GLog.f( GLog.E, indentOutput( out[:-1], 2 ) )
     GLog.logRet(errCode)
     return 1 
-
   GLog.logRet( 0, indent="\t" )
-
 
 
   #

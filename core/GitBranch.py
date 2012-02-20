@@ -312,6 +312,13 @@ def set_new_int_br( branch ):
 
   return errCode  
 
+def unset_intbr():
+
+  GLog.s( GLog.S, "UnSetting INTEGRATION branch into repo %s ... " % (Env.getLocalRoot()) )
+  out, errCode = set_repo_cfg( SWCFG_INTBR, SWCFG_UNSET )
+  GLog.logRet( errCode )
+  return 0
+
 
 def trackBranch( brObj ):
 
@@ -401,7 +408,7 @@ def check_track( value ):
   trackedInfo, tracked = toBeTrackedBr.get_track_info()
   if tracked and trackedInfo[Branch.TRACK_REMOTE] == toBeTrackedBr.getRepo():
     GLog.f( GLog.E, "Already tracked branch %s " % value )
-    return 1
+    return 0
 
   return 0 
 
@@ -698,6 +705,10 @@ def check( options ):
     err = check_branch_opt( "--set-integration-br" )
     if err != 0:
       return 1
+  if options.unset_intbr:
+    err = check_branch_opt( "--unset-integration-br" )
+    if err != 0:
+      return 1
   if options.get_int_br == True:
     err = check_branch_opt( "--get-integration-br" )
     if err != 0:
@@ -712,9 +723,8 @@ def check( options ):
       options.newB != None or options.switch_to_int == True:
     err, errstr = Status.checkLocalStatus_rec( ignoreSubmod = True )
     if err != 0:
-      GLog.f( GLog.E, indentOutput(errstr,1) )
+      GLog.f( GLog.E, errstr )
       return 1
-
 
   if options.switch_to != None:
     valid, err = validate_ref( options.switch_to )
@@ -885,6 +895,10 @@ def execute( options ):
   elif options.set_new_int != None:
 
     return set_new_int_br( options.set_new_int )
+
+  elif options.unset_intbr:
+
+    return unset_intbr()
 
   elif options.get_int_br == True:
 
@@ -1089,6 +1103,15 @@ gitbranch_mgt_options = [
         }
       ],
     [ 
+      "--unset-integration-br",
+      {
+        "action"  : "store_true",
+        "dest"    : "unset_intbr",
+        "default" : False,
+        "help"    : "Unset current integartion branch"
+        }
+      ],
+    [ 
       "-t",
       "--track",
       { 
@@ -1127,15 +1150,6 @@ gitbranch_mgt_options = [
         "help"    : 'Change name to current branch and all its labels locally and remotely.'
         }
       ],
-#    [ 
-#      "--all",
-#      {
-#        "action"  : "store_true",
-#        "dest"    : "all",
-#        "default" : False,
-#        "help"    : "Execute pull over all repositories of current project"
-#        }
-#     ]
     ]
 
 
@@ -1297,6 +1311,7 @@ branch_allowmap = {
       "--track"                : branch_opt_allowed,
       "--to-integration"       : branch_opt_allowed,
       "--set-integration-br"   : branch_opt_allowed,
+      "--unset-integration-br" : branch_opt_allowed,
       "--get-integration-br"   : branch_opt_allowed,
       "--current-branch"       : branch_opt_allowed,
       "--list"                 : branch_opt_allowed + branch_opt_list_all,

@@ -74,7 +74,7 @@ def check_allowed_options( checkopt, allowmap, alias_short2long ):
   #un-alias input
   input = sys.argv
   for (pos,val) in enumerate( input ):
-    if val[0] != "-":
+    if len( val ) > 0 and val[0] != "-":
       continue
     if val in alias_short2long.keys():
       input[pos] = alias_short2long[val]
@@ -89,7 +89,7 @@ def check_allowed_options( checkopt, allowmap, alias_short2long ):
   #check compatibility
   if checkopt in allowmap.keys():
     for currinopt in input:
-      if currinopt[0] != "-":
+      if len( currinopt ) > 0 and currinopt[0] != "-":
         continue
       if checkopt == currinopt:
         continue #do not process myseld
@@ -126,7 +126,7 @@ def load_command_options( parser, optionList ):
 
 
 def check_input(option, opt_str, value, parser):
-  if value[0] == "-":
+  if len( value ) > 0 and value[0] == "-":
     parser.error("Argument error on: "+ value)
   setattr(parser.values, option.dest, value)
 
