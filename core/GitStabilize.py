@@ -375,13 +375,14 @@ def check(options):
   #
   # src management
   #
+#  if options.src == None:
+#    options.src =  "./:HEAD"
+
   if options.src != None:
 
-    options.src = options.src.replace( '.:', './:' )
+    if Env.is_aproj():
 
-    if Env.is_aproj() == True:
-
-      ret, options.src = src_reference_check( options.src )
+      ret, options.src = src_reference_check( options.src, options.batch )
       if ret != 0:
         GLog.f( GLog.E, options.src )
         return 1
@@ -395,10 +396,12 @@ def check(options):
                          "or move to root project (%s)" % Env.getLocalRoot() )
         return 1
 
+    options.src = options.src.replace( '.:', './:' )
+
     if options.src.find( ':' ) == -1: #only 1 val
       options.src = "./:%s" % options.src
     if options.src.find( './:' ) == -1: #not currdir listed
-      options.src = "./:%s," % shaHEAD + options.src
+      options.src = "./:HEAD," + options.src
 
     global g_srcoptions_map
 
@@ -413,7 +416,6 @@ def check(options):
         new_opt_str += "%s:%s," % ( dir, ref )
 
     options.src = new_opt_str[:-1] #last ','
-
 
     for currentry in options.src.split( ',' ):
       dir, ref = currentry.split(':')
@@ -434,13 +436,14 @@ def check(options):
           GLog.f( GLog.E, "iside repo %s, according to swgit.stabilize-anyref option, only NGT labels are allowed to be stabilized" % dir )
           return 1
 
+
   # generic checks
-  err, errstr = Status.checkLocalStatus_rec()
+  err, errstr = Status.checkLocalStatus_rec( ignoreSubmod = True )
   if err != 0:
     GLog.f( GLog.E, errstr )
     return 1 
 
-  if is_integrator_repo() == False:
+  if not is_integrator_repo():
     strerr  = "This repository has been created as a 'developer' one.\n"
     strerr += "  You can stabilize only inside 'integrator' repositories.\n"
     strerr += "  You can:\n"
@@ -517,10 +520,11 @@ def check_liv( options ):
 ########################
 # STABILIZE
 ########################
-def stabilize( lblType, lblName, src_str, mergeOntoBr = None ):
+def stabilize( lblName, src_str, mergeOntoBr = None ):
 
-  cb = Branch.getCurrBr()
-  startref     = g_srcoptions_map[ "./" ]
+  lblType  = SWCFG_TAG_STB
+  cb       = Branch.getCurrBr()
+  startref = g_srcoptions_map[ "./" ]
 
   str_begin = ""
   err, beginning_sha = getSHAFromRef( "HEAD" )
@@ -604,36 +608,44 @@ def stabilize( lblType, lblName, src_str, mergeOntoBr = None ):
       GLog.f( GLog.E, out )
       return 1
 
-  #
-  # Create STB Tag on develop
-  #
-  if lblType == SWCFG_TAG_STB and cb.isStable(): #this tag only when stabilizing develop
-    devShortRef = cb.getShortRef().replace( "stable", "develop" )
-
-    fullTagName_dev = "%s/%s/%s" % ( devShortRef, lblType, lblName )
-
-    cmd_chk_startref   = "%s branch --quiet -s %s" % (SWGIT, devShortRef)
-    cmd_tag_create     = "SWINDENT=%d %s tag -m \"%s\" %s %s" % (GLog.tab+1, SWGIT, fullTagName_dev, lblType, lblName)
-    cmd_create_tag_dev = "%s && %s" % ( cmd_chk_startref, cmd_tag_create )
-    errCode = os.system( cmd_create_tag_dev )
-    if errCode != 0:
-      GLog.f( GLog.E, "\tError while creating label %s on branch %s" % ( lblName, cb.getShortRef() ) )
-      GLog.logRet(errCode)
-      return 1 
 
   #
   # Create Tag on mergeOntoBr
   #
   fullTagName_target = "%s/%s/%s" % ( cb.getShortRef(), lblType, lblName )
-
-  cmd_chk_back       = "%s branch --quiet -s %s" % (SWGIT, cb.getShortRef())
+  #cmd_chk_back       = "%s branch --quiet -s %s" % (SWGIT, cb.getShortRef())
   cmd_tag_create     = "SWINDENT=%d %s tag -m \"%s\" %s %s" % (GLog.tab+1, SWGIT, fullTagName_target, lblType, lblName)
-  cmd_create_tag_target = "%s && %s" % ( cmd_chk_back, cmd_tag_create )
-  errCode = os.system( cmd_create_tag_target )
+  #cmd_create_tag_target = "%s && %s" % ( cmd_chk_back, cmd_tag_create )
+  #errCode = os.system( cmd_create_tag_target )
+  errCode = os.system( cmd_tag_create )
   if errCode != 0:
     GLog.f( GLog.E, "\tError while creating label %s on branch %s" % ( lblName, cb.getShortRef() ) )
     GLog.logRet(errCode)
     return 1 
+
+  #
+  # Create STB Tag on develop
+  # Note: if you stabilize any ref outside develop, any FTR/topic/STB/Drop.X 
+  #       can be created
+  #
+  if cb.isStable(): #this tag only when stabilizing develop
+
+    devShortRef = cb.getShortRef().replace( "stable", "develop" )
+    fullTagName_dev    = "%s/%s/%s" % ( devShortRef,      lblType, lblName )
+
+    cmd_chk_startref   = "%s branch --quiet -s %s" % (SWGIT, startref)
+    cmd_tag_create     = "SWINDENT=%d %s tag -m \"%s\" %s %s" % (GLog.tab+1, SWGIT, fullTagName_dev, lblType, lblName)
+    cmd_create_tag_dev = "%s && %s" % ( cmd_chk_startref, cmd_tag_create )
+    errCode = os.system( cmd_create_tag_dev )
+    if errCode != 0:
+      GLog.f( GLog.E, "\tError creating label %s on branch %s, not critical." % ( lblName, cb.getShortRef() ) )
+
+    cmd_chk_back       = "%s branch --quiet -s %s" % (SWGIT, cb.getShortRef())
+    errCode = os.system( cmd_chk_back )
+    if errCode != 0:
+      GLog.f( GLog.E, "\tError while coming back on %s" % ( cb.getShortRef() ) )
+      GLog.logRet(errCode)
+      return 1 
 
   GLog.logRet( 0 )
   return 0
@@ -683,7 +695,7 @@ def execute( options ):
 ########################
 def tag_drop_stb( options ):
 
-  return stabilize( SWCFG_TAG_STB, g_labelname, options.src, g_targetbr )
+  return stabilize( g_labelname, options.src, g_targetbr )
   
 
 ########################
@@ -851,7 +863,7 @@ def tag_drop_liv( options ):
   # Proj: after merge, update subrepos according to new map 
   #       also on develop
   if Env.is_aproj():
-    cmd_refresh = "cd %s && SWINDENT=%s %s proj --reset HEAD" % ( Env.getProjectRoot(), GLog.tab, SWGIT )
+    cmd_refresh = "cd %s && SWINDENT=%s %s proj --reset HEAD" % ( Env.getProjectRoot(), GLog.tab + 1, SWGIT )
     errCode = os.system( cmd_refresh )
     if errCode != 0:
       GLog.logRet( 1 )
@@ -924,7 +936,7 @@ def main():
   usagestr =  """\
 Usage: swgit stabilize [--force] --stb [--src <startpoint>] <label> [<dst-br>]
        swgit stabilize [--force] --liv <label> [<dst-br>]
-       swgit stabilize [--force] --stb --liv <label> [<dst-br>]
+       swgit stabilize [--force] --stb --liv --src <startpoint> <label> [<dst-br>]
        swgit stabilize --show-mail-cfg|--test-mail-cfg"""
 
   parser       = OptionParser( usage = usagestr,

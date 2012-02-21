@@ -241,7 +241,7 @@ def execute( options ):
     if not rem_logib.isValid():
       GLog.f( GLog.E, rem_logib.getNotValidReason() )
     else:
-      GLog.s( GLog.S, "First update your local repository ..." )
+      GLog.s( GLog.S, "First update %s repository. Pulling branch %s ... " % ( dumpRepoName("local"), logib.getShortRef() ) )
       errCode = GitPull.pull( options.noStat, GLog.tab+1 )
       GLog.logRet( errCode )
       if errCode != 0:

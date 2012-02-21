@@ -330,7 +330,7 @@ class Test_Merge( Test_Base ):
     
     out, errCode = self.swgitUtil_.merge_on_int( "" )
     self.util_check_SUCC_scenario( out, errCode, 
-                                   "First update your local repository",
+                                   "First update",
                                    "on ftrbr, merge -I no param => merge last DEV on INT" ) 
     self.util_check_SUCC_scenario( out, errCode, 
                                    "Merging refs/tags/%s into" % self.CREATED_DEV_0,
@@ -366,7 +366,7 @@ class Test_Merge( Test_Base ):
     
     out, errCode = self.swgitUtil_.merge_on_int( "" )
     self.util_check_SUCC_scenario( out, errCode, 
-                                   "First update your local repository",
+                                   "First update",
                                    "on ftrbr, merge -I no param => merge last DEV on INT" ) 
     self.util_check_SUCC_scenario( out, errCode, 
                                    "Merging refs/tags/%s into" % self.CREATED_DEV_0,
@@ -402,7 +402,7 @@ class Test_Merge( Test_Base ):
     
     out, errCode = self.swgitUtil_.merge_on_int( "" )
     self.util_check_SUCC_scenario( out, errCode, 
-                                   "First update your local repository",
+                                   "First update",
                                    "on ftrbr, merge -I no param => merge last DEV on INT" ) 
     self.util_check_SUCC_scenario( out, errCode, 
                                    "Merging refs/tags/%s into" % self.CREATED_DEV_0,
@@ -464,7 +464,7 @@ class Test_Merge( Test_Base ):
 
     out, errCode = self.swgitUtil_.merge_on_int( "" )
     self.util_check_SUCC_scenario( out, errCode, 
-                                   "First update your local repository",
+                                   "First update",
                                    "on ftrbr, merge -I no param => merge last DEV on INT" ) 
     self.util_check_SUCC_scenario( out, errCode, 
                                    "Merging refs/tags/%s into" % self.CREATED_DEV_0,
@@ -582,7 +582,7 @@ class Test_Merge( Test_Base ):
 
     out, errCode = self.swgitUtil_.merge( self.CREATED_DEV_0 )
     self.util_check_SUCC_scenario( out, errCode, 
-                                   "First update your local repository",
+                                   "First update",
                                    "on ftrbr, merge -I no param => merge last DEV on INT" ) 
     self.util_check_SUCC_scenario( out, errCode, 
                                    "Merging refs/tags/%s into" % self.CREATED_DEV_0,

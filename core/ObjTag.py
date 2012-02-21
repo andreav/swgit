@@ -378,7 +378,9 @@ class TagSTBDsc( TagDsc ):
     self.push_on_origin_          = True
     self.one_x_commit_            = False
     self.only_on_integrator_repo_ = True
-    self.allowed_brtypes_         = [ SWCFG_BR_INT, SWCFG_BR_CST ]
+    #When stabilizing any ref, this check is too restrictive
+    #self.allowed_brtypes_         = [ SWCFG_BR_INT, SWCFG_BR_CST ]
+    self.allowed_brtypes_         = []
     self.denied_brtypes_          = []
     self.tag_in_past_             = True
     self.isValid_                 = True

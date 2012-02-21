@@ -35,12 +35,13 @@ import test_init
 import test_pull
 import test_push
 import test_nointbr
+import test_stabilize
 import test_proj
 import test_proj_clone
 import test_proj_snapshot
 import test_proj_update
 import test_proj_merge
-import test_stabilize
+import test_proj_stabilize
 import test_all
 import test_workflow
 import test_readonly
@@ -62,6 +63,7 @@ tests_map = (
     test_proj_snapshot,
     test_proj_merge,
     test_proj_update,
+    test_proj_stabilize,
     test_all,
     test_workflow,
     test_readonly,

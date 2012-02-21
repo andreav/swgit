@@ -10,7 +10,7 @@ Configuration happens inside file:
 
       ${REPO_ROOT}/.swdir/cfg/mail.cfg
 
-Configuration can be checked by issueing:
+Configuration can be checked by issuing:
 
       swgit push      --show-mail-cfg
       swgit stabilize --show-mail-cfg
@@ -30,7 +30,7 @@ In order to send mails, a command must exists:
 
 Mail server can be local or remote.In the latter case, ssh user/addr must be provided.
 
-   Note: For push mail delivery, 'to' field will be choosed among:
+   Note: For push mail delivery, 'to' field will be choosen among:
 
         1. git config --get --local user.email
         2. git config --get --global user.email
@@ -39,20 +39,20 @@ Mail server can be local or remote.In the latter case, ssh user/addr must be pro
 
 Following a file configuration example:
 
-   [STABILIZE]
-   MAILSERVER-SSHUSER = andreav
-   MAILSERVER-SSHADDR = 213.92.16.171
-   FROM               = andreav.pub@gmail.com
-   TO                 = andreav.pub@gmail.com another.developer@yahoo.com
-   CC                 =
-   BCC                =
-   SUBJECT            = swgit stabilize notification
-   BODY-HEADER        = Hi All!\nA new drop has been released\n"
-   BODY-FOOTER        =
+   [stabilize]
+   mailserver-sshuser = andreav
+   mailserver-sshaddr = 213.92.16.171
+   from               = andreav.pub@gmail.com
+   to                 = andreav.pub@gmail.com another.developer@yahoo.com
+   cc                 =
+   bcc                =
+   subject            = swgit stabilize notification
+   body-header        = Hi All!\nA new drop has been released\n"
+   body-footer        =
 
-   [PUSH]
-   MAILSERVER-SSHUSER = andreav
-   MAILSERVER-SSHADDR = 213.92.16.171
-   FROM               = andreav.pub@gmail.com
-   TO                 =
-   SUBJECT            = swgit push mail notification
+   [push]
+   mailserver-sshuser = andreav
+   mailserver-sshaddr = 213.92.16.171
+   from               = andreav.pub@gmail.com
+   to                 =
+   subject            = swgit push mail notification

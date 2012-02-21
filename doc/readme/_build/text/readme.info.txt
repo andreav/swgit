@@ -19,7 +19,8 @@ Accept parameters can be grouped into 2 categories:
 
    2. Actions: operations to accomplish on result commit(s)
 
-Some actions need just 1 param, other actions need a range of them.
+Some actions need just 1 parameter, other actions need a range of
+them.
 
 
 1. Input parameters
@@ -29,9 +30,9 @@ As input parameter, user can specify:
 
    * Single reference:
 
-        swgit inro -r <reference>
+        swgit info -r <reference>
 
-     By usging -r parameter, you can tell swgit info to operate on a
+     By using -r parameter, you can tell swgit info to operate on a
      specific reference It can be a commit, a branch, a tag.
 
    * Nothing
@@ -46,7 +47,7 @@ As input parameter, user can specify:
 
      let the user specify oldest reference
 
-     --downsream <ref>
+     --downstream <ref>
 
      let the user specify newest reference delimiting the range It is
      optional; by omitting it, swgit info uses HEAD instead.
@@ -114,8 +115,7 @@ As input parameter, user can specify:
    will show which action a user can invoke on the input reference
    list.
 
-Here, we will report some examples usefull in every-day developer-
-life:
+Here, we will report some examples useful in every-day developer-life:
 
 
 Files modified
@@ -133,9 +133,9 @@ Describe a reference
         upstream  :       1/0/0/0/andreav/INT/stable/LIV/DROP.AJ  (217 commits backwards )
         downstream:       1/0/0/0/andreav/INT/stable/LIV/DROP.AK  (110 commits forwards  )
 
-   -t accept any kind of lable.
+   -t accept any kind of label.
       You can issue, for instance, -t NGT in order to describe the
-      entered reference in respet to NGT tags.
+      entered reference in respect to NGT tags.
 
    upstream shows previous LIV label downstream shows, if it exists,
    which LIV label the reference has been merged into.
@@ -152,7 +152,7 @@ Pushed on origin?
 
       swgit info -o
 
-   This checks if HEAD has alredy been pushed on origin
+   This checks if HEAD has already been pushed on origin
 
 
 Diff between commits

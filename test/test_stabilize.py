@@ -19,7 +19,6 @@
 
 from test_proj_util import *
 
-#TODO projects
 #TODO more repos, ambiguous stable (or devevlopon mergeback)?
 
 
@@ -41,6 +40,7 @@ class Test_Stabilize( Test_ProjBase ):
   LBL_B = "Drop.B"
   CREATED_STBDEV_B = "%s/STB/%s" % ( ORIG_REPO_DEVEL_BRANCH,  LBL_B )
   CREATED_STBSTB_B = "%s/STB/%s" % ( ORIG_REPO_STABLE_BRANCH, LBL_B )
+  CREATED_STBFTR_B = "%s/STB/%s" % ( FULL_BRANCH_NAME, LBL_B )
   CREATED_LIV_B    = "%s/LIV/%s" % ( ORIG_REPO_STABLE_BRANCH, LBL_B )
   CHGLOG_B = "%s/%s/changelog/%s/%s/LIV_%s.chg" % ( STABILIZE_CLONE_DIR, SWREPO_DIR, ORIG_REPO_REL, ORIG_REPO_SUBREL, LBL_B )
   FIXLOG_B = "%s/%s/changelog/%s/%s/LIV_%s.fix" % ( STABILIZE_CLONE_DIR, SWREPO_DIR, ORIG_REPO_REL, ORIG_REPO_SUBREL, LBL_B )
@@ -306,12 +306,13 @@ class Test_Stabilize( Test_ProjBase ):
     self.util_clone_repo_stabilize( self.STABILIZE_CLONE_DIR, "" )
     out, errCode = self.sw_clo_h.set_cfg( self.CFG_ANYREF, "True" )
 
-    devbr_before_sha, devbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
-    stbbr_before_sha, stbbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
-
     out, errCode = self.sw_clo_h.branch_switch_to_br( self.BRANCH_NAME ) #localize
     out, errCode = self.sw_clo_h.int_branch_set( self.BRANCH_NAME )
     self.util_check_SUCC_scenario( out, errCode, "", "settinf FTR intbr")
+
+    devbr_before_sha, devbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    stbbr_before_sha, stbbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+    ftrbr_before_sha, ftrbr_err = self.sw_clo_h.ref2sha( self.FULL_BRANCH_NAME )
 
     #stabilize with FTR intbr
     out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, "HEAD" )
@@ -339,13 +340,18 @@ class Test_Stabilize( Test_ProjBase ):
 
     stbdev_sha, stbdev_err = self.sw_clo_h.ref2sha( self.CREATED_STBDEV_B )
     stbstb_sha, stbstb_err = self.sw_clo_h.ref2sha( self.CREATED_STBSTB_B )
+    stbftr_sha, stbftr_err = self.sw_clo_h.ref2sha( self.CREATED_STBFTR_B )
     stbstb_minus1_sha, stbstb_minus1_err = self.sw_clo_h.ref2sha( self.CREATED_STBSTB_B + "~1" )
+    stbftr_minus1_sha, stbftr_minus1_err = self.sw_clo_h.ref2sha( self.CREATED_STBFTR_B + "~1" )
+    devbr_minus1_sha, devbr_minus1_err   = self.sw_clo_h.ref2sha( ORIG_REPO_DEVEL_BRANCH + "^2" )
+    ftrbr_sha, ftrbr_err = self.sw_clo_h.ref2sha( self.FULL_BRANCH_NAME )
 
-    self.util_check_EQUAL( stbdev_err, 0, "must be craeted STB tag" )
-    self.util_check_EQUAL( stbstb_err, 0, "must be craeted STB tag" )
+    self.util_check_EQUAL( stbdev_err, 1, "must NOT be craeted develop STB tag" )
+    self.util_check_EQUAL( stbftr_err, 0, "must be craeted feature STB tag" )
+    self.util_check_EQUAL( stbstb_err, 0, "must be craeted stable STB tag" )
 
-    self.util_check_EQUAL( devbr_before_sha, stbdev_sha,  "STB tag on wrong commit" )
-    self.util_check_EQUAL( stbbr_before_sha, stbstb_minus1_sha,  "STB tag on wrong commit" )
+    self.util_check_EQUAL( ftrbr_before_sha, stbftr_sha,  "ftr STB tag on wrong commit" )
+    self.util_check_EQUAL( devbr_minus1_sha, ftrbr_sha,  "STB tag on wrong commit" )
 
     stbbr_after_sha, stbbr_after_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
     stbbr_minus1_after_sha, stbbr_after_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB + "~1" )
@@ -879,7 +885,7 @@ class Test_Stabilize( Test_ProjBase ):
   #    or
   #   provide it on command line
   #
-  def test_Stabilize_02_04_LIV_OtherIntBr( self ):
+  def test_Stabilize_02_05_LIV_OtherIntBr( self ):
 
     self.util_clone_repo_stabilize( self.STABILIZE_CLONE_DIR, "" )
 

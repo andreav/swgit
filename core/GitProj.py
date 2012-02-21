@@ -1355,6 +1355,14 @@ Usage: swgit proj --add-repo [-b branch] [--snapshot] <url> [<localname>]
     #print "ref2: ", ref2
     #print "args: ", args_submod
 
+    strbody = "project  %s" % map.getDir()
+    str_tit1 = "REF1:       "
+    str_tit2 = "REF2:       "
+    str_ref_2 = ref2
+    if ref2 == "":
+      str_ref_2 = "working dir"
+    print "%s\n%s\n%s%s\n%s%s\n%s" % ( "-"*len(strbody), strbody, str_tit1, ref1, str_tit2, str_ref_2, "-"*len(strbody) )
+
     for rn in args_submod:
       rn = dir2reponame( rn )
       smodref_1, errCode = submod_getrepover_atref( map.getDir(), rn, ref1 )
@@ -1382,7 +1390,7 @@ Usage: swgit proj --add-repo [-b branch] [--snapshot] <url> [<localname>]
             GLog.f( GLog.E, strerr )
             return 1
 
-      strbody = "repository  %s" % rn
+      strbody = "submodule  %s" % rn
       if ref2 == "MERGE_HEAD":
         str_tit1 = "HEAD:       "
         str_tit2 = "MERGE_HEAD: "

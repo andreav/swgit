@@ -1031,7 +1031,7 @@ denied-brtypes          =
     if dstbr != None:
       opt_dstbr = dstbr
 
-    cmd = "cd %s && %s stabilize --stb %s %s %s %s" % ( self.repodir_, SWGIT, opt_force, labelname, opt_src, opt_dstbr )
+    cmd = "cd %s && %s stabilize --batch --stb %s %s %s %s" % ( self.repodir_, SWGIT, opt_force, labelname, opt_src, opt_dstbr )
     return myCommand( cmd )
 
   def stabilize_liv( self, liv, dstbr = None, nomergeback = False ):

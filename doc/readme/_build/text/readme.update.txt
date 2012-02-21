@@ -1,9 +1,9 @@
 
-Wokflow - Update Repo
-*********************
+Workflow - Update Repo
+**********************
 
 
-pull executed on integartion branch
+pull executed on integration branch
 ===================================
 
       swgit branch --current-branch
@@ -64,12 +64,12 @@ pull executed on FTR branch
          1/0/0/0/andreav/FTR/topic
       swgit pull -I/--merge-from-int
 
-This last command updates integartion branch on your local repository
+This last command updates integration branch on your local repository
 
-After this it will merge local integartion branch on your current
+After this it will merge local integration branch on your current
 branch
 
-This command may be usefull in order to update an old branch and
+This command may be useful in order to update an old branch and
 keeping on developing on that branch.
 
 Note: If you are going beginning a new work, do not update an old branch!
@@ -126,7 +126,7 @@ Note: If you are going beginning a new work, do not update an old branch!
                                                origin/develop
 
 
-push executed from integartion br
+push executed from integration br
 =================================
 
       swgit branch --current-branch
@@ -134,7 +134,7 @@ push executed from integartion br
       swgit push
 
 This last command updates origin repository with your local
-integartion branch.
+integration branch.
 
          ''''''''''''''''''''''''''
           Before push from develop
@@ -214,10 +214,10 @@ push executed from FTR branch
 =============================
 
       swgit branch --current-branch
-         1/0/0/0/andraev/FTR/topic
+         1/0/0/0/andreav/FTR/topic
       swgit push -I/--merge-on-int
 
-This command executes also a merge on integartion branch.
+This command executes also a merge on integration branch.
 
    1. Update local repository.
 

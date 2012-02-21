@@ -2,7 +2,7 @@
 Repository Structure
 ********************
 
-Every numebered point is commented below.
+Every numbered point is commented below.
 
      1/0/0/0/andreav/INT/develop           1/0/0/0/andreav/INT/stable
               |                                      |                  |
@@ -50,7 +50,7 @@ Every numebered point is commented below.
 
 **0. Branches and tags**
 
-   Please refere to *References* for a detailed description.
+   Please refer to *References* for a detailed description.
 
 **1. INT/develop**
 
@@ -62,7 +62,7 @@ Every numebered point is commented below.
 
    * One per release
 
-   * Is owned by ALL developers: every user has resposability when
+   * Is owned by ALL developers: every user has responsibility when
      pushing on it
 
    * Is usually set as integration branch (see "intbr")
@@ -71,7 +71,7 @@ Every numebered point is commented below.
 
      * It is read/write
 
-     * Branches are created strating from INT/develop. Release is
+     * Branches are created starting from INT/develop. Release is
        deduced by it.
 
      * DEV Labels are merged into it
@@ -82,15 +82,15 @@ Every numebered point is commented below.
 
    This branch:
 
-   * Is created by integrator toghether with its *INT/develop* twin
+   * Is created by integrator together with its *INT/develop* twin
      with the command:
 
         swgit init --rel 1.0.0.0
 
-   * Stores all delivered stable software versions labelled with *LIV*
+   * Stores all delivered stable software versions labeled with *LIV*
      tag.
 
-   * Stores candidates software for next drop labelled with *STB* tag.
+   * Stores candidates software for next drop labeled with *STB* tag.
 
    * On developer repository, it is read-only.
 
@@ -99,7 +99,7 @@ Every numebered point is commented below.
      The most quickly way to obtain this, is cloning repository with
      option:
 
-        "--track-all"
+        "--integrator"
 
    Project integrator, please refer to "stabilizing" for more details.
 
@@ -107,7 +107,7 @@ Every numebered point is commented below.
 
    This branch:
 
-   * Is created by default when issueing this command:
+   * Is created by default when issuing this command:
 
         swgit branch --create 'topic'
 
@@ -135,7 +135,7 @@ Every numebered point is commented below.
 
    This is a special commit.
 
-   Only DEV labels can be merged into an integartion branch (usually
+   Only DEV labels can be merged into an integration branch (usually
    */INT/develop*).
 
    You can attach a DEV label to a commit in two ways:
@@ -148,14 +148,14 @@ Every numebered point is commented below.
 
             swgit tag dev
 
-   Note: Taggind always happens on last commit (HEAD). If you want to tag
+   Note: Tagging always happens on last commit (HEAD). If you want to tag
      a commit *in past*, you first need to switch on it, then tag:
 
         swgit branch -s <a reference>
         swgit tag dev
 
      This will create DEV tag as expected AND a twin tag under PAST/
-     namespace. This second tag is a temporary tag, a placemarker, and
+     namespace. This second tag is a temporary tag, a placeholder, and
      will be deleted at next push time.
 
 **6. 7. STABLE commits**
@@ -163,7 +163,7 @@ Every numebered point is commented below.
    These commits:
 
    * Represent a moment in repository history where contributes have
-     been freezed on *stable* branch.
+     been frozen on *stable* branch.
 
    * Point '7' represents a good candidate from which to create a
      delivery.
@@ -178,7 +178,8 @@ Every numebered point is commented below.
 
         swgit stabilize --stb
 
-   Plase refere to *Reporting on INT/stable* for more informations.
+   Please refer to *Reporting on INT/stable (STB labels)* for more
+   informations.
 
 **8. FIX branch (/FIX/)**
 
@@ -191,12 +192,12 @@ Every numebered point is commented below.
 
    This branch:
 
-   * Is created by default when issueing this command from an
+   * Is created by default when issuing this command from an
      *INT/stable* branch:
 
         swgit branch --create 'hotfix'
 
-   * Has a "FIX" branch type, but behaves exaclty like any FTR branch.
+   * Has a "FIX" branch type, but behaves exactly like any FTR branch.
 
    * Has a branch name as provided at creation time.
 
@@ -224,8 +225,8 @@ Every numebered point is commented below.
    This depends on you repository workflow.
 
    * When FIX branches contain a super-important last minute fix, you
-     should report it on *INT/develop*. This is the default behaviour
-     when issueing a:
+     should report it on *INT/develop*. This is the default behavior
+     when issuing a:
 
         "swgit stabilize --liv"
 
@@ -233,9 +234,9 @@ Every numebered point is commented below.
      setting release number, you may want NOT to merge them on
      *INT/develop*.
 
-        "swgit stabilize --liv --no-report"
+        "swgit stabilize --liv --no-merge-back"
 
-   Plase refere to "stabilizing" for more informations.
+   Please refer to "stabilizing" for more informations.
 
 **11. CST/customer**
 

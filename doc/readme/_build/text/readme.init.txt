@@ -1,6 +1,6 @@
 
-Wokflow - Initializing
-**********************
+Workflow - Initializing
+***********************
 
 
 Initializing a new swgit repository
@@ -57,7 +57,7 @@ Initializing a new swgit repository
           DONE
       DONE
 
-      PLEASE VERIFY EVERITHING IS OK, THEN:
+      PLEASE VERIFY EVERYTHING IS OK, THEN:
              If you are on your origin repository, that's all.
              If you are on a clone, push it on origin with:
                swgit branch -s 1/0/0/0/andreav/INT/develop
@@ -113,7 +113,7 @@ Init Options
          1/0/0/0/andreav/INT/stable/STB/Drop.A
          1/0/0/0/andreav/INT/stable/LIV/Drop.A
 
-      For more informations abouy these labels, please refer to
+      For more informations about these labels, please refer to
       "stabilizing"
 
       Note: If you want to modify LIV regexp (for instance allowing any 15
@@ -126,8 +126,8 @@ Init Options
    1. --share option is supported. This is forwarded to *git init*.
 
 
-Intializig a new release
-========================
+Initializing a new release
+==========================
 
    This creates a new couple *INT/develop* *INT/stable*.
 
@@ -147,7 +147,7 @@ Intializig a new release
           DONE
       DONE
       Initializing INT branches ...
-          Creating branch 2/0/0/ropallea/INT/develop ...
+          Creating branch 2/0/0/andreav/INT/develop ...
           DONE
           Creating label 2/0/0/0/andreav/INT/develop/NEW/BRANCH
           DONE
@@ -159,7 +159,7 @@ Intializig a new release
           DONE
       DONE
 
-      PLEASE VERIFY EVERITHING IS OK, THEN:
+      PLEASE VERIFY EVERYTHING IS OK, THEN:
              If you are on your origin repository, that's all.
              If you are on a clone, push it on origin with:
                swgit branch -s 2/0/0/0/andreav/INT/develop
@@ -203,7 +203,7 @@ Initializing a new product
           DONE
       DONE
 
-      PLEASE VERIFY EVERITHING IS OK, THEN:
+      PLEASE VERIFY EVERYTHING IS OK, THEN:
              If you are on your origin repository, that's all.
              If you are on a clone, push it on origin with:
                swgit branch -s 1/0/0/0/andreav/INT/a_product_develop
