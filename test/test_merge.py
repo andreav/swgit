@@ -86,7 +86,7 @@ class Test_Merge( Test_Base ):
 
     out, errCode = self.swgitUtil_.merge_on_int( self.CREATED_BR )
     self.util_check_DENY_scenario( out, errCode, 
-                                   "Cannot merge a branch into develop.", 
+                                   "Cannot directly merge a branch into integration branch",
                                    "MUST FAIL merge branch" ) 
 
     out, errCode = self.swgitUtil_.branch_switch_to_int()
@@ -94,12 +94,12 @@ class Test_Merge( Test_Base ):
 
     out, errCode = self.swgitUtil_.merge( self.CREATED_BR )
     self.util_check_DENY_scenario( out, errCode, 
-                                   "Cannot merge a branch into develop.", 
+                                   "Cannot directly merge a branch into integration branch",
                                    "MUST FAIL merge branch" ) 
     
     out, errCode = self.swgitUtil_.merge_on_int( self.CREATED_BR )
     self.util_check_DENY_scenario( out, errCode, 
-                                   "You already are on your current integration branch, please remote -I option",
+                                   "You already are on your current integration branch, please remove -I option",
                                    "MUST FAIL merge branch" ) 
 
 
@@ -140,7 +140,7 @@ class Test_Merge( Test_Base ):
 
     out, errCode = self.swgitUtil_.merge_on_int( self.CREATED_BR )
     self.util_check_DENY_scenario( out, errCode, 
-                                   "Cannot merge a branch into develop.", 
+                                   "Cannot directly merge a branch into integration branch",
                                    "MUST FAIL merge branch" ) 
 
     out, errCode = self.swgitUtil_.branch_switch_to_int()
@@ -148,12 +148,12 @@ class Test_Merge( Test_Base ):
 
     out, errCode = self.swgitUtil_.merge( self.CREATED_BR )
     self.util_check_DENY_scenario( out, errCode, 
-                                   "Cannot merge a branch into develop.", 
+                                   "Cannot directly merge a branch into integration branch",
                                    "MUST FAIL merge branch" ) 
     
     out, errCode = self.swgitUtil_.merge_on_int( self.CREATED_BR )
     self.util_check_DENY_scenario( out, errCode, 
-                                   "You already are on your current integration branch, please remote -I option",
+                                   "You already are on your current integration branch, please remove -I option",
                                    "MUST FAIL merge branch" ) 
 
 
@@ -169,7 +169,7 @@ class Test_Merge( Test_Base ):
 
     out, errCode = self.swgitUtil_.merge( self.CREATED_BR )
     self.util_check_DENY_scenario( out, errCode, 
-                                   "Cannot merge a branch into develop.", 
+                                   "Cannot directly merge a branch into integration branch",
                                    "MUST FAIL merge branch" ) 
     
     out, errCode = self.swgitUtil_.merge( self.CREATED_DEV_0 )
@@ -201,7 +201,7 @@ class Test_Merge( Test_Base ):
 
     out, errCode = self.swgitUtil_.merge_on_int( self.CREATED_BR )
     self.util_check_DENY_scenario( out, errCode, 
-                                   "Cannot merge a branch into develop.", 
+                                   "Cannot directly merge a branch into integration branch",
                                    "MUST FAIL merge branch" ) 
 
     out, errCode = self.swgitUtil_.merge_on_int( self.CREATED_DEV_0 )
@@ -229,7 +229,7 @@ class Test_Merge( Test_Base ):
 
     out, errCode = self.swgitUtil_.merge_on_int( self.CREATED_BR_SS )
     self.util_check_DENY_scenario( out, errCode, 
-                                   "Cannot merge a branch into develop.", 
+                                   "Cannot directly merge a branch into integration branch",
                                    "MUST FAIL merge FTR onto FTR, when is intbr" ) 
 
     out, errCode = self.swgitUtil_.merge_on_int( self.CREATED_DEV_SS )
@@ -286,7 +286,7 @@ class Test_Merge( Test_Base ):
 
     out, errCode = self.swgitUtil_.merge_on_int( "" )
     self.util_check_DENY_scenario( out, errCode, 
-                                   "You already are on your current integration branch, please remote -I option",
+                                   "You already are on your current integration branch, please remove -I option",
                                    "on intbr, merge another branch" ) 
     
     
@@ -330,7 +330,7 @@ class Test_Merge( Test_Base ):
     
     out, errCode = self.swgitUtil_.merge_on_int( "" )
     self.util_check_SUCC_scenario( out, errCode, 
-                                   "First update your local repository",
+                                   "First update",
                                    "on ftrbr, merge -I no param => merge last DEV on INT" ) 
     self.util_check_SUCC_scenario( out, errCode, 
                                    "Merging refs/tags/%s into" % self.CREATED_DEV_0,
@@ -366,7 +366,7 @@ class Test_Merge( Test_Base ):
     
     out, errCode = self.swgitUtil_.merge_on_int( "" )
     self.util_check_SUCC_scenario( out, errCode, 
-                                   "First update your local repository",
+                                   "First update",
                                    "on ftrbr, merge -I no param => merge last DEV on INT" ) 
     self.util_check_SUCC_scenario( out, errCode, 
                                    "Merging refs/tags/%s into" % self.CREATED_DEV_0,
@@ -402,16 +402,191 @@ class Test_Merge( Test_Base ):
     
     out, errCode = self.swgitUtil_.merge_on_int( "" )
     self.util_check_SUCC_scenario( out, errCode, 
-                                   "First update your local repository",
+                                   "First update",
                                    "on ftrbr, merge -I no param => merge last DEV on INT" ) 
     self.util_check_SUCC_scenario( out, errCode, 
                                    "Merging refs/tags/%s into" % self.CREATED_DEV_0,
                                    "on ftrbr, merge -I no param => merge last DEV on INT" ) 
 
 
+  #
+  # Test:
+  #   Here intbr is INT/develop
+  #   We create ambiguous intbr by manually setting intbr 
+  #     to aBranch (both on origin and aRemote)
+  #   Then merge -I
+  #
+  # Result:
+  #   Setting newintbr will deny until a full branch is specified
+  #     (with error: Multiple matches found ... )
+  #   When providing full reference, it is also tracked => no problem 
+  #     occurs when using merge -I
+  #
+  def test_Merge_08_00_ambiguous_ib( self ):
+
+    self.util_clone_createBr_modifyFile_commit_tag()
+
+    sha_dev, errCode = self.swgitUtil_.ref2sha( self.CREATED_DEV_0 )
+    self.util_check_SUCC_scenario( sha_dev, errCode, "", "retrieving %s sha" % self.CREATED_DEV_0 ) 
+
+    # modify a file
+    out, errCode = echo_on_file( self.MODIFY_FILE, "some things" )
+    self.util_check_SUCC_scenario( out, errCode, "", "modify file %s" % self.MODIFY_FILE ) 
+    sha, errCode = self.swgitUtil_.commit_minusA()
+    self.util_check_SUCC_scenario( sha, errCode, "", "commit minus A" ) 
+
+    #
+    # try setting ambiguous inbr (some attempt)
+    #
+    out, errCode = self.swgitUtil_.int_branch_set( ORIG_REPO_aBRANCH_NAME )
+
+    if modetest_morerepos():
+      remote = ORIG_REPO_AREMOTE_NAME
+      self.util_check_DENY_scenario( out, errCode, 
+                                     "Multiple matches found, please specify one among:", 
+                                     "setting ambiguous intbr" ) 
+
+      out, errCode = self.swgitUtil_.branch_switch_to_br( ORIG_REPO_aBRANCH_NAME )
+      self.util_check_DENY_scenario( out, errCode, 
+                                     "Multiple matches found, please specify one among:", 
+                                     "setting ambiguous intbr" ) 
+
+      out, errCode = self.swgitUtil_.int_branch_set( ORIG_REPO_aBRANCH )
+      self.util_check_DENY_scenario( out, errCode, 
+                                     "Multiple matches found, please specify one among:", 
+                                     "setting ambiguous intbr" ) 
+
+      out, errCode = self.swgitUtil_.int_branch_set( remote + "/" + ORIG_REPO_aBRANCH )
+      self.util_check_SUCC_scenario( out, errCode, "", "setting ambiguous intbr" ) 
+    else:
+      remote = "origin"
+      self.util_check_SUCC_scenario( out, errCode, "", "setting intbr" )
+
+    out, errCode = self.swgitUtil_.merge_on_int( "" )
+    self.util_check_SUCC_scenario( out, errCode, 
+                                   "First update",
+                                   "on ftrbr, merge -I no param => merge last DEV on INT" ) 
+    self.util_check_SUCC_scenario( out, errCode, 
+                                   "Merging refs/tags/%s into" % self.CREATED_DEV_0,
+                                   "on ftrbr, merge -I no param => merge last DEV on INT" ) 
+
+  #
+  # Test:
+  #   Here intbr is INT/develop
+  #   We go onto ambiguous ftr aBranch (both on origin and aRemote)
+  #   Then merge DEV
+  #
+  # Result:
+  #   Switch will deny until a full branch is specified
+  #     (with error: Multiple matches found ... )
+  #   When providing full reference, we switch
+  #   BUT
+  #   we are in detahced HEAD => no merge is possible
+  #
+  #  We need to track it (so resolving ambiguity) to proceed with merge
+  #
+  def test_Merge_08_01_ambiguous_targetbr( self ):
+
+    self.util_clone_createBr_modifyFile_commit_tag()
+
+    sha_dev, errCode = self.swgitUtil_.ref2sha( self.CREATED_DEV_0 )
+    self.util_check_SUCC_scenario( sha_dev, errCode, "", "retrieving %s sha" % self.CREATED_DEV_0 ) 
+
+    # modify a file
+    out, errCode = echo_on_file( self.MODIFY_FILE, "some things" )
+    self.util_check_SUCC_scenario( out, errCode, "", "modify file %s" % self.MODIFY_FILE ) 
+    sha, errCode = self.swgitUtil_.commit_minusA()
+    self.util_check_SUCC_scenario( sha, errCode, "", "commit minus A" ) 
+
+    out, errCode = self.swgitUtil_.branch_switch_to_br( ORIG_REPO_aBRANCH )
+    if modetest_morerepos():
+      remote = ORIG_REPO_AREMOTE_NAME
+      self.util_check_DENY_scenario( out, errCode, 
+                                     "Multiple matches found, please specify one among:", 
+                                     "switching to branch on more than 1 repo" ) 
+    else:
+      remote = "origin"
+      self.util_check_SUCC_scenario( out, errCode, "", "switching to branch" )
+
+    out, errCode = self.swgitUtil_.branch_switch_to_br( remote + "/" + ORIG_REPO_aBRANCH )
+    self.util_check_SUCC_scenario( out, errCode, "", "switching to branch on more than 1 repo" ) 
+
+    out, errCode = self.swgitUtil_.merge( self.CREATED_DEV_0 )
+    self.util_check_DENY_scenario( out, errCode, 
+                                   "Cannot merge anything into detached-head.",
+                                   "on ambiguous ftrbr, merge DEV" )
+
+    out, errCode = self.swgitUtil_.branch_track( remote + "/" + ORIG_REPO_aBRANCH )
+    if modetest_morerepos():
+      self.util_check_SUCC_scenario( out, errCode, "Tracking branch", "tracking branch" )
+    else:
+      self.util_check_SUCC_scenario( out, errCode, "Already tracked", "tracking branch" )
+
+    out, errCode = self.swgitUtil_.branch_switch_to_br( ORIG_REPO_aBRANCH_NAME )
+    self.util_check_SUCC_scenario( out, errCode, "", "switching to just tracked branch" ) 
+
+    out, errCode = self.swgitUtil_.merge( self.CREATED_DEV_0 )
+    self.util_check_SUCC_scenario( out, errCode, 
+                                   "Merging refs/tags/%s into" % self.CREATED_DEV_0,
+                                   "on ftrbr, merge -I no param => merge last DEV on INT" ) 
 
 
+  #
+  # Test:
+  #   Here intbr is INT/develop, well configured and tracked
+  #   Then move onto stable, ambiguous (both on origin and on remote)
+  #   logib will change to stable
+  #   BUT
+  #   without needing to set manually set it (like previous test)
+  #
+  # Result:
+  #   With multiple repositories, we can localize a branch only if 
+  #   we track it.
+  #   (also git behaves in this way: git checkout says:
+  #     without remote: error: pathspec ... did not match any file(s) known to git.
+  #     with remote:    gi onto detahced)
+  #   So afetr localizing it, is like previous test
+  #
+  def test_Merge_08_03_ambiguous_logib( self ):
 
+    self.util_clone_createBr_modifyFile_commit_tag()
+
+    sha_dev, errCode = self.swgitUtil_.ref2sha( self.CREATED_DEV_0 )
+    self.util_check_SUCC_scenario( sha_dev, errCode, "", "retrieving %s sha" % self.CREATED_DEV_0 ) 
+
+    # modify a file
+    out, errCode = echo_on_file( self.MODIFY_FILE, "some things" )
+    self.util_check_SUCC_scenario( out, errCode, "", "modify file %s" % self.MODIFY_FILE ) 
+    sha, errCode = self.swgitUtil_.commit_minusA()
+    self.util_check_SUCC_scenario( sha, errCode, "", "commit minus A" ) 
+
+    out, errCode = self.swgitUtil_.branch_switch_to_br( TEST_REPO_BR_STB )
+
+    if modetest_morerepos():
+      remote = ORIG_REPO_AREMOTE_NAME
+      self.util_check_DENY_scenario( out, errCode, 
+                                     "Multiple matches found, please specify one among:", 
+                                     "setting ambiguous intbr" ) 
+    else:
+      remote = "origin"
+      self.util_check_SUCC_scenario( out, errCode, "", "switch branch" )
+
+    out, errCode = self.swgitUtil_.branch_track( remote + "/" + TEST_REPO_BR_STB )
+    if modetest_morerepos():
+      self.util_check_SUCC_scenario( out, errCode, "Tracking branch", "tracking branch" )
+    else:
+      self.util_check_SUCC_scenario( out, errCode, "Already tracked", "tracking branch" )
+
+    out, errCode = self.swgitUtil_.branch_switch_to_br( TEST_REPO_BR_STB )
+    self.util_check_SUCC_scenario( out, errCode, "", "switching to just tracked branch" ) 
+
+    out, errCode = self.swgitUtil_.merge( self.CREATED_DEV_0 )
+    self.util_check_SUCC_scenario( out, errCode, 
+                                   "First update",
+                                   "on ftrbr, merge -I no param => merge last DEV on INT" ) 
+    self.util_check_SUCC_scenario( out, errCode, 
+                                   "Merging refs/tags/%s into" % self.CREATED_DEV_0,
+                                   "on ftrbr, merge -I no param => merge last DEV on INT" ) 
 
 
 

@@ -78,13 +78,11 @@ def check( options ):
     str_stat = " --no-stat "
 
   startb = Branch.getCurrBr()
-  ib = Branch.getIntBr()
-  sb = Branch.getStableBr() 
 
   #remote
   global g_remote
   remote_list = Remote.get_remote_list()
-  if g_remote !="":
+  if g_remote != "":
     if g_remote not in remote_list:
       GLog.f( GLog.E, "FAILED - Remote '%s' is not configured into this repository." % g_remote )
       return 1
@@ -114,22 +112,24 @@ def check( options ):
     GLog.f( GLog.E, "WARNING - in DETAHCED-HEAD only tags put-in-past will be pushed." )
     return 0
 
-  #int br
-  if not ib.isValid():
-    GLog.f( GLog.E, "FAILED - Cannot push without an integration branch set. Please use swgit branch --set-integration-br command" )
+  #log intbr: 
+  logib = Branch.getLogicalIntBr()
+  if not logib.isValid():
+    strerr  = "FAILED - Cannot push without an integration branch set.\n"
+    strerr += "         Plase set it by 'swgit branch --set-integration-br'."
+    GLog.f( GLog.E, strerr )
     return 1
-
 
   #
   # side push checks
   #
-  if Branch.is_side_operation( startb, ib, sb ):
+  if startb.getShortRef() != logib.getShortRef():
 
     # option must be specified
     if not options.side_push:
       strerr  = "FAILED - Cannot directly push a develop branch.\n"
       strerr += "         Please chose one option:\n"
-      strerr += "          1. merge it on your current int br (%s)\n" % ib.getShortRef()
+      strerr += "          1. merge it on your current int br (%s)\n" % logib.getShortRef()
       strerr += "          2. use   'swgit push -I'  option to automatically merge last DEV and push\n"
       strerr += "          3. if this is a just created branch, and you want to push it,\n"
       strerr += "                swgit branch --set-integration-br %s\n" % startb.getShortRef()
@@ -236,18 +236,6 @@ def execute( options ):
     str_stat = " --no-stat "
 
   startb = Branch.getCurrBr()
-  ib = Branch.getIntBr()
-  # on INT or CST no need to manually set INT BR
-  if startb.getType() == SWCFG_BR_CST:
-    ib = startb
-  # This is wrong when team_feature with newINT pair
-  #   see test_Satbilize_01_04_YesLbl_LIV
-  #   you are on INT/feature_develop issueing a side push => 
-  #       must be pulled right branch
-  #if startb.getType() == SWCFG_BR_INT:
-  #  ib = startb
-  sb = Branch.getStableBr() 
-  rem_ib = Branch( "%s/%s" % (g_remote,ib.getShortRef()) )
  
   #detached head
   if not startb.isValid():
@@ -284,15 +272,27 @@ def execute( options ):
 #    return 1
 #
 
-  if not Branch.is_side_operation( startb, ib, sb ):
+  logib = Branch.getLogicalIntBr()
+  rem_logib = Branch( "%s/%s" % (g_remote,logib.getShortRef()) )
+
+  f_sidepush = True
+  if startb.getShortRef() == logib.getShortRef():
+    f_sidepush = False
+
+  if not f_sidepush:
 
     #in case you previously set this as int br but never pushed it on origin,
-    # avoid pulling it
-    if rem_ib.isValid():
+    # avoid pulling it (or will get error:
+    #  
+    #   Fetching origin
+    #		Fetching tags only, you probably meant:
+    #		  git fetch --tags
+    #
+    if rem_logib.isValid():
 
-      GLog.s( GLog.S, "\tFirst update %s repository. Pulling %s from %s ... " % ( dumpRepoName("local"), rem_ib.getShortRef(), rem_ib.branch_to_remote()[0] ) )
+      GLog.s( GLog.S, "\tFirst update %s repository. Pulling branch %s ... " % ( dumpRepoName("local"), logib.getShortRef() ) )
 
-      errCode = GitPull.pull( rem_ib.getShortRef(), options.noStat, GLog.tab+2 )
+      errCode = GitPull.pull( options.noStat, GLog.tab+2 )
       GLog.logRet( errCode, indent="\t" )
       if errCode != 0:
         GLog.logRet( errCode )
@@ -305,10 +305,10 @@ def execute( options ):
     if ret == 0:
       GLog.s( GLog.S, "\tBranch %s is empty, no-op" % ( startb.getShortRef() ) )
       GLog.logRet( 0 )
-      return 0
+      return execute_push_past_tag( options )
 
     #goto int
-    cmd_swto_int = "SWINDENT=%d %s branch -i %s" % ( GLog.tab+1, SWGIT, output_opt)
+    cmd_swto_int = "SWINDENT=%d %s branch -s %s %s" % ( GLog.tab+1, SWGIT, logib.getShortRef(), output_opt)
     errCode = os.system( cmd_swto_int )
     if errCode != 0 :
       GLog.logRet( errCode )
@@ -330,20 +330,17 @@ def execute( options ):
 
   cb = Branch.getCurrBr()
 
-  #
   # Output stat
-  if rem_ib.isValid():
-    #getRemoteRef is KO because has heads/... (local copy always wins)
-    cmd = "git diff %s/%s %s --stat " % ( g_remote, ib.getShortRef(), ib.getShortRef() ) 
+  if rem_logib.isValid():
+    cmd = "git diff %s/%s %s --stat " % ( g_remote, logib.getShortRef(), logib.getShortRef() ) 
   else:
-    cmd = "git diff --stat %s %s" % ( ib.getNewBrRef(), ib.getShortRef() ) 
+    cmd = "git diff --stat %s %s" % ( logib.getNewBrRef(), logib.getShortRef() ) 
   out, errCode=myCommand(cmd)
   fileUp = ""
-  if options.noStat == False and options.quiet != True and len(out) > 0:
+  if not options.noStat and not options.quiet and len(out) > 0:
     fileUp = indentOutput( "\nFiles updated:\n"+out[:-1], 1  )
 
 
-  # push Contributes, local branches and labels
   GLog.s( GLog.S, "\tPushing contributes, branches and labels ... " )
 
   ref_discard_list = [] 
@@ -359,7 +356,7 @@ def execute( options ):
   # set limit to git log
   # exclude my origin
   notBr = ""
-  if rem_ib.isValid():
+  if rem_logib.isValid():
     notBr = " %s/%s " % ( g_remote, cb.getShortRef() )
 
   # exclude all REMOTE INT branches
@@ -407,24 +404,23 @@ def execute( options ):
           ref_discard_list.append(r)
 
   #fix for shared feature branch when commit never done (no contribs)
-  if not rem_ib.isValid():
-    r = ib.getShortRef()
+  if not rem_logib.isValid():
+    r = logib.getShortRef()
     if r not in ref_push_list:
       nb = "%s/%s/%s" % (r,SWCFG_TAG_NEW,SWCFG_TAG_NEW_NAME)
       ref_push_list.append( r )
       ref_push_list.append( nb )
-      
 
   GLog.f( GLog.I, "\t\tBranches and labels to push: \n\t\t\t" + "\n\t\t\t".join( ref_push_list ) )
   GLog.f( GLog.I, "\t\tBranches and labels discarded: \n\t\t\t" + "\n\t\t\t".join( ref_discard_list ) )
 
-  #
-  # push
-  #
 
   # every past tag must be pushed and shifted on origin
   opt_past_tags = "refs/tags/%s/*:refs/tags/*" % SWCFG_TAG_NAMESPACE_PAST
 
+  ########
+  # push #
+  ########
   cmd_push = "git push %s %s %s" % ( g_remote, " ".join( ref_push_list ), opt_past_tags )
   pushOut,errCode = myCommand( cmd_push )
   if options.noStat == False :
@@ -444,7 +440,7 @@ def execute( options ):
     sys.exit(1)
 
   #if you have pushed now on origin intbr => track it
-  if not rem_ib.isValid():
+  if not rem_logib.isValid():
     cmd_tarck_local_int_br = ""
     errCode = os.system("SWINDENT=%d %s branch --track %s/%s %s" % ( GLog.tab+1, SWGIT, g_remote, startb.getShortRef(), output_opt ) )
 
@@ -456,15 +452,15 @@ def execute( options ):
     if errCode != 0:
       GLog.f( GLog.E, "\tFAILED - Deleting local refs/tags/%s/* references. (not critical)" % SWCFG_TAG_NAMESPACE_PAST )
 
-
-  # Come back onto staring br
-  if startb.getShortRef() != ib.getShortRef() and startb.getShortRef() != sb.getShortRef():
+  # Come back onto starting br
+  #TODO make option for this behaviour
+  if f_sidepush:
     errCode = os.system("SWINDENT=%d %s branch -s %s %s" % ( GLog.tab+1, SWGIT, startb.getShortRef(), output_opt ) )
     if errCode != 0 :
       GLog.logRet( errCode )
       return 1
 
-  if options.noMail == False:
+  if not options.noMail:
 
     om = ObjMailPush()
     if om.isValid():
@@ -473,8 +469,8 @@ def execute( options ):
 
         GLog.s( GLog.S, "\tSending mail" )
 
-        log, errCode = myCommand( "git log -1 %s " % ib.getShortRef() )
-        LIV, errCode = myCommand( "%s info -t LIV -r %s | head -2 " % ( SWGIT, ib.getShortRef() ) )
+        log, errCode = myCommand( "git log -1 %s " % logib.getShortRef() )
+        LIV, errCode = myCommand( "%s info -t LIV -r %s | head -2 " % ( SWGIT, logib.getShortRef() ) )
 
         body_mail = log + "\n" + LIV + "\n" +  pushOut + "\n\nFiles changed:\n" + fileUp
 
@@ -561,15 +557,6 @@ arr_management_options = [
         "help"    : "Disable print changed files"
         }
     ],
-#   [ 
-#      "--all",
-#      {
-#        "action"  : "store_true",
-#        "dest"    : "all",
-#        "default" : False,
-#        "help"    : "Execute pull over all repositories of current project"
-#        }
-#     ], 
    ]
 
 arr_mail_options = [

@@ -93,7 +93,7 @@ Every numbered point is commented below.
     The most quickly way to obtain this, is cloning 
     repository with option:
 
-      ``--track-all``
+      ``--integrator``
 
   Project integrator, please refer to :doc:`stabilizing` for more details.
 
@@ -232,10 +232,7 @@ Every numbered point is commented below.
   * When FIX branches are used to run pre-processing or stuff like
     setting release number, you may want NOT to merge them on `INT/develop`.
 
-      ``swgit stabilize --liv --no-report``
-
-    .. todo::
-      Must be implemented, at the moment, report happens always.
+      ``swgit stabilize --liv --no-merge-back``
 
   Please refer to :doc:`stabilizing` for more informations.
 

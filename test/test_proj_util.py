@@ -831,40 +831,46 @@ class Test_ProjBase( Test_Base ):
     return
 
 
-  def util_createAndCheck_TSS100_FULL_withbkp_andclonedefbr( self, dst ):
+  def util_createAndCheck_TSS100_FULL_withbkp_andclonedefbr( self, dst, f_integrator = False ):
     self.util_createAndCheck_TSS100_FULL_withbkp()
 
     orig_projdir = dst
-    bkp_projdir  = orig_projdir + ".TSS100.FULL.CLONE.BKP"
+    if f_integrator:
+      bkp_projdir  = orig_projdir + ".TSS100.FULL.CLONE.INTEGRATOR.BKP"
+    else:
+      bkp_projdir  = orig_projdir + ".TSS100.FULL.CLONE.BKP"
     shutil.rmtree( orig_projdir, True ) #ignore errors
 
     if os.path.exists( bkp_projdir ) == True:
       shutil.copytree( bkp_projdir, orig_projdir )
     else:
-      out, errCode = swgit__utils.clone_repo_url( REPO_TSS100__ORI_URL, orig_projdir, REPO_TSS100__DEVBRANCH )
-      self.util_check_SUCC_scenario( out, errCode, "", "FAILED clone" )
+      if f_integrator:
+        out, errCode = swgit__utils.clone_repo_url( REPO_TSS100__ORI_URL, orig_projdir, REPO_TSS100__DEVBRANCH, opt = " --integrator " )
+        self.util_check_SUCC_scenario( out, errCode, "", "FAILED clone integrator into %s" % orig_projdir )
+      else:
+        out, errCode = swgit__utils.clone_repo_url( REPO_TSS100__ORI_URL, orig_projdir, REPO_TSS100__DEVBRANCH )
+        self.util_check_SUCC_scenario( out, errCode, "", "FAILED clone defbr into %s" % orig_projdir )
 
       if os.environ.get( SWENV_TESTMODE ) == SWENV_MOREREMOTES:
         dest = orig_projdir
         #print "\n%s\nMOREREMOTES for repo %s\n%s\n" % ( "="*20, dest, "="*20 )
         helper = swgit__utils( dest )
-        AREMOTE_PLAT = PROJ_TSS100_DESCRIPTION[0][0] + AREMOTE_PATH
-        AREPO_AREMOTE_URL = "%s%s" % ( TESTER_SSHACCESS, AREMOTE_PLAT )
+        AREMOTE_REPO = PROJ_TSS100_DESCRIPTION[0][0] + AREMOTE_PATH
+        AREPO_AREMOTE_URL = "%s%s" % ( TESTER_SSHACCESS, AREMOTE_REPO )
         out, errCode = helper.remote_add( ORIG_REPO_AREMOTE_NAME, AREPO_AREMOTE_URL )
         out, errCode = helper.pull()
 
         dest = helper.getDir() + "/" + tss100_name2path( "DEVPLAT" )
         #print "\n%s\nMOREREMOTES for repo %s\n%s\n" % ( "="*20, dest, "="*20 )
         helper = swgit__utils( dest )
-        AREMOTE_PLAT = PROJ_PLAT_DESCRIPTION[0][0] + AREMOTE_PATH
-        AREPO_AREMOTE_URL = "%s%s" % ( TESTER_SSHACCESS, AREMOTE_PLAT )
+        AREMOTE_REPO = PROJ_PLAT_DESCRIPTION[0][0] + AREMOTE_PATH
+        AREPO_AREMOTE_URL = "%s%s" % ( TESTER_SSHACCESS, AREMOTE_REPO )
         out, errCode = helper.remote_add( ORIG_REPO_AREMOTE_NAME, AREPO_AREMOTE_URL )
         out, errCode = helper.pull()
 
       shutil.copytree( orig_projdir, bkp_projdir )
 
     return
-
 
 
   def util_createrepos_clonePLATproj_createBr_addSNAP_commit_push( self ):

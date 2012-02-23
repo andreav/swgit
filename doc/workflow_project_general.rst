@@ -288,22 +288,24 @@ Every sha is described regarding to last LIV and STB inside that repo.
 STABILIZE --STB FOR A PROJECT
 -----------------------------
 
-When inside a project, swgit stabilize --stb enriches its meaning.
+When inside a project, ``swgit stabilize --stb`` enriches its meaning.
 
 Not only it stabilizes project as a normal repo,
-but also it reports subrepos state on stable branch.
+it also reports subrepos state on stable branch.
 
 You can use different --src values:
 
   1. TAG DROP WITH HEAD
 
-     $> swgit stabilize --stb --src HEAD
+     ::
 
-        The behavior is:
+        swgit stabilize --stb --src HEAD
 
-         proj repo: stabilize proj HEAD
-         dev repos: register subrepo HEAD into project commit
-         cst repos: not affected. Register last registered commit
+     The behavior is:
+
+     *  proj repo: stabilize proj HEAD
+     *  dev repos: register current subrepo HEAD into project commit
+     *  cst repos: not affected. Register last registered commit
 
   2. TAG DROP WITH COMMA-SEPARED LIST
 
@@ -325,7 +327,7 @@ You can use different --src values:
 
        swgit stabilize --stb --src filename.cs
 
-     filename.cs is a file containing same output as::
+     filename.cs is a file containing output formatted as command output::
 
          swgit proj --get-configspec <any_valid_reference>
 

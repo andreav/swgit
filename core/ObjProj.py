@@ -19,7 +19,7 @@
 
 from Common import *
 from ObjMap import *
-import traceback
+#import traceback
 
 g_swobjects = {}
 
@@ -194,8 +194,8 @@ class SwProj( SwRepo ):
     self._children = None #se e' none => devi ancora valutarli
 
     try:
-      if os.path.exists( rdir + "/" + SWFILE_PROJMAP ) == False:
-        traceback.print_stack()
+      if not os.path.exists( rdir + "/" + SWFILE_PROJMAP ):
+        #traceback.print_stack()
         raise Exception( "ROOT DIR [%s] is not a SWPROJ REPO" % rdir )
 
       # INIT SwRepo

@@ -224,7 +224,7 @@ def check( options ):
   errCode, dev, num = find_describe_label("%s/%s/*" % ( g_cb.getShortRef(), g_tag_type) )
   if errCode == 0:
     if num == "0" and tagDsc.get_one_x_commit():
-      GLog.f( GLog.E, "FAILED - You already have a %s label on this commit: %s " % ( g_tag_type, dev ) )
+      GLog.f( GLog.E, "FAILED - Only 1 '%s' label per-commit allowed." % ( g_tag_type ) )
       return 1
   
   if is_ref_pushed_on_origin( "HEAD" ):
@@ -344,7 +344,7 @@ def create_label( msg, replace ):
   startb = Branch.getCurrBr()
   if g_tag_in_past:
     if tagDsc.get_push_on_origin():
-      GLog.s( GLog.S, "Tagging in past creates also tag %s/%s (this only-local tag will be deleted at next push) ..." % (SWCFG_TAG_NAMESPACE_PAST, label_name) )
+      GLog.s( GLog.S, "Tagging in past also creates tag %s/%s (this only-local tag will be deleted at next push) ..." % (SWCFG_TAG_NAMESPACE_PAST, label_name) )
       cmd_tag = "git tag %s/%s %s -m \"%s\"" % ( SWCFG_TAG_NAMESPACE_PAST, label_name, opt, msg )
       out, tagerrcode = myCommand( cmd_tag )
       GLog.logRet( tagerrcode )

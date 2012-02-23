@@ -79,6 +79,11 @@ def run_all():
   suite = unittest.TestLoader().loadTestsFromTestCase( test_nointbr.Test_NoIntBr )
   unittest.TextTestRunner( verbosity=2 ).run( suite )
   
+  print "\n>>>>>>>>>> mode='%s' STABILIZE <<<<<<<<<<\n" % env_var
+
+  suite = unittest.TestLoader().loadTestsFromTestCase( test_stabilize.Test_Stabilize )
+  unittest.TextTestRunner( verbosity=2 ).run( suite )
+
   print "\n>>>>>>>>>> mode='%s' PROJ <<<<<<<<<<\n" % env_var
 
   suite = unittest.TestLoader().loadTestsFromTestCase( test_proj.Test_Proj )
@@ -106,7 +111,7 @@ def run_all():
 
   print "\n>>>>>>>>>> mode='%s' PROJ STABILIZE <<<<<<<<<<\n" % env_var
 
-  suite = unittest.TestLoader().loadTestsFromTestCase( test_stabilize.Test_Stabilize )
+  suite = unittest.TestLoader().loadTestsFromTestCase( test_proj_stabilize.Test_ProjStabilize )
   unittest.TextTestRunner( verbosity=2 ).run( suite )
 
   print "\n>>>>>>>>>> mode='%s' WORKFLOW <<<<<<<<<<\n"

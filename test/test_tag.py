@@ -1837,7 +1837,7 @@ class Test_Tag( Test_Base ):
 
     out, errCode = self.swgitUtil_Clone_.tag_create( TAG_NUM_ECHO_NOPAST["tagtype"] )
     self.util_check_SUCC_scenario( out, errCode, 
-                                   "Tagging in past creates also tag PAST/",
+                                   "Tagging in past also creates tag PAST/",
                                    "tagging in past a past label" )
 
     tag0_sha, errCode = self.gitUtil_Clone_.ref2sha( created_custtag_label )
@@ -1922,7 +1922,7 @@ class Test_Tag( Test_Base ):
 
     out, errCode = self.swgitUtil_Clone_.tag_create( TAG_NUM_ECHO_NOPAST["tagtype"] )
     self.util_check_SUCC_scenario( out, errCode, 
-                                   "Tagging in past creates also tag PAST/",
+                                   "Tagging in past also creates tag PAST/",
                                    "tagging in past a past label" )
 
     tag0_sha, errCode = self.gitUtil_Clone_.ref2sha( created_custtag_label )
@@ -1996,7 +1996,7 @@ class Test_Tag( Test_Base ):
 
     out, errCode = self.swgitUtil_Clone_.tag_create( TAG_NUM_ECHO_PAST["tagtype"] )
     self.util_check_SUCC_scenario( out, errCode, 
-                                   "Tagging in past creates also tag PAST/",
+                                   "Tagging in past also creates tag PAST/",
                                    "tagging in past a past label" )
 
     tag0_sha, errCode = self.gitUtil_Clone_.ref2sha( created_custtag_label )
@@ -2074,7 +2074,7 @@ class Test_Tag( Test_Base ):
 
     out, errCode = self.swgitUtil_Clone_.tag_create( TAG_NUM_ECHO_PAST["tagtype"] )
     self.util_check_SUCC_scenario( out, errCode, 
-                                   "Tagging in past creates also tag PAST/",
+                                   "Tagging in past also creates tag PAST/",
                                    "tagging in past a past label" )
 
     tag0_sha, errCode = self.gitUtil_Clone_.ref2sha( created_custtag_label )
@@ -2114,7 +2114,7 @@ class Test_Tag( Test_Base ):
     out, errCode = self.swgitUtil_Clone_.tag_create( TAG_NUM_ECHO_PAST["tagtype"] )
     self.util_check_SUCC_scenario( out, errCode, "",
                                    "tagging in past a past label" )
-    self.assertTrue( "Tagging in past creates also tag" not in out,
+    self.assertTrue( "Tagging in past also creates tag" not in out,
                      "FAILED tagging not in past with a past-label" )
 
     tag0_sha, errCode = self.gitUtil_Clone_.ref2sha( created_custtag_label_0 )
@@ -2144,7 +2144,7 @@ class Test_Tag( Test_Base ):
 
     out, errCode = self.swgitUtil_Clone_.tag_create( TAG_NUM_ECHO_PAST["tagtype"] )
     self.util_check_SUCC_scenario( out, errCode, 
-                                   "Tagging in past creates also tag",
+                                   "Tagging in past also creates tag",
                                    "tagging in past a past label" )
 
     tag0_sha, errCode = self.gitUtil_Clone_.ref2sha( created_custtag_label_1 )
@@ -2164,7 +2164,7 @@ class Test_Tag( Test_Base ):
 
     out, errCode = self.swgitUtil_Clone_.tag_create( TAG_NUM_ECHO_PAST["tagtype"] )
     self.util_check_SUCC_scenario( out, errCode,
-                                   "Tagging in past creates also tag",
+                                   "Tagging in past also creates tag",
                                    "tagging in past a past label" )
 
     tag0_sha, errCode = self.gitUtil_Clone_.ref2sha( created_custtag_label_1 )
@@ -2189,7 +2189,7 @@ class Test_Tag( Test_Base ):
 
     out, errCode = self.swgitUtil_Clone_.tag_create( TAG_NUM_ECHO_PAST["tagtype"] )
     self.util_check_DENY_scenario( out, errCode,
-                                   "You already have a",
+                                   "Only 1", #label per-commit allowed.
                                    "tagging in past a past label" )
 
     tag0_sha, errCode = self.gitUtil_Clone_.ref2sha( created_custtag_label_1 )
@@ -2257,7 +2257,7 @@ class Test_Tag( Test_Base ):
 
     out, errCode = self.swgitUtil_Clone_.tag_create( TAG_NUM_ECHO_NOPAST["tagtype"] )
     self.util_check_SUCC_scenario( out, errCode, 
-                                   "Tagging in past creates also tag PAST/",
+                                   "Tagging in past also creates tag PAST/",
                                    "tagging in past a past label" )
 
     tag0_sha, errCode = self.gitUtil_Clone_.ref2sha( created_custtag_label )
@@ -2307,7 +2307,7 @@ class Test_Tag( Test_Base ):
     out, errCode = self.swgitUtil_Clone_.tag_create( TAG_NOPUSH["tagtype"] )
     self.util_check_SUCC_scenario( out, errCode, "",
                                    "tagging in past a past label" )
-    self.assertTrue( "Tagging in past creates also tag" not in out, "FAILED also created PAST tag for a not push on origin label" )
+    self.assertTrue( "Tagging in past also creates tag" not in out, "FAILED also created PAST tag for a not push on origin label" )
 
     tag0_sha, errCode = self.gitUtil_Clone_.ref2sha( created_custtag_label_1 )
     self.util_check_SUCC_scenario( out, errCode, "", "retrieving %s" % created_custtag_label_1 )
