@@ -72,10 +72,16 @@ class Test_Workflow( Test_ProjBase ):
     out, errCode = self.sw_clonerepo_h.int_branch_set( self.BRANCH_NAME )
     self.util_check_SUCC_scenario( out, errCode, "", "setting shared branch as int" ) 
 
-    out, errCode = self.sw_clonerepo_h.push()
+    remote_h = self.sw_origrepo_h
+    remote = ""
+    if modetest_morerepos():
+      remote = ORIG_REPO_AREMOTE_NAME
+      remote_h = self.sw_aremoterepo_h
+
+    out, errCode = self.sw_clonerepo_h.push( remote )
     self.util_check_SUCC_scenario( out, errCode, "", "push" )
 
-    out, errCode = self.sw_origrepo_h.get_currsha( self.FULL_BRANCH_NAME )
+    out, errCode = remote_h.get_currsha( self.FULL_BRANCH_NAME )
     self.util_check_SUCC_scenario( out, errCode, "", "check origin has %s" % self.FULL_BRANCH_NAME )
 
     #check is also tracked
@@ -100,21 +106,18 @@ class Test_Workflow( Test_ProjBase ):
     out, errCode = self.sw_clonerepo_h.init_src( ORIG_REPO_DEVEL_BRANCH, c = self.FEATURE_BRANCH_NAME, )
     self.util_check_SUCC_scenario( out, errCode, "", "creating feature INT branches" ) 
 
-    out, errCode = self.sw_clonerepo_h.push()
-    self.util_check_DENY_scenario( out, errCode, "Cannot directly push a develop branch.", "push" )
+    remote_h = self.sw_origrepo_h
+    remote = ""
+    if modetest_morerepos():
+      remote = "origin"
+      remote_h = self.sw_origrepo_h
 
-    out, errCode = self.sw_clonerepo_h.push_with_merge()
-    self.util_check_SUCC_scenario( out, errCode, "is empty, no-op", "push with merge" )
-
-    out, errCode = self.sw_clonerepo_h.int_branch_set( self.FULL_FEATURE_BRANCH_NAME_DEV )
-    self.util_check_SUCC_scenario( out, errCode, "", "restoring old INT branch" )
-
-    out, errCode = self.sw_clonerepo_h.push()
+    out, errCode = self.sw_clonerepo_h.push( remote )
     self.util_check_SUCC_scenario( out, errCode, "", "push new iNT branch" )
 
-    out, errCode = self.sw_origrepo_h.get_currsha( self.FULL_FEATURE_BRANCH_NAME_DEV )
+    out, errCode = remote_h.get_currsha( self.FULL_FEATURE_BRANCH_NAME_DEV )
     self.util_check_SUCC_scenario( out, errCode, "", "check origin has %s" % self.FULL_FEATURE_BRANCH_NAME_DEV )
-    out, errCode = self.sw_origrepo_h.get_currsha( self.FULL_FEATURE_BRANCH_NAME_STB )
+    out, errCode = remote_h.get_currsha( self.FULL_FEATURE_BRANCH_NAME_STB )
     self.util_check_SUCC_scenario( out, errCode, "", "check origin has %s" % self.FULL_FEATURE_BRANCH_NAME_STB )
 
     #check is also tracked
@@ -125,14 +128,10 @@ class Test_Workflow( Test_ProjBase ):
     #
     # clone 2
     #
-    sha_dev_orig_beforeclone2, errCode = self.sw_origrepo_h.get_currsha( ORIG_REPO_DEVEL_BRANCH )
-
-    remote = ""
-    if modetest_morerepos():
-      remote   = "origin"
+    sha_dev_orig_beforeclone2, errCode = remote_h.get_currsha( ORIG_REPO_DEVEL_BRANCH )
 
     #clone integartor
-    out, errCode = swgit__utils.clone_scripts_repo_integrator( self.WORKFLOW_CLONE_2_DIR )
+    out, errCode = swgit__utils.clone_repo_integrator( TEST_ORIG_REPO, self.WORKFLOW_CLONE_2_DIR )
     self.util_check_SUCC_scenario( out, errCode, "", "FAILED cloning repo into %s" % self.WORKFLOW_CLONE_2_DIR ) 
 
     #set int br manually after
@@ -150,7 +149,7 @@ class Test_Workflow( Test_ProjBase ):
     out, errCode = self.sw_clonerepo_2_h.push_with_merge( remote )
     self.util_check_SUCC_scenario( out, errCode, "", "FAILED pushing on origin" ) 
 
-    sha_dev_orig_afterclone2push, errCode = self.sw_origrepo_h.get_currsha( ORIG_REPO_DEVEL_BRANCH )
+    sha_dev_orig_afterclone2push, errCode = remote_h.get_currsha( ORIG_REPO_DEVEL_BRANCH )
 
     self.assertEqual( sha_dev_orig_beforeclone2,
                       sha_dev_orig_afterclone2push,
@@ -164,7 +163,7 @@ class Test_Workflow( Test_ProjBase ):
     out, errCode = self.sw_clonerepo_2_h.stabilize_liv( self.FEATURE_LIV_NAME )
     self.util_check_SUCC_scenario( out, errCode, "", "stabilize LIV feature develop" ) 
 
-    sha_dev_orig_afterclone2stabilize, errCode = self.sw_origrepo_h.get_currsha( ORIG_REPO_DEVEL_BRANCH )
+    sha_dev_orig_afterclone2stabilize, errCode = remote_h.get_currsha( ORIG_REPO_DEVEL_BRANCH )
 
     self.assertEqual( sha_dev_orig_beforeclone2,
                       sha_dev_orig_afterclone2stabilize,
@@ -186,18 +185,18 @@ class Test_Workflow( Test_ProjBase ):
     self.util_check_DENY_scenario( out, errCode, "refusing to update checked out branch:", "push" )
 
     #re-push
-    out, errCode = self.sw_origrepo_h.branch_switch_to_br( ORIG_REPO_STABLE_BRANCH )
+    out, errCode = remote_h.branch_switch_to_br( ORIG_REPO_STABLE_BRANCH )
     out, errCode = self.sw_clonerepo_2_h.push( )
     self.util_check_SUCC_scenario( out, errCode, "", "push" )
 
-    sha_dev_orig_afterclone2mergepush, errCode = self.sw_origrepo_h.get_currsha( ORIG_REPO_DEVEL_BRANCH )
+    sha_dev_orig_afterclone2mergepush, errCode = remote_h.get_currsha( ORIG_REPO_DEVEL_BRANCH )
     sha_dev_clo2_afterclone2mergepush, errCode = self.sw_clonerepo_2_h.get_currsha( ORIG_REPO_DEVEL_BRANCH )
 
     self.assertEqual( sha_dev_orig_afterclone2mergepush,
                       sha_dev_clo2_afterclone2mergepush,
                       "orig/ INT/develop must change afetr clone2 push" )
 
-    sha_devFath2_orig_afterclone2mergepush, errCode = self.sw_origrepo_h.get_currsha( ORIG_REPO_DEVEL_BRANCH + "^2")
+    sha_devFath2_orig_afterclone2mergepush, errCode = remote_h.get_currsha( ORIG_REPO_DEVEL_BRANCH + "^2")
     sha_ftrdev_clo2_afterclone2mergepush, errCode = self.sw_clonerepo_2_h.get_currsha( self.FEATURE_LIV_FULL_NAME )
 
     self.assertEqual( sha_devFath2_orig_afterclone2mergepush,
@@ -229,13 +228,19 @@ class Test_Workflow( Test_ProjBase ):
     out, errCode = self.sw_clonerepo_h.init_src( ORIG_REPO_DEVEL_BRANCH, c = self.FEATURE_BRANCH_NAME, )
     self.util_check_SUCC_scenario( out, errCode, "", "creating feature INT branches" ) 
 
+    remote_h = self.sw_origrepo_h
+    remote = ""
+    if modetest_morerepos():
+      remote = "origin"
+      remote_h = self.sw_origrepo_h
 
-    out, errCode = self.sw_clonerepo_h.push_with_merge()
+
+    out, errCode = self.sw_clonerepo_h.push_with_merge( remote )
     self.util_check_SUCC_scenario( out, errCode, "", "push with merge" )
 
-    out, errCode = self.sw_origrepo_h.get_currsha( self.FULL_FEATURE_BRANCH_NAME_DEV )
+    out, errCode = remote_h.get_currsha( self.FULL_FEATURE_BRANCH_NAME_DEV )
     self.util_check_SUCC_scenario( out, errCode, "", "check origin has %s" % self.FULL_FEATURE_BRANCH_NAME_DEV )
-    out, errCode = self.sw_origrepo_h.get_currsha( self.FULL_FEATURE_BRANCH_NAME_STB )
+    out, errCode = remote_h.get_currsha( self.FULL_FEATURE_BRANCH_NAME_STB )
     self.util_check_SUCC_scenario( out, errCode, "", "check origin has %s" % self.FULL_FEATURE_BRANCH_NAME_STB )
 
     #check is also tracked
@@ -246,14 +251,10 @@ class Test_Workflow( Test_ProjBase ):
     #
     # clone 2
     #
-    sha_dev_orig_beforeclone2, errCode = self.sw_origrepo_h.get_currsha( ORIG_REPO_DEVEL_BRANCH )
-
-    remote = ""
-    if modetest_morerepos():
-      remote   = "origin"
+    sha_dev_orig_beforeclone2, errCode = remote_h.get_currsha( ORIG_REPO_DEVEL_BRANCH )
 
     #clone integartor
-    out, errCode = swgit__utils.clone_scripts_repo_integrator( self.WORKFLOW_CLONE_2_DIR )
+    out, errCode = swgit__utils.clone_repo_integrator( TEST_ORIG_REPO, self.WORKFLOW_CLONE_2_DIR )
     self.util_check_SUCC_scenario( out, errCode, "", "FAILED cloning repo into %s" % self.WORKFLOW_CLONE_2_DIR ) 
 
     #set int br manually after
@@ -271,7 +272,7 @@ class Test_Workflow( Test_ProjBase ):
     out, errCode = self.sw_clonerepo_2_h.push_with_merge( remote )
     self.util_check_SUCC_scenario( out, errCode, "", "FAILED pushing on origin" ) 
 
-    sha_dev_orig_afterclone2push, errCode = self.sw_origrepo_h.get_currsha( ORIG_REPO_DEVEL_BRANCH )
+    sha_dev_orig_afterclone2push, errCode = remote_h.get_currsha( ORIG_REPO_DEVEL_BRANCH )
 
     self.assertEqual( sha_dev_orig_beforeclone2,
                       sha_dev_orig_afterclone2push,
@@ -285,7 +286,7 @@ class Test_Workflow( Test_ProjBase ):
     out, errCode = self.sw_clonerepo_2_h.stabilize_liv( self.FEATURE_LIV_NAME )
     self.util_check_SUCC_scenario( out, errCode, "", "stabilize LIV feature develop" ) 
 
-    sha_dev_orig_afterclone2stabilize, errCode = self.sw_origrepo_h.get_currsha( ORIG_REPO_DEVEL_BRANCH )
+    sha_dev_orig_afterclone2stabilize, errCode = remote_h.get_currsha( ORIG_REPO_DEVEL_BRANCH )
 
     self.assertEqual( sha_dev_orig_beforeclone2,
                       sha_dev_orig_afterclone2stabilize,
@@ -306,7 +307,7 @@ class Test_Workflow( Test_ProjBase ):
     ######################################################
     self.util_check_SUCC_scenario( out, errCode, "Everything up-to-date", "side push with cb = INT => only pushing cb, no side merge" )
 
-    sha_dev_orig_afterclone2mergepush, errCode = self.sw_origrepo_h.get_currsha( ORIG_REPO_DEVEL_BRANCH )
+    sha_dev_orig_afterclone2mergepush, errCode = remote_h.get_currsha( ORIG_REPO_DEVEL_BRANCH )
     sha_dev_clo2_afterclone2mergepush, errCode = self.sw_clonerepo_2_h.get_currsha( ORIG_REPO_DEVEL_BRANCH )
 
     self.assertEqual( sha_dev_orig_afterclone2mergepush,
@@ -320,14 +321,14 @@ class Test_Workflow( Test_ProjBase ):
                                    "Cannot directly merge a branch into integration branch",
                                    "merging feature_develop on develop" )
 
-    out, errCode = self.sw_origrepo_h.branch_switch_to_br( ORIG_REPO_STABLE_BRANCH )
+    out, errCode = remote_h.branch_switch_to_br( ORIG_REPO_STABLE_BRANCH )
     out, errCode = self.sw_clonerepo_2_h.merge( self.FEATURE_LIV_FULL_NAME )
     self.util_check_SUCC_scenario( out, errCode, "", "merging feature LIV on INT/develop" )
     
     out, errCode = self.sw_clonerepo_2_h.push()
     self.util_check_SUCC_scenario( out, errCode, "", "push" )
 
-    sha_devFath2_orig_afterclone2mergepush, errCode = self.sw_origrepo_h.get_currsha( ORIG_REPO_DEVEL_BRANCH + "^2")
+    sha_devFath2_orig_afterclone2mergepush, errCode = remote_h.get_currsha( ORIG_REPO_DEVEL_BRANCH + "^2")
     sha_ftrdev_clo2_afterclone2mergepush, errCode = self.sw_clonerepo_2_h.get_currsha( self.FEATURE_LIV_FULL_NAME )
 
     self.assertEqual( sha_devFath2_orig_afterclone2mergepush,
