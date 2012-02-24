@@ -137,11 +137,16 @@ class swgit__utils:
   # Clone
   #
   @staticmethod
-  def clone_scripts_repo( dst ):
+  def clone_scripts_repo( dst, f_integrator = False ):
     #print "rm %s" % dst
     orig_bkp  = TEST_ORIG_REPO + ".BKP"
     clone     = TEST_ORIG_REPO + "_CLONE"
-    clone_bkp = clone          + ".BKP"
+
+    if f_integrator:
+      clone_bkp = clone          + ".INTEGRATOR.BKP"
+    else:
+      clone_bkp = clone          + ".BKP"
+
     aremote     = TEST_ORIG_REPO + AREMOTE_PATH + ".PARK"
     aremote_bkp = aremote        + ".BKP"
     aremote_dst = TEST_ORIG_REPO + AREMOTE_PATH
@@ -154,7 +159,7 @@ class swgit__utils:
     #
     # PROTOREPO
     #
-    if os.path.exists( orig_bkp ) == False:
+    if not os.path.exists( orig_bkp ):
       #orig first time
       create_protorepo()
       shutil.copytree( TEST_ORIG_REPO, orig_bkp )
@@ -164,7 +169,7 @@ class swgit__utils:
     #
     # PROTOREPO_AREMOTE
     #
-    if os.path.exists( aremote_bkp ) == False:
+    if not os.path.exists( aremote_bkp ):
       # clone first time
       cmd = "%s clone -r %s %s -b %s " % ( SWGIT, ORIG_REPO_URL, aremote, ORIG_REPO_DEVEL_BRANCH )
       out, retcode = myCommand( cmd )
@@ -192,9 +197,17 @@ class swgit__utils:
     #
     # PROTOREPO_CLONE
     #
-    if os.path.exists( clone_bkp ) == False:
+    if not os.path.exists( clone_bkp ):
       # clone first time
-      cmd = "%s clone %s %s -b %s " % ( SWGIT, ORIG_REPO_URL, clone, ORIG_REPO_DEVEL_BRANCH )
+      opt_branch = "-b %s" % ORIG_REPO_DEVEL_BRANCH
+      if f_integrator:
+        opt_branch = ""
+
+      opt_integrator = ""
+      if f_integrator:
+        opt_integrator = "--integrator"
+
+      cmd = "%s clone %s %s %s %s" % ( SWGIT, ORIG_REPO_URL, clone, opt_branch, opt_integrator )
       out, retcode = myCommand( cmd )
       if retcode != 0:
         return out, retcode
@@ -211,16 +224,12 @@ class swgit__utils:
       shutil.copytree( clone_bkp, dst )
 
 
-
     return "OK", 0
 
   
-
   @staticmethod
   def clone_scripts_repo_integrator( dst, append="" ):
-    #cmd = "%s clone -r %s %s --integrator -b %s %s" % ( SWGIT, ORIG_REPO_URL, dst, ORIG_REPO_DEVEL_BRANCH, append )
-    cmd = "%s clone -r %s %s --integrator %s" % ( SWGIT, ORIG_REPO_URL, dst, append )
-    return myCommand( cmd )
+    return swgit__utils.clone_scripts_repo( dst, f_integrator = True )
 
   @staticmethod
   def clone_repo( src, dst, br="", user="", addr="" ):

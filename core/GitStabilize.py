@@ -729,6 +729,15 @@ def tag_drop_liv( options ):
   else:
     strout += "         last stable label   : Not existing any STB, using %s\n" % tb.getNewBrRef()
 
+  tb_repo, tb_repo_errcode = tb.branch_to_remote()
+  if tb_repo_errcode != 0:
+    strerr  = "\tError while retrieving remote for pushing everthing:\n"
+    strerr += indentOutput( tb_repo, 2 )
+    GLog.f( GLog.E, strerr )
+    GLog.logRet(errCode)
+    return 1 
+  strout += "         pushing to remote   : %s\n" % (tb_repo)
+
   GLog.s( GLog.S, strout )
 
   if not options.batch:
@@ -762,7 +771,6 @@ def tag_drop_liv( options ):
   else: 
     GLog.s( GLog.S, "\tLast LIV Label is %s" % lastbutone_liv )
 
-
   #
   # Eval logs
   #
@@ -784,17 +792,16 @@ def tag_drop_liv( options ):
     GLog.logRet(errCode)
     return 1 
 
-
   #
   # push on origin stable
   #
-  GLog.s( GLog.S, "\tPushing %s on origin ... " % ( sb.getShortRef() ))
+  GLog.s( GLog.S, "\tPushing %s on '%s' ... " % ( sb.getShortRef(), tb_repo ))
 
   mail_opt = "--no-mail"
   if options.sendmail:
     mail_opt = ""
 
-  cmd_push_stable = "SWINDENT=%d %s push %s %s" % ( GLog.tab+2, SWGIT, output_opt, mail_opt )
+  cmd_push_stable = "SWINDENT=%d %s push %s %s %s" % ( GLog.tab+2, SWGIT, output_opt, mail_opt, tb_repo )
   errCode = os.system( cmd_push_stable )
   if errCode != 0 :
     GLog.logRet( errCode )
@@ -870,9 +877,9 @@ def tag_drop_liv( options ):
       sys.exit( 1 )
 
   # 3. push on origin develop
-  GLog.s( GLog.S, "\tPushing %s on origin ... " % ( devBr.getShortRef() ))
+  GLog.s( GLog.S, "\tPushing %s on '%s' ... " % ( devBr.getShortRef(), tb_repo ))
 
-  cmd_push_dev = "SWINDENT=%d %s push %s %s" % ( GLog.tab+2, SWGIT, output_opt, mail_opt )
+  cmd_push_dev = "SWINDENT=%d %s push %s %s %s" % ( GLog.tab+2, SWGIT, output_opt, mail_opt, tb_repo )
   errCode = os.system( cmd_push_dev )
   if errCode != 0 :
     GLog.logRet( errCode )
