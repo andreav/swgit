@@ -25,10 +25,10 @@ Integration branch
 
 This is a key concept to leverage `swRepositories`.
 
-  **Integration branch is THE central branch: everithing turns around it.**
+  **Integration branch is THE central branch: everything turns around it.**
 
 When creating a branch, pulling, pushing or merging, 
-everithing happens in relation to the currnet integration branch.
+everything happens in relation to the current integration branch.
 
 You can also do a subset of operation without it, but sooner or later 
 an error message will appear requesting for setting it.
@@ -49,7 +49,7 @@ You can set an integration branch in different ways:
 
       `Inside this repository I will work around this release or feature`
 
-  * By issueing the command::
+  * By issuing the command::
 
       swgit branch --set-integration-br <local or remote branch>
 
@@ -62,7 +62,7 @@ You can set any valid branch as an integration branch.
   interested in contributing to the project in a general way.
 
 | Sometimes, like in :doc:`workflow_team_feature`, you specify a FTR branch.
-| In this way you will see the project history flows indipentently 
+| In this way you will see the project history flows independently 
   from your contributes.
 | Only develops regarding your feature will be merged to you.
 
@@ -73,7 +73,7 @@ Taking advantage of it
 Here some examples for speeding up your develop work.
 
 Integration branch is especially useful when on a side branch 
-(a FTR branch for instance) and wanting to merge, push to oringin, 
+(a FTR branch for instance) and wanting to merge, push to origin, 
 updating from origin in one shot command.
 
   .. note::
@@ -87,7 +87,7 @@ updating from origin in one shot command.
     #. user tags with ``swgit tag dev -m 'ready'`` before 
        trying merge or push operations
 
-1. **branch ceation**::
+1. **branch creation**::
 
       swgit branch -c "topic"
 
@@ -119,7 +119,7 @@ updating from origin in one shot command.
       swgit push
 
    Please refer to :ref:`lbl_repo_push_fromftr` for a graphical 
-   intrpretetion.
+   interpretation.
 
 
 .. _lbl_repo_sidepull:
@@ -136,5 +136,5 @@ updating from origin in one shot command.
       swgit merge 1/0/0/0/andreav/INT/develop
 
    Please refer to :ref:`lbl_repo_pull_fromftr` for a graphical 
-   intrpretetion.
+   interpretation.
 

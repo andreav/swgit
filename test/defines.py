@@ -216,6 +216,8 @@ TEST_REPO_FILE_B      = "b.txt"
 CUSTTAG_NUM = {
     "tagtype"              : "CUSTTAG_NUM",
     "regexp"               : "",
+    "regexp_1"             : "",
+    "regexp_2"             : "",
     "push_on_origin"       : "true",
     "one_x_commit"         : "false",
     "only_on_integrator_repo"     : "false",
@@ -230,7 +232,9 @@ CUSTTAG_NUM = {
     }
 CUSTTAG_NAME = {
     "tagtype"              : "CUSTTAG_NAME",
-    "regexp"               : "^Drop[A-Z]{1,3}(_[0-9]{1,3})?$ &@& ^Issue[0-9]{5}$ &@& ^[0-9]{7}$",
+    "regexp"               : "^Drop[A-Z]{1,3}(_[0-9]{1,3})?$",
+    "regexp_1"             : "^Issue[0-9]{5}$",
+    "regexp_2"             : "^[0-9]{7}$",
     "push_on_origin"       : "true",
     "one_x_commit"         : "false",
     "only_on_integrator_repo"     : "false",

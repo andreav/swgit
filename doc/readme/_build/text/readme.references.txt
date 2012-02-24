@@ -9,7 +9,7 @@ well defined shape.
 namespaces.
 
 By this way, all standard git commands can work with them
-trasparently.
+transparently.
 
                                 *************************************
    1/0/0/0/andreav/INT/develop  ** branch shared by all developers **
@@ -82,8 +82,8 @@ A branch reference has this configuration:
              hot-fix before product delivery. This kind of branch
              starts from *stable* branches. Their contributes should
              be reported on *develop* branches as soon as possible
-             (better if by patch mechanis, in order to avoid merging
-             *develop* and *stable* histroies)
+             (better if by patch mechanism, in order to avoid merging
+             *develop* and *stable* histories)
 
         * CST:
              This branch takes care about special customers and their
@@ -110,7 +110,7 @@ A branch reference has this configuration:
 Tags
 ====
 
-A *swTag* is always created srarting from a *swBranch*.
+A *swTag* is always created starting from a *swBranch*.
 
 So its name is composed by the complete branch name, followed by a
 TagType and TagName:
@@ -124,21 +124,21 @@ TagType and TagName:
         swgit provides any built-in tag types.
 
         However, user can customize tags according to its needs, both
-        slightly modifying built-in tags behaviour, or completly
-        defining new tags and its behaviour as described at
+        slightly modifying built-in tags behavior, or completely
+        defining new tags and its behavior as described at
         "custom_tags"
 
         * Management tag types:
 
           * LIV:
-               This tag is used to mark a sofware delivery. It is
+               This tag is used to mark a software delivery. It is
                placed on *stable* branches. User cannot manually
                create it, only "swgit stabilize --liv" command can
                create it.
 
           * STB:
-               This tag is used to mark a sofware ready to be
-               delivered. Hoever, it differs from LIV tag because we
+               This tag is used to mark a software ready to be
+               delivered. However, it differs from LIV tag because we
                can mark many times a software as 'stable' before
                deciding to deliver it (and tag with LIV). STB labels
                indicate a commit ready to be delivered. User cannot
@@ -146,7 +146,7 @@ TagType and TagName:
                command can.
 
           * NGT:
-               This tag is used to mark a sofware having passed
+               This tag is used to mark a software having passed
                'nightly tests'. This tag is very useful inside agile
                project. If your project foresee automatic tests, after
                every passed session you can tag current commit with
@@ -156,7 +156,7 @@ TagType and TagName:
         * Development tag types:
 
           * DEV:
-               This is the most commom label.It indicates work if finished and ready to be integrated.In order for a developer to push her contributes on 'origin', she must
+               This is the most common label.It indicates work if finished and ready to be integrated.In order for a developer to push her contributes on 'origin', she must
                tag last work commit with a DEV label.Furthermore, DEV labels are collected during delivery in order to create
                changelog.
 
@@ -184,7 +184,7 @@ TagType and TagName:
           All other built-in labels need the user supplies a parameter
           when creating a tag.This argument must match a user-definable list of regular expressions.Every tag has its default regular expression list, but user can change it.For instance:
 
-             FIX labels must declare which issue they fix. Its name depends on the context.STB/LIV labels take the delivery name. This also will be choosed by the user.To customize tags, please refere to :doc:custom_tags
+             FIX labels must declare which issue they fix. Its name depends on the context.STB/LIV labels take the delivery name. This also will be choosen by the user.To customize tags, please refer to :doc:custom_tags
 
    Examples:
 

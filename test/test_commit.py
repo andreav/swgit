@@ -459,7 +459,7 @@ class Test_Commit( Test_Base ):
     self.util_check_SUCC_scenario( out, errCode, "", "switch to int" )
     out, errCode = self.swgitUtil_.merge( self.CREATED_BR_SS_2 )
     self.util_check_DENY_scenario( out, errCode, 
-                                   "Cannot merge a branch into develop.",
+                                   "Cannot directly merge a branch into integration branch",
                                    "merge branch into develop" )
     out, errCode = self.swgitUtil_.merge( self.CREATED_DEV_SS_2 )
     self.util_check_DENY_scenario( out, errCode, 

@@ -21,7 +21,7 @@
 Logging
 #######
 
-swgit logs everithing is done inside your repository.
+swgit logs everything is done inside your repository.
 
 File log is contained into 
 
@@ -40,4 +40,4 @@ There, for each user managing the repository, you will find 2 files:
 
       | This file is a detailed log containing all operations a user issued,
         their output, and some details about the context the user issued them into.
-      | When you need troubleshooting a problem, yhis is the first place from where to start.
+      | When you need troubleshooting a problem, this is the first place from where to start.

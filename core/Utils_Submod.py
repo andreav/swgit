@@ -35,7 +35,7 @@ def dir2reponame( dir ):
 # SRC PARAM MANAGEMENT #
 ########################
 
-def src_reference_check_all_entries( src_str, interactive = True ):
+def src_reference_check_all_entries( src_str, batch = False ):
 
   projroot = Env.getProjectRoot()
   if projroot == "":
@@ -60,7 +60,7 @@ def src_reference_check_all_entries( src_str, interactive = True ):
     #not_listed_dirs += "\t" + d.replace( projroot, "." ) + "\n"
     not_listed_dirs += "\t" + d.replace( os.getcwd(), "." ) + "\n"
 
-  if interactive == True:
+  if not batch:
     if not_listed_dirs != "":
       ask = "Not all repositories are listed into src param. These will be skipped:\n" + \
           not_listed_dirs + \
@@ -74,7 +74,7 @@ def src_reference_check_all_entries( src_str, interactive = True ):
   return 0, ""
 
 
-def src_reference_check_strlist( src_str, interactive = True ):
+def src_reference_check_strlist( src_str, batch = False ):
 
   regular_src_str = ",%s" % src_str #make all entries like this: <,PATH:REF>
 
@@ -98,13 +98,13 @@ def src_reference_check_strlist( src_str, interactive = True ):
       return 1, "%d (%s) - listed more than once." % ( numcurrentry, currentry )
 
   # ask if some dir is forgotten
-  src_reference_check_all_entries( src_str, interactive ) #will exit if error
+  src_reference_check_all_entries( src_str, batch ) #will exit if error
 
   return 0, src_str
 
 
 
-def src_reference_check_parse_file( filename, interactive = True ):
+def src_reference_check_parse_file( filename, batch = False ):
 
   retstr = ""
   srcfile = open( filename, "r" )
@@ -125,7 +125,7 @@ def src_reference_check_parse_file( filename, interactive = True ):
     retstr += line + ','
 
   retstr = retstr[:-1]
-  ret, errstr = src_reference_check_strlist( retstr, interactive )
+  ret, errstr = src_reference_check_strlist( retstr, batch )
   if ret != 0:
     return 1, "\tWrong formatted file %s at entry: %s" % ( filename, errstr )
 
@@ -137,13 +137,13 @@ def src_reference_check_parse_file( filename, interactive = True ):
 # 1. any valid ref
 # 2. a file of PATH:valid reference
 # 2. a comma-separed list of PATH:valid reference
-def src_reference_check( src, interactive = True ):
+def src_reference_check( src, batch = False ):
 
-  if os.path.exists( src ) == True:
-    return src_reference_check_parse_file( src )
+  if os.path.exists( src ):
+    return src_reference_check_parse_file( src, batch )
 
   if src.find( ":" ) != -1:
-    ret, errstr = src_reference_check_strlist( src, interactive )
+    ret, errstr = src_reference_check_strlist( src, batch )
     if ret != 0:
       return 1, "\tWrong formatted comma-separed list at position %s" % errstr
     return ret, errstr

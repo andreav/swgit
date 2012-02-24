@@ -15,7 +15,7 @@
    You should have received a copy of the GNU General Public License
    along with swgit.  If not, see <http://www.gnu.org/licenses/>.
 
-.. _todo list: http://github.com/andreav/swgit/blob/1/0/0/0/andreav/INT/stable/notes.txt
+.. _todo list: http://github.com/andreav/swgit/blob/1/0/0/0/swgit/INT/develop/notes.txt
 
 .. |subs_img_todo| image:: images/static/todo.png
 
@@ -26,9 +26,9 @@
 .. |subs_txt_latest_dev| replace:: 1/0/0/0/swgit/INT/develop
 
 .. |subst_txt_latest_stb_url| replace:: latest STABLE version
-.. _subst_txt_latest_stb_url: http://github.com/andreav/test_repo/tree/1/0/0/0/swgit/INT/stable
+.. _subst_txt_latest_stb_url: http://github.com/andreav/swgit/tree/1/0/0/0/swgit/INT/stable
 
 .. |subst_txt_latest_dev_url| replace:: latest DEVELOP version
-.. _subst_txt_latest_dev_url: http://github.com/andreav/test_repo/tree/1/0/0/0/swgit/INT/develop
+.. _subst_txt_latest_dev_url: http://github.com/andreav/swgit/tree/1/0/0/0/swgit/INT/develop
 
 .. highlight:: text

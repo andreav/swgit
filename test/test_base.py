@@ -53,3 +53,8 @@ class Test_Base( unittest.TestCase ):
     if cmd_attended_out != "":
       self.assertTrue ( cmd_attended_out in cmd_out, "\n%s,\nNOT FOUND\n'%s'\n\n - inside output - \n\n%s\n" % (test_out,cmd_attended_out,cmd_out) )
 
+  def util_check_EQUAL( self, val1, val2, msg ):
+    self.assertEqual( val1, val2, "\n\n<<MUST BE EQUAL>> %s \n\n  val1: %s\n  val2: %s\n" % (msg, val1, val2) )
+
+  def util_check_NOTEQ( self, val1, val2, msg ):
+    self.assertNotEqual( val1, val2, "\n\n<<MUST BE NOT EQUAL>> %s \n\n  val1: %s\n  val2: %s\n" % (msg, val1, val2) )

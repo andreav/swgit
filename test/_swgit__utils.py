@@ -171,11 +171,18 @@ class swgit__utils:
       if retcode != 0:
         return out, retcode
 
-      #lcoalize taht branch (so when adding this repo as remote, i will have a remote branch more)
+      #localize that branch (so when adding this repo as remote, i will have a remote branch more)
       cmd = "cd %s && %s branch -s %s" % ( aremote, SWGIT, ORIG_REPO_aBRANCH )
       out, retcode = myCommand( cmd )
       if retcode != 0:
         return out, retcode
+
+      #localize also stable (for stabilize tests)
+      cmd = "cd %s && %s branch -s %s" % ( aremote, SWGIT, ORIG_REPO_STABLE_BRANCH )
+      out, retcode = myCommand( cmd )
+      if retcode != 0:
+        return out, retcode
+
 
       shutil.copytree( aremote, aremote_bkp )
       shutil.copytree( aremote_bkp, aremote_dst )
@@ -304,6 +311,10 @@ class swgit__utils:
 
   def int_branch_set( self, ib, all = "" ):
     return swgit__utils.int_branch_set_dst( self.repodir_, ib, all )
+
+  def int_branch_UNset( self ):
+    cmd = "cd %s && %s branch --unset-integration-br" % ( self.repodir_, SWGIT )
+    return myCommand( cmd )
 
   @staticmethod
   def current_branch_dst( dst, all=""):
@@ -439,6 +450,8 @@ class swgit__utils:
   customtag_template = Template("""
 [$tagtype]
 regexp                  = $regexp
+regexp-1                = $regexp_1
+regexp-2                = $regexp_2
 push-on-origin          = $push_on_origin
 one-x-commit            = $one_x_commit
 only-on-integrator-repo = $only_on_integrator_repo
@@ -1005,25 +1018,51 @@ denied-brtypes          =
   #
   # stabilize
   #
-  def stabilize_stb( self, stb, src ):
+  def stabilize_stb( self, labelname, src, dstbr = None, force = False ):
     opt_src = ""
     if src != "":
       opt_src = "--src %s" % src
-    cmd = "cd %s && %s stabilize --stb %s %s" % ( self.repodir_, SWGIT, stb, opt_src )
+
+    opt_force = ""
+    if force:
+      opt_force = "--force"
+
+    opt_dstbr = ""
+    if dstbr != None:
+      opt_dstbr = dstbr
+
+    cmd = "cd %s && %s stabilize --batch --stb %s %s %s %s" % ( self.repodir_, SWGIT, opt_force, labelname, opt_src, opt_dstbr )
     return myCommand( cmd )
 
-  def stabilize_liv( self, liv ):
-    cmd = "cd %s && %s stabilize --liv %s --no-interactive" % ( self.repodir_, SWGIT, liv )
+  def stabilize_liv( self, liv, dstbr = None, nomergeback = False ):
+    str_nomergeback = ""
+    if nomergeback:
+      str_nomergeback = "--no-merge-back"
+
+    opt_dstbr = ""
+    if dstbr != None:
+      opt_dstbr = dstbr
+
+    cmd = "cd %s && %s stabilize --batch --liv %s %s %s" % ( self.repodir_, SWGIT, liv, str_nomergeback, opt_dstbr )
     return myCommand( cmd )
+
+  def stabilize_both( self, labelname, src, dstbr = None, force = False ):
+    opt_src = ""
+    if src != "":
+      opt_src = "--src %s" % src
+
+    opt_force = ""
+    if force:
+      opt_force = "--force"
+
+    opt_dstbr = ""
+    if dstbr != None:
+      opt_dstbr = dstbr
+
+    cmd = "cd %s && %s stabilize --stb --liv --batch %s %s %s %s" % ( self.repodir_, SWGIT, opt_force, labelname, opt_src, opt_dstbr )
+    return myCommand( cmd )
+
   
-  def stabilize_cst( self, cst, src ):
-    opt_src = ""
-    if src != "":
-      opt_src = "--src %s" % src
-    cmd = "cd %s && %s stabilize --cst %s %s" % ( self.repodir_, SWGIT, cst, opt_src )
-    return myCommand( cmd )
-
-
 
 
   #

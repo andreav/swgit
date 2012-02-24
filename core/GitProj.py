@@ -20,7 +20,6 @@
 import ConfigParser
 
 from Common import *
-from ObjKey import * 
 from ObjStatus import * 
 #from ObjLog import help_mac
 from ObjBranch import *
@@ -52,41 +51,6 @@ def check_BRexists_and_WDclean( dir ):
     return 1, errstr
 
   return 0, ""
-
-
-def checkRepo( url, branch, chk=None ):
-  src_obj_remote = create_remote_byurl( url )
-  if not src_obj_remote.isValid():
-    GLog.f( GLog.E, str(src_obj_remote) )
-    return 1
-  if src_obj_remote.getType() != "ssh" and src_obj_remote.getType() != "fs" :
-    GLog.f( GLog.E, "ERROR: at the moment, only ssh (ssh://user@addr/path/to/repo) or fs (/path/to/repo) urls supported " )
-    return 1
-
-  errCode = 0
-
-  #
-  # ssh key management
-  #
-  if src_obj_remote.getType() == "ssh":
-
-    GLog.s( GLog.S, "Remote login password maybe asked during this operation ... " )
-
-    objKey = ObjKey( src_obj_remote.getUser(), src_obj_remote.getAddress() )
-
-    out, errCode = objKey.is_reachable()
-    if errCode != 0:
-      GLog.f( GLog.E, indentOutput( out, 1 ) )
-      return 1
-
-    if objKey.create_and_copy() != 0:
-      strerr  = "FAILED: cannot create/copy swgit pub key onto host \"%s\" with user \"%s\" via ssh." % \
-                         ( src_obj_remote.getAddress(), src_obj_remote.getUser() )
-      strerr += "        Please use 'swgit key %s %s' command to investigate" % ( src_obj_remote.getUser(), src_obj_remote.getAddress() )
-      GLog.f( GLog.E, indentOutput( strerr, 1 ) )
-      return 1
-
-  return errCode
 
 
 def write_swdefbr_addindex_config( proot, reponame, branch ):
@@ -159,10 +123,10 @@ def write_snapshotfile_addindex( proot, reponame, url, branch ):
 
   #create section
   #config.add_section( reponame )
-  #config.set( reponame, SWFILE_SNAPCFG_URL   ,    url     )
-  #config.set( reponame, SWFILE_SNAPCFG_BRANCH,    branch  )
-  #config.set( reponame, SWFILE_SNAPCFG_ALWAYSUPD, "False" )
-  new_cont = "[%s]\n%s = %s\n%s = %s\n" % ( reponame, SWFILE_SNAPCFG_URL, url, SWFILE_SNAPCFG_BRANCH, branch )
+  #config.set( reponame, SWCFG_SNAP_URL   ,    url     )
+  #config.set( reponame, SWCFG_SNAP_BRANCH,    branch  )
+  #config.set( reponame, SWCFG_SNAP_ALWAYSUPD, "False" )
+  new_cont = "[%s]\n%s = %s\n%s = %s\n" % ( reponame, SWCFG_SNAP_URL, url, SWCFG_SNAP_BRANCH, branch )
   cmd_echo = "echo '%s' >> %s" % (new_cont, filename)
   ret = os.system( cmd_echo )
   if ret != 0:
@@ -517,10 +481,6 @@ Usage: swgit proj --add-repo [-b branch] [--snapshot] <url> [<localname>]
       GLog.f( GLog.E, errstr )
       sys.exit( 1 )
 
-    ret = checkRepo( proj_url, options.proj_branch )
-    if ret != 0:
-      sys.exit( 1 )
-
     GLog.s( GLog.S, "Adding section %s to project %s" % ( repo_name , Env.getLocalRoot() ) )
 
     #
@@ -573,7 +533,7 @@ Usage: swgit proj --add-repo [-b branch] [--snapshot] <url> [<localname>]
     GLog.logRet( 0 )
 
     # work is finished, notify user about commit and push
-    GLog.s( GLog.S, "\nPLEASE VERIFY EVERITHING IS OK, THEN COMMIT with \"swgit commit --dev %s\", MERGE ON DEVELOP AND PUSH PROJECT DIRECTORY (%s)\n" % ( repo_name, Env.getLocalRoot() ) )
+    GLog.s( GLog.S, "\nPLEASE VERIFY EVERYTHING IS OK, THEN COMMIT with \"swgit commit --dev %s\", MERGE ON DEVELOP AND PUSH PROJECT DIRECTORY (%s)\n" % ( repo_name, Env.getLocalRoot() ) )
 
     sys.exit( 0 )
 
@@ -683,7 +643,7 @@ Usage: swgit proj --add-repo [-b branch] [--snapshot] <url> [<localname>]
         sys.exit( 1 )
 
       # work is finished, notify user about commit and push
-      GLog.s( GLog.S, "\nPLEASE VERIFY EVERITHING IS OK, THEN COMMIT with \"swgit commit --dev %s\" option set, MERGE ON DEVELOP AND PUSH PROJECT DIRECTORY (%s)\n" % ( rn, proot ) )
+      GLog.s( GLog.S, "\nPLEASE VERIFY EVERYTHING IS OK, THEN COMMIT with \"swgit commit --dev %s\" option set, MERGE ON DEVELOP AND PUSH PROJECT DIRECTORY (%s)\n" % ( rn, proot ) )
 
       GLog.logRet( 0 )
 
@@ -1395,6 +1355,14 @@ Usage: swgit proj --add-repo [-b branch] [--snapshot] <url> [<localname>]
     #print "ref2: ", ref2
     #print "args: ", args_submod
 
+    strbody = "project  %s" % map.getDir()
+    str_tit1 = "REF1:       "
+    str_tit2 = "REF2:       "
+    str_ref_2 = ref2
+    if ref2 == "":
+      str_ref_2 = "working dir"
+    print "%s\n%s\n%s%s\n%s%s\n%s" % ( "-"*len(strbody), strbody, str_tit1, ref1, str_tit2, str_ref_2, "-"*len(strbody) )
+
     for rn in args_submod:
       rn = dir2reponame( rn )
       smodref_1, errCode = submod_getrepover_atref( map.getDir(), rn, ref1 )
@@ -1422,7 +1390,7 @@ Usage: swgit proj --add-repo [-b branch] [--snapshot] <url> [<localname>]
             GLog.f( GLog.E, strerr )
             return 1
 
-      strbody = "repository  %s" % rn
+      strbody = "submodule  %s" % rn
       if ref2 == "MERGE_HEAD":
         str_tit1 = "HEAD:       "
         str_tit2 = "MERGE_HEAD: "

@@ -215,11 +215,17 @@ class TagDsc( ObjCfgTag ):
 #
 #[LABEL-TYPE]            =
 #regexp                  =
+#regexp-1                =
+#regexp-2                =
 #push-on-origin          =
 #one-x-commit            =
 #only-on-integrator-repo =
 #allowed-brtypes         =
+#allowed-brtypes-1       =
+#allowed-brtypes-2       =
 #denied-brtypes          =
+#denied-brtypes-1        =
+#denied-brtypes-2        =
 #tag-in-past             =
 #hook-pretag-script      =
 #hook-pretag-sshuser     =
@@ -332,7 +338,7 @@ class TagLIVDsc( TagDsc ):
     super(TagLIVDsc, self ).__init__( self.type_, loadcfg = False )
 
     self.set_fields_mandatory( [] )
-    self.set_fields_optional( self.get_regexp_optional_field( SWCFG_TAG_LIVREGEXP ) + 
+    self.set_fields_optional( self.get_regexp_optional_field( [SWCFG_TAG_LIVREGEXP] ) + 
                               self.get_hook_optional_field_default() )
 
     self.load_cfg()
@@ -344,7 +350,7 @@ class TagLIVDsc( TagDsc ):
     self.merge_on_stable_         = True
     self.merge_on_cst_            = True
     self.push_on_origin_          = True
-    self.one_x_commit_            = True
+    self.one_x_commit_            = False
     self.only_on_integrator_repo_ = True
     self.allowed_brtypes_         = [ SWCFG_BR_INT, SWCFG_BR_CST ]
     self.denied_brtypes_          = []
@@ -360,7 +366,7 @@ class TagSTBDsc( TagDsc ):
     super(TagSTBDsc, self ).__init__( self.type_, loadcfg = False )
 
     self.set_fields_mandatory( [] )
-    self.set_fields_optional( self.get_regexp_optional_field( SWCFG_TAG_LIVREGEXP ) + 
+    self.set_fields_optional( self.get_regexp_optional_field( [SWCFG_TAG_LIVREGEXP] ) + 
                               self.get_hook_optional_field_default() )
 
     self.load_cfg()
@@ -370,9 +376,11 @@ class TagSTBDsc( TagDsc ):
     self.merge_on_stable_         = True
     self.merge_on_cst_            = True
     self.push_on_origin_          = True
-    self.one_x_commit_            = True
+    self.one_x_commit_            = False
     self.only_on_integrator_repo_ = True
-    self.allowed_brtypes_         = [ SWCFG_BR_INT, SWCFG_BR_CST ]
+    #When stabilizing any ref, this check is too restrictive
+    #self.allowed_brtypes_         = [ SWCFG_BR_INT, SWCFG_BR_CST ]
+    self.allowed_brtypes_         = []
     self.denied_brtypes_          = []
     self.tag_in_past_             = True
     self.isValid_                 = True
@@ -409,7 +417,7 @@ class TagFIXDsc( TagDsc ):
     super(TagFIXDsc, self ).__init__( self.type_, loadcfg = False )
 
     self.set_fields_mandatory( [] )
-    self.set_fields_optional( self.get_regexp_optional_field( "^Issue[0-9]{5}$%s^[0-9]{7}$" % SWCFG_KEY_TAGDSC_LIST_DELIMITER ) +
+    self.set_fields_optional( self.get_regexp_optional_field( ["^Issue[0-9]{5}$", "^[0-9]{7}$" ] ) +
                               self.get_hook_optional_field_default() )
 
     self.load_cfg()
@@ -458,7 +466,7 @@ class TagNGTDsc( TagDsc ):
     super(TagNGTDsc, self ).__init__( self.type_, loadcfg = False )
 
     self.set_fields_mandatory( [] )
-    self.set_fields_optional( self.get_regexp_optional_field( SWCFG_TAG_LIVREGEXP ) +
+    self.set_fields_optional( self.get_regexp_optional_field( [SWCFG_TAG_LIVREGEXP] ) +
                               self.get_hook_optional_field_default() )
 
     self.load_cfg()
@@ -482,7 +490,7 @@ class TagNEWDsc( TagDsc ):
     super(TagNEWDsc, self ).__init__( self.type_, loadcfg = False )
 
     self.set_fields_mandatory( [] )
-    self.set_fields_optional( self.get_regexp_optional_field( SWCFG_TAG_NEWREGEXP ) +
+    self.set_fields_optional( self.get_regexp_optional_field( [SWCFG_TAG_NEWREGEXP] ) +
                               self.get_hook_optional_field_default() )
 
     self.load_cfg()

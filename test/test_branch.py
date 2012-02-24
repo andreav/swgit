@@ -1240,7 +1240,14 @@ class Test_Branch( Test_Base ):
     self.util_check_SUCC_scenario( out, errCode, "", "deleting INT branch and all tags" ) 
 
     out, errCode = self.swgitUtil_.branch_delete_E( ORIG_REPO_STABLE_BRANCH )
-    self.util_check_SUCC_scenario( out, errCode, "", "deleting INT branch and all tags" ) 
+
+    if modetest_morerepos():
+      self.util_check_DENY_scenario( out, errCode, "Multiple matches found", "deleting INT branch and all tags" ) 
+
+      out, errCode = self.swgitUtil_.branch_delete_E( ORIG_REPO_AREMOTE_NAME + "/" + ORIG_REPO_STABLE_BRANCH )
+      self.util_check_SUCC_scenario( out, errCode, "", "deleting INT branch and all tags" ) 
+    else:
+      self.util_check_SUCC_scenario( out, errCode, "", "deleting INT branch and all tags" ) 
 
     #craete 
     out, errCode = self.swgitUtil_.branch_create( self.BRANCH_NAME )
@@ -1387,7 +1394,13 @@ class Test_Branch( Test_Base ):
     self.util_check_SUCC_scenario( out, errCode, "", "deleting INT branch and all tags" ) 
 
     out, errCode = self.swgitUtil_.branch_delete_E( ORIG_REPO_STABLE_BRANCH )
-    self.util_check_SUCC_scenario( out, errCode, "", "deleting INT branch and all tags" ) 
+    if modetest_morerepos():
+      self.util_check_DENY_scenario( out, errCode, "Multiple matches found", "deleting INT branch and all tags" ) 
+
+      out, errCode = self.swgitUtil_.branch_delete_E( "origin/" + ORIG_REPO_STABLE_BRANCH )
+      self.util_check_SUCC_scenario( out, errCode, "", "deleting INT branch and all tags" ) 
+    else:
+      self.util_check_SUCC_scenario( out, errCode, "", "deleting INT branch and all tags" ) 
 
 
     #craete 

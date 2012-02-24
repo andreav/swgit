@@ -30,8 +30,7 @@ import Utils
 import Utils_All
 
 
-def pull( brname, noStat=False, tab="" ):
-  #cmd="git pull origin %s --tags" % brname
+def pull( noStat=False, tab="" ):
   cmd="git pull --all --tags " #--recurse-submodules compatible from 1.7.4.3
   out,errCode = myCommand( cmd )
 
@@ -61,13 +60,6 @@ def check(options):
     return 1 
 
   startb = Branch.getCurrBr()
-  ib = Branch.getIntBr()
-  # on INT or CST no need to manually set INT BR
-  if startb.getType() == SWCFG_BR_CST:
-    ib = startb
-  if startb.getType() == SWCFG_BR_INT:
-    ib = startb
-  sb = Branch.getStableBr()
 
   #detached head
   if not startb.isValid():
@@ -75,21 +67,24 @@ def check(options):
     return 1
 
   #int br
-  if not ib.isValid():
-    GLog.f( GLog.E, "FAILED - Cannot pull without an integration branch set. Please use swgit branch --set-integration-br command" )
+  logib = Branch.getLogicalIntBr()
+  if not logib.isValid():
+    strerr  = "FAILED - Cannot pull without an integration branch set.\n"
+    strerr += "         Plase set it by 'swgit branch --set-integration-br'."
+    GLog.f( GLog.E, strerr )
     return 1
 
-  if Branch.is_side_operation( startb, ib, sb ):
+  if startb.getShortRef() != logib.getShortRef():
     if not options.side_pull:
       strerr  = "FAILED - Cannot directly pull a develop branch.\n"
-      strerr += "         Please move onto your current int br (%s)\n" % ib.getShortRef()
+      strerr += "         Please move onto your current int br (%s)\n" % logib.getShortRef()
       strerr += "         or\n"
       strerr += "         use 'swgit pull -I' option to merge automatically after pulling integration branch"
       GLog.f( GLog.E, strerr )
       return 1
 
   #intbr only local
-  rem_ib = ib.branch_to_remote_obj()
+  rem_ib = logib.branch_to_remote_obj()
   if not rem_ib.isValid():
     strerr  = "FAILED - Your current integration branch is only a local branch (%s).\n" % startb.getShortRef()
     strerr += "         If you want to pull it, before push it on origin\n"
@@ -98,7 +93,7 @@ def check(options):
     return 1
 
   #intbr not tracked
-  trackedInfo, tracked = ib.get_track_info()
+  trackedInfo, tracked = logib.get_track_info()
   if not tracked:
     GLog.f( GLog.E, "FAILED - Your current integration branch is not tracked. Please use swgit branch --track %s" % startb.getShortRef() )
     return 1
@@ -117,52 +112,44 @@ def execute(options):
 
   GLog.s( GLog.S, "Pull contributes from origin into " + dumpRepoName("your local") + " repository ..." )
   
-   
   startb = Branch.getCurrBr()
-  ib = Branch.getIntBr()
-  # on INT or CST no need to manually set INT BR
-  if startb.getType() == SWCFG_BR_CST:
-    ib = startb
-  if startb.getType() == SWCFG_BR_INT:
-    ib = startb
-  sb = Branch.getStableBr()  
+  logib = Branch.getLogicalIntBr()
 
   #
   # pull on intbr
   #
-  if not Branch.is_side_operation( startb, ib, sb ):
+  if startb.getShortRef() == logib.getShortRef():
 
-    errCode = pull( startb.getShortRef(), options.noStat )
+    errCode = pull( options.noStat )
     GLog.logRet( errCode )
     return errCode
 
   else: #side pull
 
     # Go onto int br
-    cmd_swto_int = "SWINDENT=%d %s branch -i %s" % ( GLog.tab+1, SWGIT, output_opt)
+    cmd_swto_int = "SWINDENT=%d %s branch -s %s %s" % ( GLog.tab+1, SWGIT, logib.getShortRef(), output_opt)
     errCode = os.system( cmd_swto_int )
     if errCode != 0 :
       GLog.logRet( errCode )
       return 1     
 
-    GLog.s( GLog.S, "\tPull contributes of %s from origin... " % ( ib.getShortRef() ) )
+    GLog.s( GLog.S, "\tPulling contributes for branch %s ... " % ( logib.getShortRef() ) )
 
     # pull
-    errCode = pull( ib.getShortRef(), options.noStat )
+    errCode = pull( options.noStat )
     GLog.logRet( errCode, indent="\t" )
     if errCode != 0 :
       GLog.logRet( 1 )
       return 1
     
-    # Come back onto staring br
+    # Come back onto starting br
     errCode = os.system("SWINDENT=%d %s branch -s %s %s" % ( GLog.tab+1, SWGIT, startb.getShortRef(), output_opt ) )
     if errCode != 0 :
       GLog.logRet( errCode )
       return 1 
 
-    # Merge on side, only if not in CHK
-    cmd = "SWINDENT=%d %s merge %s %s %s " % ( GLog.tab+1, SWGIT, ib.getShortRef(), output_opt, str_stat )
-    GLog.f( GLog.D, cmd )
+    cmd = "SWINDENT=%d %s merge %s %s %s " % ( GLog.tab+1, SWGIT, logib.getShortRef(), output_opt, str_stat )
+    GLog.f( GLog.I, cmd )
     errCode = os.system( cmd )
     if errCode != 0 :
       GLog.logRet( errCode )
@@ -246,15 +233,6 @@ arr_management_options = [
         "help"    : "Disable automatic merge from %s branch into current %s branch." % (SWCFG_BR_INT, SWCFG_BR_FTR)
         }
       ],
-#    [ 
-#      "--all",
-#      {
-#        "action"  : "store_true",
-#        "dest"    : "all",
-#        "default" : False,
-#        "help"    : "Execute pull over all repositories of current project"
-#        }
-#     ]
   ]
 
 

@@ -212,7 +212,7 @@ class Test_Workflow( Test_ProjBase ):
   #
   # Result:
   #
-  #   push -I does not work: no DEV label
+  #   push -I works but do nothing here: just pushes develop (because cb = INT)
   #   tagging DEV on INT(/develop) is not allowed
   #   merging INT/feature_develop into INT/develop is not allowed
   #   So, only way is choosing a LIV from INT/stable
@@ -229,17 +229,9 @@ class Test_Workflow( Test_ProjBase ):
     out, errCode = self.sw_clonerepo_h.init_src( ORIG_REPO_DEVEL_BRANCH, c = self.FEATURE_BRANCH_NAME, )
     self.util_check_SUCC_scenario( out, errCode, "", "creating feature INT branches" ) 
 
-    out, errCode = self.sw_clonerepo_h.push()
-    self.util_check_DENY_scenario( out, errCode, "Cannot directly push a develop branch.", "push" )
 
     out, errCode = self.sw_clonerepo_h.push_with_merge()
-    self.util_check_SUCC_scenario( out, errCode, "is empty, no-op", "push with merge" )
-
-    out, errCode = self.sw_clonerepo_h.int_branch_set( self.FULL_FEATURE_BRANCH_NAME_DEV )
-    self.util_check_SUCC_scenario( out, errCode, "", "restoring old INT branch" )
-
-    out, errCode = self.sw_clonerepo_h.push()
-    self.util_check_SUCC_scenario( out, errCode, "", "push new iNT branch" )
+    self.util_check_SUCC_scenario( out, errCode, "", "push with merge" )
 
     out, errCode = self.sw_origrepo_h.get_currsha( self.FULL_FEATURE_BRANCH_NAME_DEV )
     self.util_check_SUCC_scenario( out, errCode, "", "check origin has %s" % self.FULL_FEATURE_BRANCH_NAME_DEV )
@@ -307,11 +299,12 @@ class Test_Workflow( Test_ProjBase ):
     out, errCode = self.sw_clonerepo_2_h.tag_create( "dev", msg = "feature finished, tagging an INT branch with DEV" )
     self.util_check_DENY_scenario( out, errCode, "", "tagging DEV on INT branch must be denied" )
 
-    # push -I will fail, no DEV found on INT/faeture_develop (correct)
+    # push -I will not fail, but will do nothing: just push INT/faeture_develop
+    #         no merge because cb is /INT/ => behave like integartion branch
     ######################################################
     out, errCode = self.sw_clonerepo_2_h.push_with_merge()
     ######################################################
-    self.util_check_DENY_scenario( out, errCode, "No DEV label found on branch", "side push" )
+    self.util_check_SUCC_scenario( out, errCode, "Everything up-to-date", "side push with cb = INT => only pushing cb, no side merge" )
 
     sha_dev_orig_afterclone2mergepush, errCode = self.sw_origrepo_h.get_currsha( ORIG_REPO_DEVEL_BRANCH )
     sha_dev_clo2_afterclone2mergepush, errCode = self.sw_clonerepo_2_h.get_currsha( ORIG_REPO_DEVEL_BRANCH )
@@ -324,7 +317,7 @@ class Test_Workflow( Test_ProjBase ):
     out, errCode = self.sw_clonerepo_2_h.branch_switch_to_int()
     out, errCode = self.sw_clonerepo_2_h.merge( self.FULL_FEATURE_BRANCH_NAME_DEV )
     self.util_check_DENY_scenario( out, errCode, 
-                                   "Cannot merge a branch into develop. Please specify a valid reference to be merged in", 
+                                   "Cannot directly merge a branch into integration branch",
                                    "merging feature_develop on develop" )
 
     out, errCode = self.sw_origrepo_h.branch_switch_to_br( ORIG_REPO_STABLE_BRANCH )

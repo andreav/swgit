@@ -17,9 +17,9 @@
 
 .. include:: globals.rst
 
-###################
-Wokflow - Multisite
-###################
+####################
+Workflow - Multisite
+####################
 
 Scenario:
 

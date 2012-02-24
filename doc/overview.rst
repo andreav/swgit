@@ -22,7 +22,7 @@ Overview
 ########
 
 
-swgit orginizes your git repository in a structured way
+swgit organizes your git repository in a structured way
 -------------------------------------------------------
 
 swgit provides and supports application level workflows over git repositories.
@@ -35,7 +35,7 @@ It is built turning special attention to:
 
 It chooses a 'Shared Repository' collaborative model:
 
-  * team members are responsible for integarting their work
+  * team members are responsible for integrating their work
 
   * team members push their contributes to 'origin'
 
@@ -51,13 +51,13 @@ When working with :doc:`projects`, shell access on 'origin' repository must be a
 
 | At the moment, swgit only works on Linux platforms.
 | Thanks to its python nature, Windows porting should be not too difficult. 
-| Anyone who whishes to contribute, can contribute. 
+| Anyone who wishes to contribute, can contribute. 
 
 
 History full of informations
 ----------------------------
 
-  **Enriching repository with lots of informations retrivable at a glance.**
+  **Enriching repository with lots of informations retrievable at a glance.**
  
   Personally I do not like straight, single commit lined up, git histories.
  
@@ -76,18 +76,18 @@ History full of informations
   
 
 
-Defining Integartor and Developers Roles
+Defining Integrator and Developers Roles
 ----------------------------------------
 
-  Integartion happens at two levels:
+  Integration happens at two levels:
 
     1. Every **Developer** is responsible for merging his/her contributes
 
-    2. An **Integrator** is responsible for deliverying software product 
+    2. An **Integrator** is responsible for delivering software product 
        stable versions.
 
   Thanks to repository structure, both roles can continue working in the same repository
-  without  getting in each other's way:
+  without  getting in each others way:
  
   * | *Developers* do not interfere with build/delivery process.
     | *INT/develop* branches free *Developers*.
@@ -122,7 +122,7 @@ Agile natural support
 Defining repository customers
 -----------------------------
 
-  Particulary useful when supporting client-specific requirements.
+  Particularly useful when supporting client-specific requirements.
 
   | swgit let the *Integrator* create customer-specific branches.
   | These branches receives special treatment according to different workflows.
@@ -139,7 +139,7 @@ Repository modularity
   Personally I find *submodules* a bit tricky.
 
   In my opinion they are fantastic if used for third party libraries,
-  but pratically very difficult to leverage when deciding to split your
+  but practically very difficult to leverage when deciding to split your
   repository into sub repositories and develop inside all of them.
 
   Also, *git subtrees* alternative is not suitable for me, simply too complicated.
@@ -147,7 +147,7 @@ Repository modularity
   In synthesis: 
     *both submodules and subtrees are difficult to leverage especially when contributing back to origin repository, and, for newbies, quite unusable at all.*
 
-  swgit boosts reposiory modularity with :doc:`projects`:
+  swgit boosts repository modularity with :doc:`projects`:
   
     * They are completely compatible with 'git submodule' leveraging their main features
 
@@ -171,17 +171,17 @@ Repository modularity
 Simplifying git usage for newbies
 ---------------------------------
 
-  1. When I first met git, togheter with the great power of the tool, 
-     immeadetely I perceived the possibility of inadvertently destroing my
+  1. When I first met git, together with the great power of the tool, 
+     immediately I perceived the possibility of inadvertently destroying my
      'origin' repository with a *wrong push*.
  
      Many *Deny Scenarios* are implemented to:
 
-       * Avoid dangerous behaviours/commands
+       * Avoid dangerous behaviors/commands
 
-       * Force user following builtin workflows
+       * Force user following built-in workflows
 
-  2. Moreover, I think git sometimes groups any SCM funcionalities 
+  2. Moreover, I think git sometimes groups any SCM functionality 
      under unnatural commands.
 
        * Deleting a tag remotely is done by pushing an empty reference on 'origin'
@@ -191,11 +191,11 @@ Simplifying git usage for newbies
        * ...
 
      | It is perfectly understandable when accepting git philosophy, but
-       at the beginnig, I spent so much time looking for the correct command
+       at the beginning, I spent so much time looking for the correct command
        to invoke.
-     | swgit also endeavours reducing these aspects, tricky for newbies.
+     | swgit also endeavors reducing these aspects, tricky for newbies.
 
-  3. Well defined wokflows are supported in order to shorten and simplify 
+  3. Well defined workflows are supported in order to shorten and simplify 
      development when following them. (:doc:`workflows`)
 
 
@@ -206,7 +206,7 @@ Customization
   
     * possibility in defining new labels, integrated in existent workflows
   
-    * changing tags behaviours
+    * changing tags behaviors
   
     * specifying pre- and post- tagging hooks
 
@@ -215,13 +215,13 @@ Automatic mail delivery
 -----------------------
 
   It is possible to configure your repository for automatically 
-  deliverying mails at push and deploy time.
+  delivering mails at push and deploy time.
 
-  This reaveals confortable to track developments by email.
+  This reveals comfortable to track developments by email.
 
   Please refer to :doc:`mail`
 
-Logging everithing
+Logging everything
 ------------------
 
   Every operation, its output, beginning and final commits are logged on 

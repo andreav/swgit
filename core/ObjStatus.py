@@ -19,6 +19,7 @@
 
 from ObjEnv import * 
 from Utils_Submod import * 
+#import traceback
 
 class Status:
   def __init__( self):
@@ -34,16 +35,19 @@ class Status:
     
   @staticmethod
   def getFile( root = ".", ignoreSubmod = False ):
+    #print "%"*80
+    #traceback.print_stack()
+
     # use poll instead of wait when long output can be genearetd. 
     #  In those cases this happen:
     #  1. command generates great output
     #  2. no one consumes it
     #  3. wait blocks untils command ends but it cannot because queue if full.
     opt_smod = ""
-    if ignoreSubmod == True:
-      opt_smod = " --ignore-submodules "
+    if ignoreSubmod:
+      opt_smod = "--ignore-submodules"
 
-    cmd = "cd %s && git status -s %s" % (root,opt_smod)
+    cmd = "cd %s && git status --porcelain -s %s" % (root,opt_smod)
     outerr, errCode = myCommand_fast_nojoin( cmd )
 
     #outerr = out.splitlines()
@@ -65,6 +69,9 @@ class Status:
     modToCommit=[]
     modRM=[]
 
+    mod2commit = ("M ","A ","AM","R ","C ","D ")
+    conflict   = ("DD","AA","UU","AU","UD","UA","DU")
+
     for line in outerr:
       type = line[0:2]
       file = line[3:-1]
@@ -73,33 +80,42 @@ class Status:
       if file in repolist:
         mod = True
 
-      if type[1:] == "D" :
+      if type[1] == "D" :
         if not mod:
           fileRM.append(file)
         else:
           modRM.append( file )
-      # opzione a sinistra e destra vuoto ok
-      if type in ("M ","A ","AM","R ","C ","D ") :
+        continue
+
+      if type in mod2commit:
         if not mod:
           fileToCommit.append( file )
         else:
           modToCommit.append( file )
-      elif type in ("DD","AA","UU","AU","UD","UA","DU") :
+        continue
+
+      if type in conflict:
         if not mod:
           fileUU.append( file )
         else:
           modUU.append( file )
-      elif type.count("M") > 0 or type.count("D") > 0:
+        continue
+
+      if type.count("M") > 0 or type.count("D") > 0:
         if not mod:
           fileChanged.append( file )
         else:
           modChanged.append( file )
-      else :
-        if not mod:
-          fileBO.append( file )
-        else:
-          modBO.append( file )
+        continue
 
+      if not mod:
+        fileBO.append( file )
+      else:
+        modBO.append( file )
+
+
+    #print fileUU,fileChanged,fileToCommit,fileBO,fileRM,\
+    #       modUU,modChanged,modToCommit,modBO,modRM
     return fileUU,fileChanged,fileToCommit,fileBO,fileRM,\
            modUU,modChanged,modToCommit,modBO,modRM
 
@@ -137,23 +153,32 @@ class Status:
           Status.getFile( root, ignoreSubmod )
     
     if len(fileUU) > 0:
-      errstr = "Conflicted file(s) detected. Please procede in this way:\n\tResolve conflicts\n\tswgit add resolved files\n\tswgit commit\n\t\t"
-      errstr = errstr + "\t\t".join( fileUU )
+      errstr  = "Conflicted file(s) detected. Please procede in this way:\n"
+      errstr += "\tResolve conflicts\n"
+      errstr += "\tswgit add resolved files\n"
+      errstr += "\tswgit commit\n\t\t"
+      errstr = errstr + "\n\t\t".join( fileUU )
       return 1, errstr
       
     if len( fileChanged ) > 0:
-      errstr = "Locally modified file(s) detected. Please procede in this way:\n\tswgit commit -a\n\t\t"
+      errstr  = "Locally modified file(s) detected. Please procede in this way:\n"
+      errstr += "\tswgit stash\n"
+      errstr += "\tor\n"
+      errstr += "\tswgit commit -a\n\t\t"
       errstr = errstr + "\n\t\t".join( fileChanged )
       return 1, errstr
 
     if len( fileToCommit ) > 0:
-      errstr = "New file(s) not commited detected. Please procede in this way:\n\tswgit Commit\n\t\t"
+      errstr = "New file(s) not commited detected. Please procede in this way:\n\tswgit commit\n\t\t"
       errstr = errstr + "\n\t\t".join( fileToCommit )
       return 1, errstr
 
     if len(modUU) > 0:
-      errstr = "Conflicted repository(ies) detected. Please procede in this way:\n\tResolve conflicts\n\tswgit add resolved repositories\n\tswgit commit\n\t\t"
-      errstr = errstr + "\t\t".join( modUU )
+      errstr  = "Conflicted repository(ies) detected. Please procede in this way:\n"
+      errstr += "\tResolve conflicts\n"
+      errstr += "\tswgit add resolved files\n"
+      errstr += "\tswgit commit\n\t\t"
+      errstr = errstr + "\n\t\t".join( modUU )
       return 1, errstr
       
     if len( modChanged ) > 0:

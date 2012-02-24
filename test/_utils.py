@@ -43,6 +43,7 @@ def plat_name2path( name ):
   return "NOTFOUND"
 
 def tss100_name2path( name ):
+  if name == "TSS100":  return "."
   if name == "DEVTDM":  return "TEST_PROJ_REPO_TDM"
   if name == "DEVPLAT": return "DEV/TEST_PROJ_REPO_PLAT"
   if name == "CSTPLAT": return "CST/TEST_PROJ_REPO_PLAT"

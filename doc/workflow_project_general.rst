@@ -17,9 +17,9 @@
 
 .. include:: globals.rst
 
-###########################
-Wokflow - Project - General
-###########################
+############################
+Workflow - Project - General
+############################
 
 PROJECT GENERAL DESCRIPTION
 ---------------------------
@@ -95,7 +95,7 @@ A contained repository (plain or project) can be:
 CREATING/ADDING REPO TO PROJECT
 -------------------------------
 
-When you add a repositoty you automatically create a project.
+When you add a repository you automatically create a project.
 Following commands to realize it::
 
   swgit branch -c addingrepo
@@ -110,11 +110,11 @@ Following commands to realize it::
 --repository is not mandatory.
   You specify it when you want to change repo name
   or
-  when you want to place repo in a subfoler. (i.e. --repository SUB/FOLRER/REPO)
+  when you want to place repo in a subfolder. (i.e. --repository SUB/FOLDER/REPO)
 
 Remember specifying <SUBREPO> name when committing any subrepo upgrade.
 
-*swgit commit* default behaviour ignores subrepo changes (This is done 
+*swgit commit* default behavior ignores subrepo changes (This is done 
 in order to treat project directory like any normal repository).
 
 
@@ -131,7 +131,7 @@ Remember specifying <SUBREPO> name when committing any subrepo upgrade.
 
 If you do not specify <SUBREPO>, you will commit ONLY all file inside proj.
 
-By this way, when you work inside project repository, you can ignore SUREPO presence.
+By this way, when you work inside project repository, you can ignore SUBREPO presence.
 
 
 UPDATING PROJECT
@@ -144,29 +144,29 @@ When you want to update your project you can do as follows::
 This command will pull project repository,
 then it will pull every SUBREPO inside the project.
 
-According to SUBREPO type, the behaviour is different:
+According to SUBREPO type, the behavior is different:
 
   * DEV repositories:
 
-    User work always on integartion branch HEAD inside these repositories.
+    User work always on integration branch HEAD inside these repositories.
     So, swgit proj --update will pull integration branch.
 
   * CST repositories:
 
     User reference these repositories, but quite never works there.
-    So, swgit proj --update will put that repositories on last freezed commit,
+    So, swgit proj --update will put that repositories on last frozen commit,
     according to project repository stored information.
 
-swgit provides two options when updating to modifying behaviour:
+swgit provides two options when updating to modifying behavior:
 
-  1. Side merge behaviour::
+  1. Side merge behavior::
 
        swgit proj --update -I/--merge-from-int
 
     * DEV repositories:
 
        If HEAD is on a topic branch, side pull will be done, i.e., 
-       integartion branch will be merged on topic branch.
+       integration branch will be merged on topic branch.
 
     * CST repositories:
 
@@ -211,7 +211,7 @@ proj --update will move every subrepo on the right place, according to its kind.
 SHOW PROJECT STRUCTURE
 ----------------------
 
-You can quickly analize project state in this way::
+You can quickly analyze project state in this way::
 
   swgit proj --list
 
@@ -230,9 +230,9 @@ You can quickly analize project state in this way::
                Checkout       : cde04856f53949bfc9274045c7330cbbee4273b6
                CurrBr         : 6/6/6/6/user/INT/develop
 
-Some usefull informatins are shown:
+Some useful informations are shown:
 
-  :Local Path: path relative to super project conatining this repo
+  :Local Path: path relative to super project containing this repo
 
   :Origin:     url of origin repository
 
@@ -248,15 +248,15 @@ Some usefull informatins are shown:
   :Act int Branch: Sometimes this differs from Def int branch.
                    This can happen because inside that repo, user issued::
 
-                       swgit branch --set-integration <another_banch>
+                       swgit branch --set-integration <another_branch>
 
                    to change default value.
-                   This is particulary usefull when implementing some workflows
+                   This is particularly useful when implementing some workflows
                    like :doc:`workflow_team_feature`.
 
   :Checkout: This show the sha onto which the repository currently is.
 
-  :CurrBr:   This show if you are in DETACED-HEAD or not.
+  :CurrBr:   This show if you are in DETACHED-HEAD or not.
 
 
 SHOW "CONFIG SPEC" FOR A PROJECT
@@ -288,22 +288,24 @@ Every sha is described regarding to last LIV and STB inside that repo.
 STABILIZE --STB FOR A PROJECT
 -----------------------------
 
-When inside a project, swgit stabilize --stb enriches its meaning.
+When inside a project, ``swgit stabilize --stb`` enriches its meaning.
 
 Not only it stabilizes project as a normal repo,
-but also it reports subrepos state on stable branch.
+it also reports subrepos state on stable branch.
 
 You can use different --src values:
 
   1. TAG DROP WITH HEAD
 
-     $> swgit stabilize --stb --src HEAD
+     ::
 
-        The behaviour is:
+        swgit stabilize --stb --src HEAD
 
-         proj repo: stabilize proj HEAD
-         dev repos: register subrepo HEAD into project commit
-         cst repos: not affected. Register last registered commit
+     The behavior is:
+
+     *  proj repo: stabilize proj HEAD
+     *  dev repos: register current subrepo HEAD into project commit
+     *  cst repos: not affected. Register last registered commit
 
   2. TAG DROP WITH COMMA-SEPARED LIST
 
@@ -313,7 +315,7 @@ You can use different --src values:
 
      In this way you can choose to freeze a different commit for every repo.
 
-     The behaviour is:
+     The behavior is:
 
        every repo into src    : checked out before stabilizing project
        every repo NOT into src: same as --src HEAD (see previous point)
@@ -325,14 +327,14 @@ You can use different --src values:
 
        swgit stabilize --stb --src filename.cs
 
-     filename.cs is a file containing same output as::
+     filename.cs is a file containing output formatted as command output::
 
          swgit proj --get-configspec <any_valid_reference>
 
      Inside that file you can more neatly write commits
      you want to select for each repo.
 
-     The behaviour is 
+     The behavior is 
 
        same as comma separed list.
 

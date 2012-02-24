@@ -25,7 +25,7 @@ Inside a swRepository, we can recognize three roles:
 
 .. _lbl_role_integrator:
 
-Integartors
+Integrators
 ===========
 
 This is the repository maintainer.
@@ -41,22 +41,22 @@ This command creates two branches::
   1/0/0/0/andreav/INT/develop
   1/0/0/0/andreav/INT/stable
     
-Deveolopers will work with INT/develop branch.
+Developers will work with INT/develop branch.
 
 Integrator will report INT/develop contributes onto INT/stable thus obtaining many results:
 
-  #. Shifting build/pakaging/delivery on a different branch
+  #. Shifting build/packaging/delivery on a different branch
 
   #. Letting users continue working on INT/develop
 
-  #. In case, creating fix contribues to deliver a new fully working package.
+  #. In case, creating fix contributes to deliver a new fully working package.
 
 When reporting contributes on INT/stable he/she will issue a command::
 
-  swgit stabilize --stb <stabilized_reference> Drop.A
+  swgit stabilize --stb --src <stabilized_reference> Drop.A
 
-After packaging a new drop, he/she will collect chagelogs and fixlogs, 
-and will tag INT/stable commit with a LIV label by the command::
+After packaging a new drop, he/she will collect changelogs and fixlogs, 
+and will tag *INT/stable* commit with a LIV label by the command::
 
   swgit stabilize --liv Drop.A
 
@@ -89,9 +89,8 @@ Customers
 
 Customers are represented in a swRepository by *CST* branch types.
 
-Every time an Integartor decides to support a new customer, he/she issues a 
+Every time an Integrator decides to support a new customer, he/she issues a 
 command like this::
-
 
   swgit init --rel 1.0.0.0 --cst <google> --src 1/0/0/0/andreav/INT/stable
 
@@ -99,13 +98,12 @@ This command creates this branch::
 
   1/0/0/0/andreav/CST/google
 
-
-From now on, Integartor is responsible for keeping up to date with right contributes 
+From now on, Integrator is responsible for keeping up to date with right contributes 
 this branch.
 
 Once again, Integrator best friend command is *stabilize*::
 
-  swgit stabilize --src <stabilized_reference_for_cusotmer> Drop.A
+  swgit stabilize --stb --src <stabilized_reference_for_customer> Drop.A
 
 This branch behaves similarly to INT/stable branch, but essentially stores all 
 customer specific requirements.
@@ -113,5 +111,5 @@ customer specific requirements.
 When customer will reference our repository, hopefully he/she will select commits only
 from his/her dedicated branch.
 
-Integrator in a cusotmer context is firstly interested into :doc:`workflow_customer`.
+Integrator in a customer context is firstly interested into :doc:`workflow_customer`.
 

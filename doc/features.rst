@@ -25,15 +25,8 @@ Features/Documentation
    :maxdepth: 2
 
    scripting.rst
-
-.. toctree::
-   :maxdepth: 1
-
    ssh.rst
-
-.. toctree::
-   :maxdepth: 2
-
+   configure.rst
    references.rst
    roles.rst
    repository_structure.rst

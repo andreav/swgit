@@ -69,7 +69,7 @@ def eval_curr_branch_shortref( ref ):
 def find_describe_label( pattern, startpoint="HEAD", nolog=False):
     cmd = "git describe %s --tags --long --match %s" % (startpoint, pattern)
 
-    if nolog == True:
+    if nolog:
       out,errCode = myCommand_fast( cmd )
     else:
       out,errCode = myCommand( cmd )

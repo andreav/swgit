@@ -42,18 +42,18 @@ branch.
 
 Main branch goals are:
 
-   1. storing all delivered stable software versions, labelled with
+   1. storing all delivered stable software versions, labeled with
       *LIV* tag.
 
-   2. storing candidates software for next drop, labelled with *STB*
+   2. storing candidates software for next drop, labeled with *STB*
       tag.
 
-   3. letting the integartor shift aside from the "develop process"
-      (tourning around *INT/develop* branch).On *INT/stable* he/she cat take necessary time for preparing,
+   3. letting the integrator shift aside from the "develop process"
+      (turning around *INT/develop* branch).On *INT/stable* he/she cat take necessary time for preparing,
       and in case  fixing, next delivery.
 
-In this context *Integrator* referes to project maintainer, who
-reports contributes on *INT/stable*.
+In this context *Integrator* refers to project maintainer, who reports
+contributes on *INT/stable*.
 
 
 NGT tag
@@ -62,88 +62,112 @@ NGT tag
    This tag is a *built-in swgit tag*.
 
    It is used by the Integrator, and is put only on *INT/develop*
-   worthful commits.
+   worth commits.
 
    *NGT* refers to 'nightly tests'. The idea here is:
 
       At night, a test suite will check if repository HEAD is valuable.If so, a NGT tag will mark that reference
 
-   Day after, when integartor arrives at his/her desk, a NGT tag will
+   Day after, when integrator arrives at his/her desk, a NGT tag will
    be a good candidate to be stabilized.
 
-   Of course, Integartor will decide, according to feature list, if
+   Of course, Integrator will decide, according to feature list, if
    it's time for preparing a new delivery.
 
 
-Reporting on *INT/stable*
-=========================
+Reporting on *INT/stable* (STB labels)
+======================================
 
-   Periodically Integartor will report a worthful *INT/develop* commit
+   Periodically Integrator will report a worth *INT/develop* commit
    onto *INT/stable* by:
 
-      swgit stabilize --stb Drop.A --src <reference>
+         swgit stabilize --stb --src <reference> Drop.A
 
-      *Drop.A* is the name of next delivery. This name will be matched
-      against STB label regexp configuration parameter; default value
-      is:
+   *Drop.A* is the name of next delivery. This name will be matched
+   against STB label regexp configuration parameter; default value is:
 
-            ^Drop\.[A-Z]{1,3}(_[0-9]{1,3})?$
+         ^Drop\.[A-Z]{1,3}(_[0-9]{1,3})?$
 
-      If you want to change *STB* regexp, please refere to *Analizig
-      tags configuration* and *Setting tag values*.
+   If you want to change *STB* regexp, please refer to *Analyzing tags
+   configuration* and *Setting tag values*.
 
-      Note: By default, --src argument must be a NGT tag.
-        This encourages continuous testing agile principle.If you need to stabilize any reference, please issue inside you repository:
+   This command will:
 
-           swgit config swgit.stabilize-anyref True
+   * Merge --src <reference> argument into target *INT/stable*
 
-   This command will merge --src reference argument on *INT/stable*.
+   * Create 1/0/0/0/andreav/INT/develop/STB/Drop.A - This mark
+     *INT/develop* starting point.
 
-   This command will create two *STB* labels:
+   * Create 1/0/0/0/andreav/INT/stable/STB/Drop.A  - This mark
+     *INT/stable* arrival point.
 
-      * 1/0/0/0/andreav/INT/develop/STB/Drop.A - This mark
-        *INT/develop* starting point.
+   Note: By default, --src argument must be a NGT tag.
+     This encourages continuous testing agile principle.If you need to stabilize any reference, please issue inside you repository:
 
-      * 1/0/0/0/andreav/INT/stable/STB/Drop.A  - This mark
-        *INT/stable* arrival point.
+        **swgit config swgit.stabilize-anyref True**
 
-   Note: In order to strengthen concept that only Integartor can issue this command,
-     swgit will deny this operation on any repository but *integrator repository*This is a weak, easely workaroundable, limit. However this avoids accidental
+   Note: In order to strengthen concept that only Integrator can issue this command,
+     swgit will deny this operation on any repository but *integrator repository*This is a weak, easily workaroundable, limit. However this avoids accidental
      command execution on a Developer repository.
 
+-[ Target branch selection ]-
 
-Creating a delivery
-===================
+======================================================================
 
-   Integartor decides to release a delivery.
+   Target branches onto which to stabilize contributes always are
+   INT/stable or CST/customer branches.
+
+   In order to select target branch, *Integrator* can:
+
+      1. Provide it on command line (last argument):
+
+            swgit stabilize --stb Drop.A 1/0/0/0/andreav/INT/stable
+
+      2. Switch on it:
+
+            swgit branch -s 1/0/0/0/andreav/INT/stable
+            swgit stabilize --liv Drop.A
+
+      3. Select appropriate integration branch (*INT/develop* or
+         *INT/stable* are equivalent, they both translate to
+         *INT/stable*):
+
+            swgit branch --set-integration-br 1/0/0/0/andreav/INT/stable
+            swgit stabilize --liv Drop.A
+
+
+Creating a delivery (LIV labels)
+================================
+
+   Integrator decides to release a delivery.
 
    1. He/She will go into an *integrator repository*,
 
-   2. go onto stable branch with:
+   2. go onto stable branch thus selecting last stabilized commit:
 
          swgit branch -s 1/0/0/0/andreav/INT/stable
 
-   3. Build and verify everything is ok.
+   3.1 If everything is ok he/she will "stabilize --liv" this commit
+   (see below).
 
-         * If so, he/she will "stabilize --liv" this commit (see
-           below).
+   3.2 If something has to be done before releasing, he/she will
+   create a branch:
 
-         * If anything has to be done, he/she will create a branch:
+         swgit branch -c "hotfix"
 
-              swgit branch -c "hotfix"
+      thus creating a *FIX branch*:
 
-           thus creating a *FIX branch*:
+         1/0/0/0/andreav/FIX/hotfix
 
-              1/0/0/0/andreav/FIX/hotfix
+      from which to do necessary actions.
 
-           from which to do what next drop needs.
+      When fix is  done, he/she will merge on *INT/stable*:
 
-           When fix is  done, he/she will "swgit tag dev" any
-           contribute and he/she will merge on *INT/stable* branch
-           that label. Like any developer should do, except for
-           merging on *INT/stable*.
+         swgit tag dev -m "hotfix for Drop.A"
+         swgit branch -s 1/0/0/0/andreav/INT/stable
+         swgit merge 1/0/0/0/andreav/FIX/hotfix/DEV/000
 
-   In the end, when everithing is ok, Integartor will issue:
+      Now he/she cal create a delivery.
 
       swgit stabilize --liv Drop.A
 
@@ -153,14 +177,14 @@ Creating a delivery
 
          ${REPO_ROOT}/.swdir/changelog/<REL>/
 
-      * **Changelog**: containiinig all DEV labels from last
-        repository LIV till now.
+      * **Changelog**: containing all DEV labels from last repository
+        LIV till now.
 
       * **Fixlog**: containing all FIX labels from last repository LIV
         till now.
 
-      * **Ticketlog**: a machine readable file, containing only
-        Tickect numbers. (i.e. tagName for every FIX label)
+      * **Ticketlog**: a machine readable file, containing only Ticket
+        numbers. (i.e. tagName for every FIX label)
 
    1. Add everything to the index and committing
 
@@ -168,12 +192,19 @@ Creating a delivery
 
          1/0/0/0/andreav/INT/stable/LIV/Drop.A
 
-   3. Merge */INT/stable* on */INT/develop*
+   3. Merge */INT/stable* on */INT/develop* (this step can be jumped
+      by providing option --no-merge-back when stabilizing --liv)
 
-   4. Push everithing on 'origin'
+   4. Push everything on 'origin'
 
-   Note: In order to strengthen concept that only Integartor can issue this command,
-     swgit will deny this operation on any repository but *integrator repository*This is a weak, easely workaroundable, limit. However this avoids accidental
+   When issuing **swgit stabilizing --liv**, target branch (branch to
+   be labelled) will be selected like for **swgit stabilizing --stb**
+   (see *here*).
+
+   Note: You can stabilize both --stb and --liv in one shot.Just provide *--liv* option when issuing *swgit stabilize --stb*.
+
+   Note: In order to strengthen concept that only Integrator can issue this command,
+     swgit will deny this operation on any repository but *integrator repository*This is a weak, easily workaroundable, limit. However this avoids accidental
      command execution on a Developer repository.
 
 

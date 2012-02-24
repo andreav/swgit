@@ -34,10 +34,10 @@ class ObjSnapshotRepo( ObjCfgSnap ):
 # for more informations
 #
 #[A-SNAP-REPO]
-#URL     =
-#BRANCH  =
-#AR-TYPE = (tar or zip)
-#AR-TOOL = (tar or unzip)
+#url     =
+#branch  =
+#ar-type = (tar or zip)
+#ar-tool = (tar or unzip)
 #
 """
 

@@ -1157,7 +1157,7 @@ class Test_Proj( Test_ProjBase ):
     #this second merge will create the conflict
     out, errCode = clo2_hm["TSS100"].merge_on_int( dev_2 )
     self.util_check_DENY_scenario( out, errCode, 
-                                   "You already are on your current integration branch, please remote -I option",
+                                   "You already are on your current integration branch, please remove -I option",
                                    "MUST FAIL second merge with conflict" )
     out, errCode = clo2_hm["TSS100"].merge( dev_2 )
     self.util_check_DENY_scenario( out, errCode, 
