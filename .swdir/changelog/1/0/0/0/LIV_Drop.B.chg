@@ -1,0 +1,48 @@
+From:    swgit <andreav.pub@gmail.com>
+Date:    Wed Feb 15 12:20:04 2012 +0100
+Ref:     refs/tags/1/0/0/0/andreav/FTR/sshmgt/DEV/000
+
+    new SSH management; cfg lists modified
+
+From:    swgit <andreav.pub@gmail.com>
+Date:    Wed Feb 15 16:05:27 2012 +0100
+Ref:     refs/tags/1/0/0/0/andreav/FTR/sshmgt/DEV/001
+
+    nopasswd dsa to rsa
+
+From:    swgit <andreav.pub@gmail.com>
+Date:    Thu Feb 16 09:51:11 2012 +0100
+Ref:     refs/tags/1/0/0/0/andreav/FTR/sshmgt/DEV/002
+
+    workflow ssh drawing
+
+From:    swgit <andreav.pub@gmail.com>
+Date:    Thu Feb 16 10:56:06 2012 +0100
+Ref:     refs/tags/1/0/0/0/swgit/FTR/images/DEV/000
+
+    pull and push images improved
+
+From:    swgit <andreav.pub@gmail.com>
+Date:    Thu Feb 16 12:50:42 2012 +0100
+Ref:     refs/tags/1/0/0/0/swgit/FTR/stabilizing/DEV/000
+
+    stabilize: reworked
+
+From:    swgit <andreav.pub@gmail.com>
+Date:    Mon Feb 20 14:27:49 2012 +0100
+Ref:     refs/tags/1/0/0/0/swgit/FTR/stabilizing/DEV/001
+
+    Merge Pull Push with logicalIntBr everithing tested
+
+From:    swgit <andreav.pub@gmail.com>
+Date:    Tue Feb 21 17:29:31 2012 +0100
+Ref:     refs/tags/1/0/0/0/swgit/FTR/stabilizing/DEV/002
+
+    stabilize proj - checkLocalStatus ignore submodules; ObjStatus modified
+
+From:    swgit <andreav.pub@gmail.com>
+Date:    Fri Feb 10 17:43:17 2012 +0100
+Ref:     refs/tags/1/0/0/0/swgit/FTR/urldownload/DEV/000
+
+    fix download url
+
