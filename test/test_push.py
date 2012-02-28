@@ -1338,6 +1338,110 @@ class Test_Push( Test_Base ):
       self.assertEqual( self.sw_origrepo_h.ref2sha( r )[1]   , 1, "get sha %s" % r )
 
 
+  #
+  # Test:
+  #  push onto repo 1 a    new branch
+  #  push onto repo 2 same new branch
+  #  re-push onto repo 1, but now remote branch exists but is NOT correctly tracked
+  #
+  # Result:
+  #  everithing works because pull --all will be satisfied from tracked branch.
+  #
+  # Note:
+  #  Behaviour here is ok.
+  #  We were looking for crashing push. It could happen only when we 
+  #  push with an integartion branch remote but not tracked, and this should not possible
+  #  Next test will force it manually.
+  #
+  def test_Push_09_01_MoreRemotes_CrossPush( self ):
+    out, errCode = swgit__utils.clone_scripts_repo( self.PUSH_CLONE_DIR )
+    self.util_check_SUCC_scenario( out, errCode, "", "clone" )
+
+    if not modetest_morerepos():
+      out, errCode = self.swgitUtil_Clone_.remote_add( ORIG_REPO_AREMOTE_NAME, ORIG_REPO_AREMOTE_URL )
+      self.util_check_SUCC_scenario( out, errCode, "", "add remote" )
+
+    out, errCode = self.swgitUtil_Clone_.pull()
+    self.util_check_SUCC_scenario( out, errCode, "", "pull" )
+
+    out, errCode = self.swgitUtil_Clone_.branch_create( self.BRANCH_NAME )
+    self.util_check_SUCC_scenario( out, errCode, "", "create branch" )
+    out, errCode = self.swgitUtil_Clone_.modify_file( ORIG_REPO_aFILE, "ccc" )
+    self.util_check_SUCC_scenario( out, errCode, "", "modify file" )
+    out, errCode = self.swgitUtil_Clone_.commit_minusA_dev_fix( self.DDTS )
+    self.util_check_SUCC_scenario( out, errCode, "", "commmit" )
+    out, errCode = self.swgitUtil_Clone_.int_branch_set( self.BRANCH_NAME )
+    self.util_check_SUCC_scenario( out, errCode, "Setting INTEGRATION branch to", "set int br to just create file" )
+    out, errCode = self.swgitUtil_Clone_.push_with_merge( remote = "origin" )
+    self.util_check_SUCC_scenario( out, errCode, "", "push to origin" )
+    out, errCode = self.swgitUtil_Clone_.push_with_merge( remote = ORIG_REPO_AREMOTE_NAME )
+    self.util_check_SUCC_scenario( out, errCode, "", "push to remote" )
+
+    out, errCode = self.swgitUtil_Clone_.modify_repo( ORIG_REPO_aFILE, "ddd", gotoint = False )
+    self.util_check_SUCC_scenario( out, errCode, "", "modify file" )
+    out, errCode = self.swgitUtil_Clone_.push_with_merge( remote = "origin" )
+    self.util_check_SUCC_scenario( out, errCode, "", "push to origin" )
+
+
+  def test_Push_09_02_Remote_track_new_intbr( self ):
+    out, errCode = swgit__utils.clone_scripts_repo( self.PUSH_CLONE_DIR )
+    self.util_check_SUCC_scenario( out, errCode, "", "clone" )
+
+    out, errCode = self.swgitUtil_Clone_.branch_create( self.BRANCH_NAME )
+    self.util_check_SUCC_scenario( out, errCode, "", "create branch" )
+    out, errCode = self.swgitUtil_Clone_.int_branch_set( self.BRANCH_NAME )
+    self.util_check_SUCC_scenario( out, errCode, "Setting INTEGRATION branch to", "set int br to just create file" )
+
+    out, errCode = self.swgitUtil_Clone_.branch_create( self.BRANCH_NAME_SS )
+    self.util_check_SUCC_scenario( out, errCode, "", "create branch" )
+    out, errCode = self.swgitUtil_Clone_.modify_file( ORIG_REPO_aFILE, "ccc" )
+    self.util_check_SUCC_scenario( out, errCode, "", "modify file" )
+    out, errCode = self.swgitUtil_Clone_.commit_minusA_dev_fix( self.DDTS )
+    self.util_check_SUCC_scenario( out, errCode, "", "commmit" )
+
+    out, errCode = self.swgitUtil_Clone_.branch_list_track()
+    self.assertTrue( self.CREATED_BR not in out, "Must be untracked branch" )
+
+    # first push will track
+    #########################################################
+    out, errCode = self.swgitUtil_Clone_.push_with_merge( "origin" )
+    self.util_check_SUCC_scenario( out, errCode, "", "push to origin" )
+    #########################################################
+
+    out, errCode = self.swgitUtil_Clone_.branch_list_track()
+    self.assertTrue( self.CREATED_BR in out, "Must be tracked branch" )
+
+    #must be possible pushing because intbr has just been tracked
+    # Once there was this error (because not right tracked branch)
+    #		Fetching tags only, you probably meant:
+		#   git fetch --tags
+    out, errCode = self.swgitUtil_Clone_.push_with_merge( "origin" )
+    self.util_check_SUCC_scenario( out, errCode, "", "push to origin" )
+
+    #manually untrack branch
+    out, errCode = self.swgitUtil_Clone_.system_unix( "git config  --unset branch.%s.merge" % self.CREATED_BR )
+    
+    out, errCode = self.swgitUtil_Clone_.branch_list_track()
+    self.assertTrue( self.CREATED_BR not in out, "Must be untracked branch" )
+
+    #########################################################
+    out, errCode = self.swgitUtil_Clone_.push_with_merge( "origin" )
+    self.util_check_DENY_scenario( out, errCode, 
+                                   "Your current integration branch remotely exists but is not tracked.", 
+                                   "push to origin" )
+    #########################################################
+
+    out, errCode = self.swgitUtil_Clone_.branch_track( "origin/%s" % self.CREATED_BR )
+    self.util_check_SUCC_scenario( out, errCode, "", "track branch" )
+
+    out, errCode = self.swgitUtil_Clone_.branch_list_track()
+    self.assertTrue( self.CREATED_BR in out, "Must be tracked branch" )
+
+    #########################################################
+    out, errCode = self.swgitUtil_Clone_.push_with_merge( "origin" )
+    self.util_check_SUCC_scenario( out, errCode, "", "push to origin" )
+    #########################################################
+
 
 if __name__ == '__main__':
   manage_debug_opt( sys.argv )
