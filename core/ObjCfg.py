@@ -54,6 +54,7 @@ class ObjCfg( object ):
     self.section_ = section
     self.justify  = 35
     self.error_fields_  = []
+    self.loaded_  = False
 
     self.config_  = ConfigParser.RawConfigParser()
     try:
@@ -70,6 +71,9 @@ class ObjCfg( object ):
 
 
   def load_cfg( self ):
+
+    if self.loaded_:
+      return
 
     self.isValid_ = True
 
@@ -97,17 +101,22 @@ class ObjCfg( object ):
         if df != None:
           ms( df )
 
+    self.loaded_ = True
+
 
   def isValid( self ):
     return self.isValid_
 
-  def dump( self ):
+  def dump( self, f_short = False ):
     j = self.justify_
     retstr = "Is valid".ljust(j) + "%s" % self.isValid_
     for (ms, mg, d, k, al) in self.fields_mandatory_:
       retstr += "\n" + ("%s" % d).ljust(j) + "%s" % mg()
     for (ms, mg, d, k, al, df) in self.fields_optional_:
       retstr += "\n" + ("%s" % d).ljust(j) + "%s" % mg()
+
+    if f_short:
+      return retstr + "\n"
 
     if len( self.error_fields_ ) > 0:
       retstr += "\n\nFor each wrong field, you can set it in this way:"
@@ -122,16 +131,18 @@ class ObjCfg( object ):
     j = self.justify_
     retstr = ("\n * %s" % d).ljust( j )
 
+    str_list = ""
     if isinstance( mg(), list ):
-      retstr += "by \"git config %s.%s.%s(-1, -2, ...) <val>\"" % (SWCFG_PREFIX, self.section_, k)
-      retstr += "\n ".ljust( j ) + "or by file:   %s, section %s, key %s(-01, -02, ...)" % (self.file_,self.section_,k)
-    else:
-      retstr += "by \"git config %s.%s.%s <val>\"" % (SWCFG_PREFIX, self.section_, k)
-      retstr += "\n ".ljust( j ) + "or by file:   %s, section %s, key %s" % (self.file_,self.section_,k)
+      str_list = "(-1, -2, ...)"
+
+    retstr += "- 'git config %s.%s.%s%s <val>'" % (SWCFG_PREFIX, self.section_, k, str_list)
+    retstr += "\n ".ljust( j ) + "- file        %s"   % self.file_
+    retstr += "\n ".ljust( j ) + "  sect        %s"   % self.section_
+    retstr += "\n ".ljust( j ) + "  key         %s%s" % (k, str_list)
+    
     if al != "":
-      retstr += "\n ".ljust( j )
-      retstr += "by \"git config %s <val>\"" % (al)
-      retstr += "\n ".ljust(j)
+      retstr += "\n ".ljust( j ) + "- 'git config %s <val>'\n" % al
+
     return retstr
 
   def show_config_options_byfield( self, key ):
@@ -707,16 +718,194 @@ class ObjCfgSsh( ObjCfg ):
     return " ".join(self.eval_git_ssh_envvar_list())
 
 
+class ObjCfgStabilize_PreLivCommit_Hook( ObjCfg ):
+
+  def __init__( self ):
+
+    super(ObjCfgStabilize_PreLivCommit_Hook, self ).__init__( SWFILE_GENERICCFG, SWCFG_STABILIZE_SECT )
+
+    self.justify_ = 35
+
+    self.hook_precommit_script_   = ObjCfg.NOT_INIT
+    self.hook_precommit_sshuser_  = ObjCfg.NOT_INIT
+    self.hook_precommit_sshaddr_  = ObjCfg.NOT_INIT
+
+    self.fields_mandatory_ = [
+        [ self.set_hook_precommit_script, 
+          self.get_hook_precommit_script,
+          "Hook pre-liv-commit script"        , SWCFG_KEY_STAB_HOOK_PRELIVCOMMIT_SCRIPT  , "" ],
+        ]
+
+    self.fields_optional_ = [ 
+        [ self.set_hook_precommit_sshuser, 
+          self.get_hook_precommit_sshuser,
+          "Hook pre-liv-commit ssh user"      , SWCFG_KEY_STAB_HOOK_PRELIVCOMMIT_SSHUSER , "", "" ],
+        [ self.set_hook_precommit_sshaddr, 
+          self.get_hook_precommit_sshaddr,
+          "Hook pre-liv-commit ssh addr"      , SWCFG_KEY_STAB_HOOK_PRELIVCOMMIT_SSHADDR , "", "" ],
+        ]
+
+    self.load_cfg()
+
+  def set_hook_precommit_script( self, v ):
+    self.hook_precommit_script_ = v
+  def get_hook_precommit_script( self ):
+    return self.hook_precommit_script_
+  def set_hook_precommit_sshuser( self, v ):
+    self.hook_precommit_sshuser_ = v
+  def get_hook_precommit_sshuser( self ):
+    return self.hook_precommit_sshuser_
+  def set_hook_precommit_sshaddr( self, v ):
+    self.hook_precommit_sshaddr_ = v
+  def get_hook_precommit_sshaddr( self ):
+    return self.hook_precommit_sshaddr_
+
+
+class ObjCfgStabilize_CHGLOG_fmt_file( ObjCfg ):
+
+  def __init__( self ):
+
+    super(ObjCfgStabilize_CHGLOG_fmt_file, self ).__init__( SWFILE_GENERICCFG, SWCFG_STABILIZE_SECT )
+
+    self.justify_ = 35
+
+    self.chglog_fmt_file_   = ObjCfg.NOT_INIT
+
+    self.fields_mandatory_ = []
+
+    self.fields_optional_ = [
+        [ self.set_chglog_fmt_file, 
+          self.get_chglog_fmt_file,
+          "CHGLOG file format"   , SWCFG_KEY_STAB_CHGLOG_FMT_FILE  , "", SWCFG_STABILIZE_CHGLOG_FILE_FORMAT ],
+        ]
+
+    self.load_cfg()
+
+  def set_chglog_fmt_file( self, v ):
+    self.chglog_fmt_file_ = v
+  def get_chglog_fmt_file( self ):
+    return self.chglog_fmt_file_
+
+class ObjCfgStabilize_CHGLOG_fmt_mail( ObjCfg ):
+
+  def __init__( self ):
+
+    super(ObjCfgStabilize_CHGLOG_fmt_mail, self ).__init__( SWFILE_GENERICCFG, SWCFG_STABILIZE_SECT )
+
+    self.justify_ = 35
+
+    self.chglog_fmt_mail_   = ObjCfg.NOT_INIT
+
+    self.fields_mandatory_ = []
+
+    self.fields_optional_ = [
+        [ self.set_chglog_fmt_mail, 
+          self.get_chglog_fmt_mail,
+          "CHGLOG mail format"   , SWCFG_KEY_STAB_CHGLOG_FMT_MAIL  , "", SWCFG_STABILIZE_CHGLOG_MAIL_FORMAT ],
+        ]
+
+    self.load_cfg()
+
+  def set_chglog_fmt_mail( self, v ):
+    self.chglog_fmt_mail_ = v
+  def get_chglog_fmt_mail( self ):
+    return self.chglog_fmt_mail_
+
+class ObjCfgStabilize_CHGLOG_sort_mail( ObjCfg ):
+
+  def __init__( self ):
+
+    super(ObjCfgStabilize_CHGLOG_sort_mail, self ).__init__( SWFILE_GENERICCFG, SWCFG_STABILIZE_SECT )
+
+    self.justify_ = 35
+
+    self.chglog_sort_mail_   = ObjCfg.NOT_INIT
+
+    self.fields_mandatory_ = []
+
+    self.fields_optional_ = [
+        [ self.set_chglog_sort_mail, 
+          self.get_chglog_sort_mail,
+          "CHGLOG mail sort criteria"   , SWCFG_KEY_STAB_CHGLOG_SORT_MAIL  , "", SWCFG_STABILIZE_CHGLOG_MAIL_SORT ],
+        ]
+
+    self.load_cfg()
+
+  def set_chglog_sort_mail( self, v ):
+    self.chglog_sort_mail_ = v
+  def get_chglog_sort_mail( self ):
+    return self.chglog_sort_mail_
+
+
+
+class ObjCfgStabilize_FIXLOG_fmt_file( ObjCfg ):
+
+  def __init__( self ):
+
+    super(ObjCfgStabilize_FIXLOG_fmt_file, self ).__init__( SWFILE_GENERICCFG, SWCFG_STABILIZE_SECT )
+
+    self.justify_ = 35
+
+    self.fixlog_fmt_file_   = ObjCfg.NOT_INIT
+
+    self.fields_mandatory_ = []
+
+    self.fields_optional_ = [
+        [ self.set_fixlog_fmt_file, 
+          self.get_fixlog_fmt_file,
+          "FIXLOG file format"   , SWCFG_KEY_STAB_FIXLOG_FMT_FILE  , "", SWCFG_STABILIZE_FIXLOG_FILE_FORMAT ],
+        ]
+
+    self.load_cfg()
+
+  def set_fixlog_fmt_file( self, v ):
+    self.fixlog_fmt_file_ = v
+  def get_fixlog_fmt_file( self ):
+    return self.fixlog_fmt_file_
+
+
+class ObjCfgStabilize_FIXLOG_fmt_mail( ObjCfg ):
+
+  def __init__( self ):
+
+    super(ObjCfgStabilize_FIXLOG_fmt_mail, self ).__init__( SWFILE_GENERICCFG, SWCFG_STABILIZE_SECT )
+
+    self.justify_ = 35
+
+    self.fixlog_fmt_mail_   = ObjCfg.NOT_INIT
+
+    self.fields_mandatory_ = []
+
+    self.fields_optional_ = [
+        [ self.set_fixlog_fmt_mail, 
+          self.get_fixlog_fmt_mail,
+          "FIXLOG mail format"   , SWCFG_KEY_STAB_FIXLOG_FMT_MAIL  , "", SWCFG_STABILIZE_FIXLOG_MAIL_FORMAT ],
+        ]
+
+    self.load_cfg()
+
+  def set_fixlog_fmt_mail( self, v ):
+    self.fixlog_fmt_mail_ = v
+  def get_fixlog_fmt_mail( self ):
+    return self.fixlog_fmt_mail_
+
+
+
 def main():
 
   objs = []
 
-  objcfg = ObjCfgMail( SWFILE_MAILCFG, SWCFG_MAIL_STABILIZE_SECT )
+  objcfg = ObjCfgMail( SWFILE_MAILCFG, SWCFG_STABILIZE_SECT )
   objs.append( objcfg )
   objcfg = ObjCfgMail( SWFILE_MAILCFG, SWCFG_MAIL_PUSH_SECT )
   objs.append( objcfg )
-  objcfg = ObjCfgSsh()
-  objs.append( objcfg )
+  objs.append( ObjCfgSsh() )
+  objs.append( ObjCfgStabilize_PreLivCommit_Hook() )
+  objs.append( ObjCfgStabilize_CHGLOG_fmt_file() )
+  objs.append( ObjCfgStabilize_FIXLOG_fmt_file() )
+  objs.append( ObjCfgStabilize_CHGLOG_fmt_mail() )
+  objs.append( ObjCfgStabilize_FIXLOG_fmt_mail() )
+  objs.append( ObjCfgStabilize_CHGLOG_sort_mail() )
 
   for o in objs:
     print "\n", '#'*10, o, '#'*10, "\n"

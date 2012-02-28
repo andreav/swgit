@@ -144,10 +144,11 @@ LOGS_DIR       = TESTDIR + "LOGS/"
 LOGS_FILE      = "swgit_tests.log"
 DEBUG          = False
 
-SWREPO_DIR        = ".swdir/"
-SWTAG_FILE        = SWREPO_DIR + "cfg/custom_tags.cfg"
+SWREPO_DIR          = ".swdir/"
+SWTAG_FILE          = SWREPO_DIR + "cfg/custom_tags.cfg"
 SWSTABILIZE_MAILCFG = SWREPO_DIR + "cfg/mail.cfg"
-SWCFG_TEST_UNSET  = "SWCFG_TEST_UNSET"
+SWSTABILIZE_FILE    = SWREPO_DIR + "cfg/generic.cfg"
+SWCFG_TEST_UNSET    = "SWCFG_TEST_UNSET"
 
 
 # Scripts repo (owner is root => 2/0/0/0./root/INT/...)

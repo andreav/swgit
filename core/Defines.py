@@ -38,6 +38,20 @@ SWCFG_SSH_BIN              = "bin"
 SWCFG_SSH_IDENTITY         = 'identity'
 SWCFG_SSH_USE_NOPASS_ID    = "use-nopassw-id"
 SWCFG_SSH_TESTACCESS_TIMEOUT   = 10
+DEFAULT_SSH_CFG = """\
+#
+# Please run
+#   swgit ssh --show-local-cfg
+# for more informations
+#
+#[ssh]
+#bin            = (default: ssh)
+#identity-1     = A private identity to be provided
+#identity-2     =      "              "
+# ... 
+#use-nopassw-id = True/False: use default no-passw identity, if created
+
+"""
 
 #script files
 SWGIT = os.path.abspath( os.path.dirname( os.path.abspath( __file__ ) ) + "/../swgit" )
@@ -118,7 +132,7 @@ SWCFG_TAG_NEWREGEXP      = "^BRANCH$"
 SWCFG_TAG_LIVREGEXP      = '^Drop\.[A-Z]{1,3}(_[0-9]{1,3})?$'
 
 #mailcfg
-SWCFG_MAIL_STABILIZE_SECT     = "stabilize"
+SWCFG_STABILIZE_SECT          = "stabilize"
 SWCFG_MAIL_PUSH_SECT          = "push"
 SWCFG_MAIL_MAILSERVER_SSHUSER = "mailserver-sshuser"
 SWCFG_MAIL_MAILSERVER_SSHADDR = "mailserver-sshaddr"
@@ -166,6 +180,31 @@ SWCFG_KEY_TAGDSC_HOOK_POSTTAG_SCRIPT     = "hook-posttag-script"
 SWCFG_KEY_TAGDSC_HOOK_POSTTAG_SSHUSER    = "hook-posttag-sshuser"
 SWCFG_KEY_TAGDSC_HOOK_POSTTAG_SSHADDR    = "hook-posttag-sshaddr"
 
+#stabilize
+SWCFG_KEY_STAB_HOOK_PRELIVCOMMIT_SCRIPT   = "hook-pre-liv-commit-script"
+SWCFG_KEY_STAB_HOOK_PRELIVCOMMIT_SSHUSER  = "hook-pre-liv-commit-sshuser"
+SWCFG_KEY_STAB_HOOK_PRELIVCOMMIT_SSHADDR  = "hook-pre-liv-commit-sshaddr"
+SWCFG_KEY_STAB_CHGLOG_FMT_FILE            = "chglog-fmt-file"
+SWCFG_KEY_STAB_FIXLOG_FMT_FILE            = "fixlog-fmt-file"
+SWCFG_KEY_STAB_CHGLOG_FMT_MAIL            = "chglog-fmt-mail"
+SWCFG_KEY_STAB_CHGLOG_SORT_MAIL           = "chglog-sort-mail"
+SWCFG_KEY_STAB_FIXLOG_FMT_MAIL            = "fixlog-fmt-mail"
+DEFAULT_STAB_CFG = """\
+#
+# Please run
+#   swgit stabilize --show-cfg
+# for more informations
+#
+#[stabilize]
+#hook-pre-liv-commit-script  = 
+#hook-pre-liv-commit-sshuser =
+#hook-pre-liv-commit-sshaddr =
+#chglog-fmt-file  =
+#fixlog-fmt-file  =
+#chglog-fmt-mail  =
+#chglog-sort-mail =
+
+"""
 
 #git cfg defines
 GITCFG_USERNAME = "user.name"

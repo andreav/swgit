@@ -1027,7 +1027,7 @@ denied-brtypes          =
   #
   # stabilize
   #
-  def stabilize_stb( self, labelname, src, dstbr = None, force = False ):
+  def stabilize_stb( self, labelname, src, dstbr = None, force = False, f_startpointlbl = False ):
     opt_src = ""
     if src != "":
       opt_src = "--src %s" % src
@@ -1040,22 +1040,30 @@ denied-brtypes          =
     if dstbr != None:
       opt_dstbr = dstbr
 
-    cmd = "cd %s && %s stabilize --batch --stb %s %s %s %s" % ( self.repodir_, SWGIT, opt_force, labelname, opt_src, opt_dstbr )
+    opt_startpointlabel = ""
+    if f_startpointlbl:
+      opt_startpointlabel = "--start-point-label"
+
+    cmd = "cd %s && %s stabilize --batch --stb %s %s %s %s %s" % ( self.repodir_, SWGIT, opt_force, labelname, opt_src, opt_dstbr, opt_startpointlabel )
     return myCommand( cmd )
 
-  def stabilize_liv( self, liv, dstbr = None, nomergeback = False ):
-    str_nomergeback = ""
-    if nomergeback:
-      str_nomergeback = "--no-merge-back"
+  def stabilize_liv( self, liv, dstbr = None, f_mergeback = True, f_nochglogs = False ):
+    opt_mergeback = ""
+    if f_mergeback:
+      opt_mergeback = "--merge-back"
 
     opt_dstbr = ""
     if dstbr != None:
       opt_dstbr = dstbr
 
-    cmd = "cd %s && %s stabilize --batch --liv %s %s %s" % ( self.repodir_, SWGIT, liv, str_nomergeback, opt_dstbr )
+    opt_nochglogs = ""
+    if f_nochglogs:
+      opt_nochglogs = "--no-chglogs"
+
+    cmd = "cd %s && %s stabilize --batch --liv %s %s %s %s" % ( self.repodir_, SWGIT, liv, opt_mergeback, opt_dstbr, opt_nochglogs )
     return myCommand( cmd )
 
-  def stabilize_both( self, labelname, src, dstbr = None, force = False ):
+  def stabilize_both( self, labelname, src, dstbr = None, force = False, f_nochglogs = False,f_mergeback = True, f_startpointlbl = False ):
     opt_src = ""
     if src != "":
       opt_src = "--src %s" % src
@@ -1068,7 +1076,19 @@ denied-brtypes          =
     if dstbr != None:
       opt_dstbr = dstbr
 
-    cmd = "cd %s && %s stabilize --stb --liv --batch %s %s %s %s" % ( self.repodir_, SWGIT, opt_force, labelname, opt_src, opt_dstbr )
+    opt_nochglogs = ""
+    if f_nochglogs:
+      opt_nochglogs = "--no-chglogs"
+
+    opt_startpointlabel = ""
+    if f_startpointlbl:
+      opt_startpointlabel = "--start-point-label"
+
+    opt_mergeback = ""
+    if f_mergeback:
+      opt_mergeback = "--merge-back"
+
+    cmd = "cd %s && %s stabilize --stb --liv --batch %s %s %s %s %s %s %s" % ( self.repodir_, SWGIT, opt_mergeback, opt_force, labelname, opt_src, opt_dstbr, opt_nochglogs, opt_startpointlabel )
     return myCommand( cmd )
 
   
@@ -1117,4 +1137,68 @@ denied-brtypes          =
   def remote_add( self, name, url ):
     cmd = "cd %s && git remote add %s %s" % (self.repodir_, name, url)
     return myCommand( cmd )
+
+
+
+  stabilize_template = Template("""
+[stabilize]
+hook-pre-liv-commit-script  = $hook_pre_liv_commit_script
+hook-pre-liv-commit-sshuser = $hook_pre_liv_commit_sshuser
+hook-pre-liv-commit-sshaddr = $hook_pre_liv_commit_sshaddr
+""" )
+
+  def section_stabilize_define( self, stabilizeCfg ):
+    stabilize_file = self.repodir_ + SWSTABILIZE_FILE
+
+    stabilize_cfg = self.stabilize_template.substitute( stabilizeCfg )
+
+    tagf = open( stabilize_file, "w" )
+    tagf.write( stabilize_cfg )
+    tagf.close()
+
+  stabilize_template_chglog_file = Template("""
+[stabilize]
+chglog-fmt-file  = $chglog_fmt_file
+""" )
+
+  def section_stabilize_chglogfile_define( self, stabilizeCfg ):
+    stabilize_file = self.repodir_ + SWSTABILIZE_FILE
+
+    stabilize_cfg = self.stabilize_template_chglog_file.substitute( stabilizeCfg )
+
+    tagf = open( stabilize_file, "w" )
+    tagf.write( stabilize_cfg )
+    tagf.close()
+
+
+  stabilize_template_fixlog_file = Template("""
+[stabilize]
+fixlog-fmt-file  = $fixlog_fmt_file
+""" )
+
+  def section_stabilize_fixlogfile_define( self, stabilizeCfg ):
+    stabilize_file = self.repodir_ + SWSTABILIZE_FILE
+
+    stabilize_cfg = self.stabilize_template_fixlog_file.substitute( stabilizeCfg )
+
+    tagf = open( stabilize_file, "w" )
+    tagf.write( stabilize_cfg )
+    tagf.close()
+
+
+  stabilize_template_chglog_mail = Template("""
+[stabilize]
+chglog-fmt-mail   = $chglog_fmt_mail
+chglog-sort-mail  = $chglog_sort_mail
+""" )
+
+  def section_stabilize_chglogmail_define( self, stabilizeCfg ):
+    stabilize_file = self.repodir_ + SWSTABILIZE_FILE
+
+    stabilize_cfg = self.stabilize_template_chglog_mail.substitute( stabilizeCfg )
+
+    tagf = open( stabilize_file, "w" )
+    tagf.write( stabilize_cfg )
+    tagf.close()
+
 

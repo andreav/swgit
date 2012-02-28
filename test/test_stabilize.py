@@ -23,8 +23,8 @@ from test_proj_util import *
 
 
 class Test_Stabilize( Test_ProjBase ):
-  STABILIZE_CLONE_DIR = SANDBOX + "TEST_STABILIZE_CLONE"
-  STABILIZE_REPO_DIR  = SANDBOX + "TEST_STABILIZE_REPO"
+  STABILIZE_CLONE_DIR = SANDBOX + "TEST_STABILIZE_CLONE/"
+  STABILIZE_REPO_DIR  = SANDBOX + "TEST_STABILIZE_REPO/"
   BRANCH_NAME        = "test_stabilize"
   FULL_BRANCH_NAME    = "%s/%s/%s/FTR/%s" % ( ORIG_REPO_REL, ORIG_REPO_SUBREL, ORIG_REPO_GITUSER, BRANCH_NAME )
   BRANCH_NAME_SS     = "side_of_side"
@@ -42,25 +42,25 @@ class Test_Stabilize( Test_ProjBase ):
   CREATED_STBSTB_B = "%s/STB/%s" % ( ORIG_REPO_STABLE_BRANCH, LBL_B )
   CREATED_STBFTR_B = "%s/STB/%s" % ( FULL_BRANCH_NAME, LBL_B )
   CREATED_LIV_B    = "%s/LIV/%s" % ( ORIG_REPO_STABLE_BRANCH, LBL_B )
-  CHGLOG_B = "%s/%s/changelog/%s/%s/LIV_%s.chg" % ( STABILIZE_CLONE_DIR, SWREPO_DIR, ORIG_REPO_REL, ORIG_REPO_SUBREL, LBL_B )
-  FIXLOG_B = "%s/%s/changelog/%s/%s/LIV_%s.fix" % ( STABILIZE_CLONE_DIR, SWREPO_DIR, ORIG_REPO_REL, ORIG_REPO_SUBREL, LBL_B )
-  TKTLOG_B = "%s/%s/changelog/%s/%s/LIV_%s.tkt" % ( STABILIZE_CLONE_DIR, SWREPO_DIR, ORIG_REPO_REL, ORIG_REPO_SUBREL, LBL_B )
+  CHGLOG_B = "./%s/changelog/%s/%s/LIV_%s.chg" % ( SWREPO_DIR, ORIG_REPO_REL, ORIG_REPO_SUBREL, LBL_B )
+  FIXLOG_B = "./%s/changelog/%s/%s/LIV_%s.fix" % ( SWREPO_DIR, ORIG_REPO_REL, ORIG_REPO_SUBREL, LBL_B )
+  TKTLOG_B = "./%s/changelog/%s/%s/LIV_%s.tkt" % ( SWREPO_DIR, ORIG_REPO_REL, ORIG_REPO_SUBREL, LBL_B )
 
   LBL_C = "Drop.C"
   CREATED_STBDEV_C = "%s/STB/%s" % ( ORIG_REPO_DEVEL_BRANCH,  LBL_C )
   CREATED_STBSTB_C = "%s/STB/%s" % ( ORIG_REPO_STABLE_BRANCH, LBL_C )
   CREATED_LIV_C    = "%s/LIV/%s" % ( ORIG_REPO_STABLE_BRANCH, LBL_C )
-  CHGLOG_C = "%s/%s/changelog/%s/%s/LIV_%s.chg" % ( STABILIZE_CLONE_DIR, SWREPO_DIR, ORIG_REPO_REL, ORIG_REPO_SUBREL, LBL_C )
-  FIXLOG_C = "%s/%s/changelog/%s/%s/LIV_%s.fix" % ( STABILIZE_CLONE_DIR, SWREPO_DIR, ORIG_REPO_REL, ORIG_REPO_SUBREL, LBL_C )
-  TKTLOG_C = "%s/%s/changelog/%s/%s/LIV_%s.tkt" % ( STABILIZE_CLONE_DIR, SWREPO_DIR, ORIG_REPO_REL, ORIG_REPO_SUBREL, LBL_C )
+  CHGLOG_C = "./%s/changelog/%s/%s/LIV_%s.chg" % ( SWREPO_DIR, ORIG_REPO_REL, ORIG_REPO_SUBREL, LBL_C )
+  FIXLOG_C = "./%s/changelog/%s/%s/LIV_%s.fix" % ( SWREPO_DIR, ORIG_REPO_REL, ORIG_REPO_SUBREL, LBL_C )
+  TKTLOG_C = "./%s/changelog/%s/%s/LIV_%s.tkt" % ( SWREPO_DIR, ORIG_REPO_REL, ORIG_REPO_SUBREL, LBL_C )
 
   LBL_D = "Drop.D"
   CREATED_STBDEV_D = "%s/STB/%s" % ( ORIG_REPO_DEVEL_BRANCH,  LBL_D )
   CREATED_STBSTB_D = "%s/STB/%s" % ( ORIG_REPO_STABLE_BRANCH, LBL_D )
   CREATED_LIV_D    = "%s/LIV/%s" % ( ORIG_REPO_STABLE_BRANCH, LBL_D )
-  CHGLOG_D = "%s/%s/changelog/%s/%s/LIV_%s.chg" % ( STABILIZE_CLONE_DIR, SWREPO_DIR, ORIG_REPO_REL, ORIG_REPO_SUBREL, LBL_D )
-  FIXLOG_D = "%s/%s/changelog/%s/%s/LIV_%s.fix" % ( STABILIZE_CLONE_DIR, SWREPO_DIR, ORIG_REPO_REL, ORIG_REPO_SUBREL, LBL_D )
-  TKTLOG_D = "%s/%s/changelog/%s/%s/LIV_%s.tkt" % ( STABILIZE_CLONE_DIR, SWREPO_DIR, ORIG_REPO_REL, ORIG_REPO_SUBREL, LBL_D )
+  CHGLOG_D = "./%s/changelog/%s/%s/LIV_%s.chg" % ( SWREPO_DIR, ORIG_REPO_REL, ORIG_REPO_SUBREL, LBL_D )
+  FIXLOG_D = "./%s/changelog/%s/%s/LIV_%s.fix" % ( SWREPO_DIR, ORIG_REPO_REL, ORIG_REPO_SUBREL, LBL_D )
+  TKTLOG_D = "./%s/changelog/%s/%s/LIV_%s.tkt" % ( SWREPO_DIR, ORIG_REPO_REL, ORIG_REPO_SUBREL, LBL_D )
 
 
   MYCST_REL      = "1/1"
@@ -201,7 +201,7 @@ class Test_Stabilize( Test_ProjBase ):
 
     out, errCode = self.sw_clo_h.set_cfg( "swgit.integrator", "True" )
 
-    out, errCode = self.sw_clo_h.stabilize_stb( "Drop.B", "HEAD" )
+    out, errCode = self.sw_clo_h.stabilize_stb( "Drop.B", "HEAD", f_startpointlbl = True )
     self.util_check_SUCC_scenario( out, errCode,
                                    "",
                                    "stabilize inside develop repo" )
@@ -276,7 +276,7 @@ class Test_Stabilize( Test_ProjBase ):
     out, errCode = self.sw_clo_h.set_cfg( "swgit.integrator", "True" )
     self.util_check_SUCC_scenario( out, errCode, "", "changing repo into integrator" )
 
-    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, "HEAD" )
+    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, "HEAD", f_startpointlbl = True )
     self.util_check_SUCC_scenario( out, errCode,
                                    "",
                                    "stabilize without stable branch tracked" )
@@ -336,7 +336,7 @@ class Test_Stabilize( Test_ProjBase ):
     self.util_check_SUCC_scenario( out, errCode, "", "switch" )
     #############
 
-    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, "HEAD" )
+    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, "HEAD", f_startpointlbl = True )
     self.util_check_SUCC_scenario( out, errCode, "", "stabilize from another branch" )
 
     stbdev_sha, stbdev_err = self.sw_clo_h.ref2sha( self.CREATED_STBDEV_B )
@@ -389,7 +389,7 @@ class Test_Stabilize( Test_ProjBase ):
                                    "stabilize from detached, with FTR intbr" )
 
     ##################
-    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, TEST_REPO_BR_DEV, TEST_REPO_BR_STB )
+    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, TEST_REPO_BR_DEV, TEST_REPO_BR_STB, f_startpointlbl = True )
     self.util_check_SUCC_scenario( out, errCode, "", "stabilize from detached head, without intbr set, specifying target" )
     ##################
 
@@ -425,7 +425,7 @@ class Test_Stabilize( Test_ProjBase ):
     out, errCode = self.sw_clo_h.branch_switch_to_br( self.FULL_BRANCH_NAME + "~1" )
     self.util_check_SUCC_scenario( out, errCode, "", "switch detached head" )
 
-    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, TEST_REPO_BR_DEV, TEST_REPO_BR_STB )
+    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, TEST_REPO_BR_DEV, TEST_REPO_BR_STB, f_startpointlbl = True )
     self.util_check_SUCC_scenario( out, errCode, "", "stabilize from detached head, without intbr set, specifying target" )
     ##################
 
@@ -517,7 +517,7 @@ class Test_Stabilize( Test_ProjBase ):
                                    "Already exists a tag named",
                                    "stabilize without stable branch tracked" )
 
-    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, "HEAD" )
+    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, "HEAD", f_startpointlbl = True )
     self.util_check_SUCC_scenario( out, errCode,
                                    "",
                                    "stabilize without stable branch tracked" )
@@ -586,7 +586,7 @@ class Test_Stabilize( Test_ProjBase ):
     self.util_check_EQUAL( self.sw_clo_h.ref2sha( self.CREATED_STBSTB_B )[1], 1, "must not be craeted STB tag" )
 
     #re-issue, forced
-    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, ORIG_REPO_DEVEL_BRANCH, force = True )
+    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, ORIG_REPO_DEVEL_BRANCH, force = True, f_startpointlbl = True )
     self.util_check_SUCC_scenario( out, errCode, "",
                                    "re-issue same stabilize after resolving conflict" )
 
@@ -611,7 +611,7 @@ class Test_Stabilize( Test_ProjBase ):
                                    "Already exists a tag named",
                                    "re-issue same stabilize after just done stabilize" )
 
-    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_C, ORIG_REPO_DEVEL_BRANCH, force = True )
+    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_C, ORIG_REPO_DEVEL_BRANCH, force = True, f_startpointlbl = True )
     self.util_check_SUCC_scenario( out, errCode, "",
                                    "re-issue same stabilize after just done stabilize" )
 
@@ -623,6 +623,43 @@ class Test_Stabilize( Test_ProjBase ):
                            self.sw_clo_h.ref2sha( self.CREATED_STBDEV_C )[0], "must be craeted STB tag" )
     self.util_check_EQUAL( self.sw_clo_h.ref2sha( self.CREATED_STBSTB_B )[0], 
                            self.sw_clo_h.ref2sha( self.CREATED_STBSTB_C )[0], "must be craeted STB tag" )
+
+
+  def test_Stabilize_01_06_STB_NO_STARTLBL( self ):
+
+    self.util_clone_repo_stabilize( self.STABILIZE_CLONE_DIR, "" )
+
+    out, errCode = self.sw_clo_h.set_cfg( self.CFG_ANYREF, "True" )
+    self.util_check_SUCC_scenario( out, errCode, "", "setting stabilize anyref" )
+    out, errCode = self.sw_clo_h.set_cfg( "swgit.integrator", "True" )
+    self.util_check_SUCC_scenario( out, errCode, "", "changing repo into integrator" )
+
+    devbr_before_sha, devbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    stbbr_before_sha, stbbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+
+    out, errCode = self.sw_clo_h.branch_switch_to_int()
+    self.util_check_SUCC_scenario( out, errCode, "", "switch to int" )
+
+    #############
+    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, "HEAD", f_startpointlbl = False )
+    #############
+    self.util_check_SUCC_scenario( out, errCode,
+                                   "",
+                                   "stabilize, no start label" )
+
+    stbdev_sha, stbdev_err = self.sw_clo_h.ref2sha( self.CREATED_STBDEV_B )
+    stbstb_sha, stbstb_err = self.sw_clo_h.ref2sha( self.CREATED_STBSTB_B )
+    stbstb_minus1_sha, stbstbminus1__err = self.sw_clo_h.ref2sha( self.CREATED_STBSTB_B + "~1" )
+
+    self.util_check_EQUAL( stbdev_err, 1, "must NOT be craeted STB tag on develop" )
+    self.util_check_EQUAL( stbstb_err, 0, "must be craeted STB tag" )
+
+    self.util_check_EQUAL( stbbr_before_sha, stbstb_minus1_sha,  "STB tag on wrong commit" )
+
+    stbbr_after_sha, stbbr_after_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+    stbbr_minus1_after_sha, stbbr_after_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB + "~1" )
+    self.util_check_NOTEQ( stbbr_before_sha, stbbr_after_sha, "stable not moved" )
+    self.util_check_EQUAL( stbbr_before_sha, stbbr_minus1_after_sha, "stable not moved" )
 
 
   def test_Stabilize_02_00_LIV_NoLbl( self ):
@@ -692,9 +729,9 @@ class Test_Stabilize( Test_ProjBase ):
     self.util_check_EQUAL( stbbr_before_sha, stbbr_afterB_minus1_sha, "develop not moved" )
     self.util_check_EQUAL( stbbr_afterB_sha,  stblivB_sha, "livB label not created" )
 
-    self.util_check_EQUAL( os.path.getsize( self.CHGLOG_B ), 0, "empty, chglog" )
-    self.util_check_EQUAL( os.path.getsize( self.FIXLOG_B ), 0, "empty, chglog" )
-    self.util_check_EQUAL( os.path.getsize( self.TKTLOG_B ), 0, "empty, chglog" )
+    self.util_check_EQUAL( os.path.getsize( self.sw_clo_h.getDir() + self.CHGLOG_B ), 0, "empty, chglog" )
+    self.util_check_EQUAL( os.path.getsize( self.sw_clo_h.getDir() + self.FIXLOG_B ), 0, "empty, chglog" )
+    self.util_check_EQUAL( os.path.getsize( self.sw_clo_h.getDir() + self.TKTLOG_B ), 0, "empty, chglog" )
 
     out, errCode = self.sw_clo_h.stabilize_liv( self.LBL_B )
     self.util_check_DENY_scenario( out, errCode,
@@ -716,12 +753,12 @@ class Test_Stabilize( Test_ProjBase ):
     self.util_check_EQUAL( stbbr_afterC_minus1_sha, stbbr_afterB_sha, "stable not moved" )
     self.util_check_EQUAL( stbbr_afterC_sha,  stblivC_sha, "liv label not created" )
 
-    self.util_check_EQUAL( os.path.getsize( self.CHGLOG_C ), 0, "empty, chglog" )
-    self.util_check_EQUAL( os.path.getsize( self.FIXLOG_C ), 0, "empty, chglog" )
-    self.util_check_EQUAL( os.path.getsize( self.TKTLOG_C ), 0, "empty, chglog" )
+    self.util_check_EQUAL( os.path.getsize( self.sw_clo_h.getDir() + self.CHGLOG_C ), 0, "empty, chglog" )
+    self.util_check_EQUAL( os.path.getsize( self.sw_clo_h.getDir() + self.FIXLOG_C ), 0, "empty, chglog" )
+    self.util_check_EQUAL( os.path.getsize( self.sw_clo_h.getDir() + self.TKTLOG_C ), 0, "empty, chglog" )
 
     # no-merge-back
-    out, errCode = self.sw_clo_h.stabilize_liv( self.LBL_D, nomergeback = True )
+    out, errCode = self.sw_clo_h.stabilize_liv( self.LBL_D, f_mergeback = False )
     self.util_check_SUCC_scenario( out, errCode,
                                    "",
                                    "issue Another LIV without no contributes" )
@@ -736,9 +773,9 @@ class Test_Stabilize( Test_ProjBase ):
     self.util_check_EQUAL( stbbr_afterD_minus1_sha, stbbr_afterC_sha, "stable not moved" )
     self.util_check_EQUAL( stbbr_afterD_sha,  stblivD_sha, "liv label not created" )
 
-    self.util_check_EQUAL( os.path.getsize( self.CHGLOG_D ), 0, "empty, chglog" )
-    self.util_check_EQUAL( os.path.getsize( self.FIXLOG_D ), 0, "empty, chglog" )
-    self.util_check_EQUAL( os.path.getsize( self.TKTLOG_D ), 0, "empty, chglog" )
+    self.util_check_EQUAL( os.path.getsize( self.sw_clo_h.getDir() + self.CHGLOG_D ), 0, "empty, chglog" )
+    self.util_check_EQUAL( os.path.getsize( self.sw_clo_h.getDir() + self.FIXLOG_D ), 0, "empty, chglog" )
+    self.util_check_EQUAL( os.path.getsize( self.sw_clo_h.getDir() + self.TKTLOG_D ), 0, "empty, chglog" )
 
   def test_Stabilize_02_01_LIV_YesLbl( self ):
 
@@ -1005,7 +1042,7 @@ class Test_Stabilize( Test_ProjBase ):
 
     #make stb
     ################################################
-    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, "HEAD" )
+    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, "HEAD", f_startpointlbl = True )
     self.util_check_SUCC_scenario( out, errCode, "", "stabilize --stb" )
     ################################################
 
@@ -1074,9 +1111,9 @@ class Test_Stabilize( Test_ProjBase ):
     self.util_check_EQUAL( stbbr_before_sha, stbbr_afterB_minus1_sha, "develop not moved" )
     self.util_check_EQUAL( stbbr_afterB_sha,  stblivB_sha, "livB label not created" )
 
-    self.assertTrue( os.path.exists( self.CHGLOG_B ), "chg file not found" )
-    self.assertTrue( os.path.exists( self.FIXLOG_B ), "fix file not found" )
-    self.assertTrue( os.path.exists( self.TKTLOG_B ), "tkt file not found" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.CHGLOG_B ), "chg file not found" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.FIXLOG_B ), "fix file not found" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.TKTLOG_B ), "tkt file not found" )
 
 
     #file content
@@ -1118,9 +1155,9 @@ class Test_Stabilize( Test_ProjBase ):
     self.util_check_EQUAL( stbbr_afterC_minus1_sha, stbbr_afterB_sha, "stable not moved" )
     self.util_check_EQUAL( stbbr_afterC_sha,  stblivC_sha, "liv label not created" )
 
-    self.util_check_EQUAL( os.path.getsize( self.CHGLOG_C ), 0, "empty, chglog" )
-    self.util_check_EQUAL( os.path.getsize( self.FIXLOG_C ), 0, "empty, chglog" )
-    self.util_check_EQUAL( os.path.getsize( self.TKTLOG_C ), 0, "empty, chglog" )
+    self.util_check_EQUAL( os.path.getsize( self.sw_clo_h.getDir() + self.CHGLOG_C ), 0, "empty, chglog" )
+    self.util_check_EQUAL( os.path.getsize( self.sw_clo_h.getDir() + self.FIXLOG_C ), 0, "empty, chglog" )
+    self.util_check_EQUAL( os.path.getsize( self.sw_clo_h.getDir() + self.TKTLOG_C ), 0, "empty, chglog" )
 
     #file content
     notexistList = [ self.BUILTIN_DEV_0, self.BUILTIN_DEV_1, self.BUILTIN_FIX_0, self.DDTS, self.LBL_B, self.CREATED_STBDEV_B, self.CREATED_STBSTB_B ]
@@ -1160,7 +1197,7 @@ class Test_Stabilize( Test_ProjBase ):
 
     #make stb liv toghether
     ################################################
-    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, "HEAD" )
+    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, "HEAD", f_startpointlbl = True )
     self.util_check_SUCC_scenario( out, errCode, "", "stabilize --stb" )
     ################################################
 
@@ -1174,9 +1211,9 @@ class Test_Stabilize( Test_ProjBase ):
     self.util_check_EQUAL( stbbr_before_sha, stbbr_afterB_minus2_sha, "develop not moved" )
     self.util_check_EQUAL( stbbr_afterB_sha,  stblivB_sha, "livB label not created" )
 
-    self.assertTrue( os.path.exists( self.CHGLOG_B ), "chg file not found" )
-    self.assertTrue( os.path.exists( self.FIXLOG_B ), "fix file not found" )
-    self.assertTrue( os.path.exists( self.TKTLOG_B ), "tkt file not found" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.CHGLOG_B ), "chg file not found" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.FIXLOG_B ), "fix file not found" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.TKTLOG_B ), "tkt file not found" )
 
 
     #file content
@@ -1204,7 +1241,7 @@ class Test_Stabilize( Test_ProjBase ):
     # Another stb+liv (must be same result as previous test (splitted operations)
     #
     ################################################
-    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_C, TEST_REPO_BR_DEV )
+    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_C, TEST_REPO_BR_DEV, f_startpointlbl = True )
     self.util_check_SUCC_scenario( out, errCode, "", "issue Another LIV without no contributes" )
     ################################################
 
@@ -1218,9 +1255,9 @@ class Test_Stabilize( Test_ProjBase ):
     self.util_check_EQUAL( stbbr_afterC_minus2_sha, stbbr_afterB_sha, "stable not moved" )
     self.util_check_EQUAL( stbbr_afterC_sha,  stblivC_sha, "liv label not created" )
 
-    self.util_check_EQUAL( os.path.getsize( self.CHGLOG_C ), 0, "empty, chglog" )
-    self.util_check_EQUAL( os.path.getsize( self.FIXLOG_C ), 0, "empty, chglog" )
-    self.util_check_EQUAL( os.path.getsize( self.TKTLOG_C ), 0, "empty, chglog" )
+    self.util_check_EQUAL( os.path.getsize( self.sw_clo_h.getDir() + self.CHGLOG_C ), 0, "empty, chglog" )
+    self.util_check_EQUAL( os.path.getsize( self.sw_clo_h.getDir() + self.FIXLOG_C ), 0, "empty, chglog" )
+    self.util_check_EQUAL( os.path.getsize( self.sw_clo_h.getDir() + self.TKTLOG_C ), 0, "empty, chglog" )
 
     #file content
     notexistList = [ self.BUILTIN_DEV_0, self.BUILTIN_DEV_1, self.BUILTIN_FIX_0, self.DDTS, self.LBL_B, self.CREATED_STBDEV_B, self.CREATED_STBSTB_B ]
@@ -1241,7 +1278,7 @@ class Test_Stabilize( Test_ProjBase ):
                                    "please provide --force option.", 
                                    "issue Another LIV reporting INT/stable" )
 
-    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_D, TEST_REPO_BR_STB, force = True )
+    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_D, TEST_REPO_BR_STB, force = True, f_startpointlbl = True )
     self.util_check_SUCC_scenario( out, errCode, "", "issue Another LIV reporting INT/stable" )
 
 
@@ -1271,7 +1308,7 @@ class Test_Stabilize( Test_ProjBase ):
                                    "stabilize --cst" )
 
     #make stb
-    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, self.BUILTIN_DEV_0 )
+    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, self.BUILTIN_DEV_0, f_startpointlbl = True )
     self.util_check_SUCC_scenario( out, errCode,
                                    "",
                                    "stabilize --cst" )
@@ -1322,7 +1359,7 @@ class Test_Stabilize( Test_ProjBase ):
     ##################
     cstbr_before_sha, cstbr_err = self.sw_clo_h.ref2sha( self.MYCST_FULL_BR )
 
-    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, TEST_REPO_BR_DEV )
+    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, TEST_REPO_BR_DEV, f_startpointlbl = True )
     self.util_check_SUCC_scenario( out, errCode, "", "stabilize from another branch" )
 
     stbdev_sha, stbdev_err = self.sw_clo_h.ref2sha( self.CREATED_STBDEV_B )
@@ -1377,7 +1414,7 @@ class Test_Stabilize( Test_ProjBase ):
 
     ##################
     out, errCode = self.sw_clo_h.branch_switch_to_br( self.MYCST_FULL_BR + "~1" ) #go detached
-    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, TEST_REPO_BR_DEV, self.MYCST_FULL_BR )
+    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, TEST_REPO_BR_DEV, self.MYCST_FULL_BR, f_startpointlbl = True )
     self.util_check_SUCC_scenario( out, errCode, "", "stabilize from another branch" )
     ##################
 
@@ -1458,7 +1495,7 @@ class Test_Stabilize( Test_ProjBase ):
 
 
     #re-issue, forced
-    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, ORIG_REPO_DEVEL_BRANCH, force = True )
+    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, ORIG_REPO_DEVEL_BRANCH, force = True, f_startpointlbl = True )
     self.util_check_SUCC_scenario( out, errCode, "",
                                    "re-issue same stabilize after resolving conflict" )
 
@@ -1484,7 +1521,7 @@ class Test_Stabilize( Test_ProjBase ):
                                    "Already exists a tag named",
                                    "re-issue same stabilize after resolving conflict" )
 
-    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_C, ORIG_REPO_DEVEL_BRANCH, force = True )
+    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_C, ORIG_REPO_DEVEL_BRANCH, force = True, f_startpointlbl = True )
     self.util_check_SUCC_scenario( out, errCode, "",
                                    "re-issue same stabilize after resolving conflict" )
 
@@ -1525,7 +1562,7 @@ class Test_Stabilize( Test_ProjBase ):
     cst1br_before_sha, cst1br_err = self.sw_clo_h.ref2sha( self.MYCST_FULL_BR )
 
     ################################################
-    out, errCode = self.sw_clo_h.stabilize_liv( self.LBL_B, self.MYCST_FULL_BR )
+    out, errCode = self.sw_clo_h.stabilize_liv( self.LBL_B, self.MYCST_FULL_BR, f_mergeback = False )
     self.util_check_SUCC_scenario( out, errCode, "", "stabilize liv, cb = FTR, intbr = develop, targetB = CST1" )
     ################################################
 
@@ -1542,7 +1579,7 @@ class Test_Stabilize( Test_ProjBase ):
     cst2br_before_sha, cst2br_err = self.sw_clo_h.ref2sha( self.MYCST2_FULL_BR )
 
     ################################################
-    out, errCode = self.sw_clo_h.stabilize_liv( self.LBL_B, self.MYCST2_FULL_BR )
+    out, errCode = self.sw_clo_h.stabilize_liv( self.LBL_B, self.MYCST2_FULL_BR, f_mergeback = False )
     self.util_check_SUCC_scenario( out, errCode, "", "stabilize liv, cb = CST1, targetB = cst2" )
     ################################################
 
@@ -1556,7 +1593,7 @@ class Test_Stabilize( Test_ProjBase ):
     ################################################
     out, errCode = self.sw_clo_h.branch_switch_to_br( self.MYCST_FULL_BR )
     self.util_check_SUCC_scenario( out, errCode, "", "switch to cst1" )
-    out, errCode = self.sw_clo_h.stabilize_liv( self.LBL_C  )
+    out, errCode = self.sw_clo_h.stabilize_liv( self.LBL_C , f_mergeback = False )
     self.util_check_SUCC_scenario( out, errCode, "", "stabilize liv, cb = CST1, intbr = develop, targetB = None" )
     ################################################
 
@@ -1569,7 +1606,7 @@ class Test_Stabilize( Test_ProjBase ):
   # Test 1:
   #   plain CST stabilize stb + liv
   #
-  def test_Stabilize_05_00_CST_together( self ):
+  def test_Stabilize_05_01_CST_together( self ):
 
     self.util_clone_repo_stabilize( self.STABILIZE_CLONE_DIR, "" )
     out, errCode = self.sw_clo_h.set_cfg( self.CFG_ANYREF, "True" )
@@ -1590,7 +1627,7 @@ class Test_Stabilize( Test_ProjBase ):
     cst1br_before_sha, cst1br_err = self.sw_clo_h.ref2sha( self.MYCST_FULL_BR )
 
     ################################################
-    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, TEST_REPO_BR_DEV, self.MYCST_FULL_BR )
+    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, TEST_REPO_BR_DEV, self.MYCST_FULL_BR, f_mergeback = False, f_startpointlbl = True )
     self.util_check_SUCC_scenario( out, errCode, "", "stabilize both, cb = FTR, intbr = develop, targetB = CST1" )
     ################################################
 
@@ -1599,7 +1636,7 @@ class Test_Stabilize( Test_ProjBase ):
     self.util_check_EQUAL( cst1br_before_sha, livBcst1_minu2_sha, "CST not moved" )
 
 
-  def test_Stabilize_06_01_MoreRemotes( self ):
+  def test_Stabilize_06_00_MoreRemotes( self ):
 
     out, errCode = swgit__utils.clone_scripts_repo_integrator( self.STABILIZE_CLONE_DIR )
     self.util_check_SUCC_scenario( out, errCode, "", "clone --integrator" )
@@ -1634,7 +1671,7 @@ class Test_Stabilize( Test_ProjBase ):
 
     #make stb liv toghether
     ################################################
-    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, "HEAD" )
+    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, "HEAD", f_startpointlbl = True )
     self.util_check_SUCC_scenario( out, errCode, "", "stabilize both" )
     ################################################
 
@@ -1648,10 +1685,12 @@ class Test_Stabilize( Test_ProjBase ):
     self.util_check_EQUAL( stbbr_before_sha, stbbr_afterB_minus2_sha, "develop not moved" )
     self.util_check_EQUAL( stbbr_afterB_sha,  stblivB_sha, "livB label not created" )
 
-    self.assertTrue( os.path.exists( self.CHGLOG_B ), "chg file not found" )
-    self.assertTrue( os.path.exists( self.FIXLOG_B ), "fix file not found" )
-    self.assertTrue( os.path.exists( self.TKTLOG_B ), "tkt file not found" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.CHGLOG_B ), "chg file not found" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.FIXLOG_B ), "fix file not found" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.TKTLOG_B ), "tkt file not found" )
 
+    out, errCode = test_ori_h.branch_switch_to_br( self.CREATED_LIV_B )
+    self.util_check_SUCC_scenario( out, errCode, "", "switch to %s" % self.CREATED_LIV_B )
 
     #file content
     for hlp in ( self.sw_clo_h, test_ori_h ):
@@ -1680,7 +1719,7 @@ class Test_Stabilize( Test_ProjBase ):
     # Another stb+liv (must be same result as splitted operations
     #
     ################################################
-    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_C, TEST_REPO_BR_DEV )
+    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_C, TEST_REPO_BR_DEV, f_startpointlbl = True )
     self.util_check_SUCC_scenario( out, errCode, "", "issue Another LIV without no contributes" )
     ################################################
 
@@ -1694,9 +1733,12 @@ class Test_Stabilize( Test_ProjBase ):
     self.util_check_EQUAL( stbbr_afterC_minus2_sha, stbbr_afterB_sha, "stable not moved" )
     self.util_check_EQUAL( stbbr_afterC_sha,  stblivC_sha, "liv label not created" )
 
-    self.util_check_EQUAL( os.path.getsize( self.CHGLOG_C ), 0, "empty, chglog" )
-    self.util_check_EQUAL( os.path.getsize( self.FIXLOG_C ), 0, "empty, chglog" )
-    self.util_check_EQUAL( os.path.getsize( self.TKTLOG_C ), 0, "empty, chglog" )
+    self.util_check_EQUAL( os.path.getsize( self.sw_clo_h.getDir() + self.CHGLOG_C ), 0, "empty, chglog" )
+    self.util_check_EQUAL( os.path.getsize( self.sw_clo_h.getDir() + self.FIXLOG_C ), 0, "empty, chglog" )
+    self.util_check_EQUAL( os.path.getsize( self.sw_clo_h.getDir() + self.TKTLOG_C ), 0, "empty, chglog" )
+
+    out, errCode = test_ori_h.branch_switch_to_br( self.CREATED_LIV_C )
+    self.util_check_SUCC_scenario( out, errCode, "", "switch to %s" % self.CREATED_LIV_C )
 
     #file content
     for hlp in ( self.sw_clo_h, test_ori_h ):
@@ -1719,9 +1761,1175 @@ class Test_Stabilize( Test_ProjBase ):
                                    "please provide --force option.", 
                                    "issue Another LIV reporting INT/stable" )
 
-    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_D, TEST_REPO_BR_STB, force = True )
+    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_D, TEST_REPO_BR_STB, force = True, f_startpointlbl = True )
     self.util_check_SUCC_scenario( out, errCode, "", "issue Another LIV reporting INT/stable" )
 
+
+
+  def test_Stabilize_07_00_nochglogs( self ):
+
+    out, errCode = swgit__utils.clone_scripts_repo_integrator( self.STABILIZE_CLONE_DIR )
+    self.util_check_SUCC_scenario( out, errCode, "", "clone --integrator" )
+
+    #on ori move away from head (for push)
+    test_ori_h = self.sw_origrepo_h
+    if modetest_morerepos():
+      test_ori_h = self.sw_aremoterepo_h
+
+    out, errCode = test_ori_h.branch_switch_to_br( TEST_REPO_TAG_LIV )
+    self.util_check_SUCC_scenario( out, errCode, "", "switch to %s" % TEST_REPO_TAG_LIV )
+
+    out, errCode = self.sw_clo_h.set_cfg( self.CFG_ANYREF, "True" )
+
+    out, errCode = self.sw_clo_h.int_branch_set( TEST_REPO_BR_DEV )
+    self.util_check_SUCC_scenario( out, errCode, "", "setting intbr" )
+    out, errCode = self.sw_clo_h.branch_switch_to_int()
+    self.util_check_SUCC_scenario( out, errCode, "", "switch on intbr" )
+
+    sha_before, errCode = self.sw_clo_h.get_currsha()
+    devbr_before_sha, devbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    stbbr_before_sha, stbbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+
+    self.util_check_EQUAL( sha_before, devbr_before_sha, "on develop before starting" )
+    self.util_check_NOTEQ( devbr_before_sha, stbbr_before_sha, "develop and stable must differ" )
+
+    # change target repo, by tracking differently stable branch
+    if modetest_morerepos():
+      out, errCode = self.sw_clo_h.branch_track( ORIG_REPO_AREMOTE_NAME + "/" + ORIG_REPO_STABLE_BRANCH )
+      self.util_check_SUCC_scenario( out, errCode, "", "tracking stable int toward %s" % ORIG_REPO_STABLE_BRANCH )
+
+
+    #make stb liv toghether
+    ################################################
+    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, "HEAD", f_nochglogs = True, f_startpointlbl = True )
+    self.util_check_SUCC_scenario( out, errCode, "", "stabilize both no chglogs" )
+    ################################################
+
+    devbr_afterB_sha, devbr_afterB_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    devbr_afterB_minus1_sha, devbr_afterB_minus1_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV + "~1" )
+    stbbr_afterB_sha, stbbr_afterB_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+    stbbr_afterB_minus1_sha, stbbr_afterB_minus1_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB + "~1" )
+    stblivB_sha, stblivB_err = self.sw_clo_h.ref2sha( self.CREATED_LIV_B )
+
+    self.util_check_EQUAL( devbr_before_sha, devbr_afterB_minus1_sha, "develop not moved" )
+    #only 1 commit created
+    self.util_check_EQUAL( stbbr_before_sha, stbbr_afterB_minus1_sha, "develop not moved" )
+    self.util_check_EQUAL( stbbr_afterB_sha,  stblivB_sha, "livB label not created" )
+
+    self.assertFalse( os.path.exists( self.sw_clo_h.getDir() + self.CHGLOG_B ), "chg file MUST not exsist" )
+    self.assertFalse( os.path.exists( self.sw_clo_h.getDir() + self.FIXLOG_B ), "fix file MUST not exsist" )
+    self.assertFalse( os.path.exists( self.sw_clo_h.getDir() + self.TKTLOG_B ), "tkt file MUST not exsist" )
+
+    out, errCode = test_ori_h.branch_switch_to_br( self.CREATED_LIV_B )
+    self.util_check_SUCC_scenario( out, errCode, "", "switch to %s" % self.CREATED_LIV_B )
+
+    #file content
+    for hlp in ( self.sw_clo_h, test_ori_h ):
+
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_DEV0, self.CHGLOG_B ) )
+      self.util_check_NOTEQ( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_DEV0 )
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_DEV1, self.CHGLOG_B ) )
+      self.util_check_NOTEQ( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_DEV1 )
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_FIX, self.FIXLOG_B ) )
+      self.util_check_NOTEQ( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_FIX )
+      out, errCode = hlp.system_unix( "grep -e \"^%s$\" %s" % ( ORIG_REPO_aFIX_NAME, self.TKTLOG_B ) )
+      self.util_check_NOTEQ( errCode, 0, "must exists %s" % ORIG_REPO_aFIX_NAME )
+
+
+      notexistList = [ self.LBL_B, self.CREATED_STBDEV_B, self.CREATED_STBSTB_B ]
+      for t in notexistList:
+        out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( t, self.CHGLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( t, self.FIXLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"^%s$\" %s" % ( t, self.TKTLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+
+
+  def test_Stabilize_08_00_hook_preliv( self ):
+
+    out, errCode = swgit__utils.clone_scripts_repo_integrator( self.STABILIZE_CLONE_DIR )
+    self.util_check_SUCC_scenario( out, errCode, "", "clone --integrator" )
+
+    #on ori move away from head (for push)
+    test_ori_h = self.sw_origrepo_h
+    if modetest_morerepos():
+      test_ori_h = self.sw_aremoterepo_h
+
+    out, errCode = test_ori_h.branch_switch_to_br( TEST_REPO_TAG_LIV )
+    self.util_check_SUCC_scenario( out, errCode, "", "switch to %s" % TEST_REPO_TAG_LIV )
+
+    out, errCode = self.sw_clo_h.set_cfg( self.CFG_ANYREF, "True" )
+
+    out, errCode = self.sw_clo_h.int_branch_set( TEST_REPO_BR_DEV )
+    self.util_check_SUCC_scenario( out, errCode, "", "setting intbr" )
+    out, errCode = self.sw_clo_h.branch_switch_to_int()
+    self.util_check_SUCC_scenario( out, errCode, "", "switch on intbr" )
+
+    sha_before, errCode = self.sw_clo_h.get_currsha()
+    devbr_before_sha, devbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    stbbr_before_sha, stbbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+
+    self.util_check_EQUAL( sha_before, devbr_before_sha, "on develop before starting" )
+    self.util_check_NOTEQ( devbr_before_sha, stbbr_before_sha, "develop and stable must differ" )
+
+    # change target repo, by tracking differently stable branch
+    if modetest_morerepos():
+      out, errCode = self.sw_clo_h.branch_track( ORIG_REPO_AREMOTE_NAME + "/" + ORIG_REPO_STABLE_BRANCH )
+      self.util_check_SUCC_scenario( out, errCode, "", "tracking stable int toward %s" % ORIG_REPO_STABLE_BRANCH )
+
+    # define hook
+    precommit_file = "%s/precommit_file.txt" % self.sw_clo_h.getDir()
+    stabilize = {}
+    stabilize["hook_pre_liv_commit_script"]  = "echo 'aaaa' > %s && git add %s && echo 'swtest-output-'" % ( precommit_file, precommit_file )
+    stabilize["hook_pre_liv_commit_sshuser"] = ""
+    stabilize["hook_pre_liv_commit_sshaddr"] = ""
+    self.sw_clo_h.section_stabilize_define( stabilize )
+    out, errCode = self.sw_clo_h.system_unix( "git commit -a -m 'stabilize cfg'" )
+    self.util_check_SUCC_scenario( out, errCode, "", "Committing, stabilize cfg" )
+
+    devbr_before_sha, devbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    stbbr_before_sha, stbbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+
+    #make stb liv toghether
+    ################################################
+    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, "HEAD", f_startpointlbl = True )
+    self.util_check_SUCC_scenario( out, errCode, "", "stabilize with pre-commit script" )
+    self.util_check_SUCC_scenario( out, errCode, "swtest-output- %s" % self.LBL_B, "stabilize with pre-commit script" )
+    ################################################
+
+    devbr_afterB_sha, devbr_afterB_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    devbr_afterB_minus1_sha, devbr_afterB_minus1_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV + "^1" )
+    stbbr_afterB_sha, stbbr_afterB_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+    stbbr_afterB_minus2_sha, stbbr_afterB_minus2_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB + "~2" )
+    stblivB_sha, stblivB_err = self.sw_clo_h.ref2sha( self.CREATED_LIV_B )
+
+    self.util_check_EQUAL( devbr_before_sha, devbr_afterB_minus1_sha, "develop not moved" )
+    self.util_check_EQUAL( stbbr_before_sha, stbbr_afterB_minus2_sha, "develop not moved" )
+    self.util_check_EQUAL( stbbr_afterB_sha,  stblivB_sha, "livB label not created" )
+
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.CHGLOG_B ), "chg file MUST exsist" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.FIXLOG_B ), "fix file MUST exsist" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.TKTLOG_B ), "tkt file MUST exsist" )
+    self.assertTrue( os.path.exists( precommit_file ), "file created by pre-commit script" )
+
+    out, errCode = test_ori_h.branch_switch_to_br( self.CREATED_LIV_B )
+    self.util_check_SUCC_scenario( out, errCode, "", "switch to %s" % self.CREATED_LIV_B )
+
+    #file content
+    for hlp in ( self.sw_clo_h, test_ori_h ):
+
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_DEV0, self.CHGLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_DEV0 )
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_DEV1, self.CHGLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_DEV1 )
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_FIX, self.FIXLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_FIX )
+      out, errCode = hlp.system_unix( "grep -e \"^%s$\" %s" % ( ORIG_REPO_aFIX_NAME, self.TKTLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aFIX_NAME )
+
+
+      notexistList = [ self.LBL_B, self.CREATED_STBDEV_B, self.CREATED_STBSTB_B ]
+      for t in notexistList:
+        out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( t, self.CHGLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( t, self.FIXLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"^%s$\" %s" % ( t, self.TKTLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+
+
+  def test_Stabilize_08_01_hookssh_preliv( self ):
+
+    out, errCode = swgit__utils.clone_scripts_repo_integrator( self.STABILIZE_CLONE_DIR )
+    self.util_check_SUCC_scenario( out, errCode, "", "clone --integrator" )
+
+    #on ori move away from head (for push)
+    test_ori_h = self.sw_origrepo_h
+    if modetest_morerepos():
+      test_ori_h = self.sw_aremoterepo_h
+
+    out, errCode = test_ori_h.branch_switch_to_br( TEST_REPO_TAG_LIV )
+    self.util_check_SUCC_scenario( out, errCode, "", "switch to %s" % TEST_REPO_TAG_LIV )
+
+    out, errCode = self.sw_clo_h.set_cfg( self.CFG_ANYREF, "True" )
+
+    out, errCode = self.sw_clo_h.int_branch_set( TEST_REPO_BR_DEV )
+    self.util_check_SUCC_scenario( out, errCode, "", "setting intbr" )
+    out, errCode = self.sw_clo_h.branch_switch_to_int()
+    self.util_check_SUCC_scenario( out, errCode, "", "switch on intbr" )
+
+    sha_before, errCode = self.sw_clo_h.get_currsha()
+    devbr_before_sha, devbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    stbbr_before_sha, stbbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+
+    self.util_check_EQUAL( sha_before, devbr_before_sha, "on develop before starting" )
+    self.util_check_NOTEQ( devbr_before_sha, stbbr_before_sha, "develop and stable must differ" )
+
+    # change target repo, by tracking differently stable branch
+    if modetest_morerepos():
+      out, errCode = self.sw_clo_h.branch_track( ORIG_REPO_AREMOTE_NAME + "/" + ORIG_REPO_STABLE_BRANCH )
+      self.util_check_SUCC_scenario( out, errCode, "", "tracking stable int toward %s" % ORIG_REPO_STABLE_BRANCH )
+
+    # define hook
+    stabilize = {}
+    stabilize["hook_pre_liv_commit_script"]  = "echo \"swtest-output-\""
+    stabilize["hook_pre_liv_commit_sshuser"] = TEST_USER_SSH
+    stabilize["hook_pre_liv_commit_sshaddr"] = TEST_ADDR
+    self.sw_clo_h.section_stabilize_define( stabilize )
+    out, errCode = self.sw_clo_h.system_unix( "git commit -a -m 'stabilize cfg'" )
+    self.util_check_SUCC_scenario( out, errCode, "", "Committing, stabilize cfg" )
+
+    devbr_before_sha, devbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    stbbr_before_sha, stbbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+
+    #make stb liv toghether
+    ################################################
+    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, "HEAD", f_startpointlbl = True )
+    self.util_check_SUCC_scenario( out, errCode, "", "stabilize with pre-commit script" )
+    self.util_check_SUCC_scenario( out, errCode, "swtest-output- %s" % self.LBL_B, "stabilize with pre-commit script" )
+    ################################################
+
+    devbr_afterB_sha, devbr_afterB_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    devbr_afterB_minus1_sha, devbr_afterB_minus1_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV + "^1" )
+    stbbr_afterB_sha, stbbr_afterB_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+    stbbr_afterB_minus2_sha, stbbr_afterB_minus2_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB + "~2" )
+    stblivB_sha, stblivB_err = self.sw_clo_h.ref2sha( self.CREATED_LIV_B )
+
+    self.util_check_EQUAL( devbr_before_sha, devbr_afterB_minus1_sha, "develop not moved" )
+    self.util_check_EQUAL( stbbr_before_sha, stbbr_afterB_minus2_sha, "develop not moved" )
+    self.util_check_EQUAL( stbbr_afterB_sha,  stblivB_sha, "livB label not created" )
+
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.CHGLOG_B ), "chg file MUST exsist" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.FIXLOG_B ), "fix file MUST exsist" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.TKTLOG_B ), "tkt file MUST exsist" )
+
+    out, errCode = test_ori_h.branch_switch_to_br( self.CREATED_LIV_B )
+    self.util_check_SUCC_scenario( out, errCode, "", "switch to %s" % self.CREATED_LIV_B )
+
+    #file content
+    for hlp in ( self.sw_clo_h, test_ori_h ):
+
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_DEV0, self.CHGLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_DEV0 )
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_DEV1, self.CHGLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_DEV1 )
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_FIX, self.FIXLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_FIX )
+      out, errCode = hlp.system_unix( "grep -e \"^%s$\" %s" % ( ORIG_REPO_aFIX_NAME, self.TKTLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aFIX_NAME )
+
+
+      notexistList = [ self.LBL_B, self.CREATED_STBDEV_B, self.CREATED_STBSTB_B ]
+      for t in notexistList:
+        out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( t, self.CHGLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( t, self.FIXLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"^%s$\" %s" % ( t, self.TKTLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+
+
+  #
+  # Test:
+  #  in this test hook returns error.
+  #  Not a problem, only chglogs have been evaluated, 
+  #    no commit, no liv, no merge (but --stb one, of course) 
+  #  Just fix, problem with hook, reset --hard and re-issue
+  #
+  def test_Stabilize_08_02_hook_preliv_fail( self ):
+
+    out, errCode = swgit__utils.clone_scripts_repo_integrator( self.STABILIZE_CLONE_DIR )
+    self.util_check_SUCC_scenario( out, errCode, "", "clone --integrator" )
+
+    #on ori move away from head (for push)
+    test_ori_h = self.sw_origrepo_h
+    if modetest_morerepos():
+      test_ori_h = self.sw_aremoterepo_h
+
+    out, errCode = test_ori_h.branch_switch_to_br( TEST_REPO_TAG_LIV )
+    self.util_check_SUCC_scenario( out, errCode, "", "switch to %s" % TEST_REPO_TAG_LIV )
+
+    out, errCode = self.sw_clo_h.set_cfg( self.CFG_ANYREF, "True" )
+
+    out, errCode = self.sw_clo_h.int_branch_set( TEST_REPO_BR_DEV )
+    self.util_check_SUCC_scenario( out, errCode, "", "setting intbr" )
+    out, errCode = self.sw_clo_h.branch_switch_to_int()
+    self.util_check_SUCC_scenario( out, errCode, "", "switch on intbr" )
+
+    sha_before, errCode = self.sw_clo_h.get_currsha()
+    devbr_before_sha, devbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    stbbr_before_sha, stbbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+
+    self.util_check_EQUAL( sha_before, devbr_before_sha, "on develop before starting" )
+    self.util_check_NOTEQ( devbr_before_sha, stbbr_before_sha, "develop and stable must differ" )
+
+    # change target repo, by tracking differently stable branch
+    if modetest_morerepos():
+      out, errCode = self.sw_clo_h.branch_track( ORIG_REPO_AREMOTE_NAME + "/" + ORIG_REPO_STABLE_BRANCH )
+      self.util_check_SUCC_scenario( out, errCode, "", "tracking stable int toward %s" % ORIG_REPO_STABLE_BRANCH )
+
+    # define hook
+    precommit_file = "%s/precommit_file.txt" % self.sw_clo_h.getDir()
+    stabilize = {}
+    stabilize["hook_pre_liv_commit_script"]  = "return 1"
+    stabilize["hook_pre_liv_commit_sshuser"] = ""
+    stabilize["hook_pre_liv_commit_sshaddr"] = ""
+    self.sw_clo_h.section_stabilize_define( stabilize )
+    out, errCode = self.sw_clo_h.system_unix( "git commit -a -m 'stabilize cfg'" )
+    self.util_check_SUCC_scenario( out, errCode, "", "Committing, stabilize cfg" )
+
+    devbr_before_sha, devbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    stbbr_before_sha, stbbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+
+    #make stb liv toghether
+    ################################################
+    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, "HEAD", f_startpointlbl = True )
+    self.util_check_DENY_scenario( out, errCode, 
+                                   "returned error. Abort stabilization.", 
+                                   "stabilize with pre-commit returning error script" )
+    ################################################
+
+    devbr_afterB_sha, devbr_afterB_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    devbr_afterB_minus1_sha, devbr_afterB_minus1_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV + "^1" )
+    stbbr_afterB_sha, stbbr_afterB_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+    stbbr_afterB_minus1_sha, stbbr_afterB_minus1_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB + "~1" )
+
+    stbdev_sha, stbdev_err = self.sw_clo_h.ref2sha( self.CREATED_STBDEV_B )
+    stbstb_sha, stbstb_err = self.sw_clo_h.ref2sha( self.CREATED_STBSTB_B )
+    stblivB_sha, stblivB_err = self.sw_clo_h.ref2sha( self.CREATED_LIV_B )
+
+    self.util_check_EQUAL( stbdev_err, 0, "create STB on develop" )
+    self.util_check_EQUAL( stbstb_err, 0, "create STB on stable" )
+    self.util_check_EQUAL( stblivB_err, 1, "create LIV on stable" )
+
+    self.util_check_EQUAL( devbr_before_sha, devbr_afterB_sha, "develop moved?" )
+    self.util_check_EQUAL( stbbr_before_sha, stbbr_afterB_minus1_sha, "stable not moved?" )
+
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.CHGLOG_B ), "chg file MUST exsist" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.FIXLOG_B ), "fix file MUST exsist" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.TKTLOG_B ), "tkt file MUST exsist" )
+
+    self.assertFalse( os.path.exists( test_ori_h.getDir() + self.CHGLOG_B ), "chg file MUST NOT exsist" )
+    self.assertFalse( os.path.exists( test_ori_h.getDir() + self.FIXLOG_B ), "fix file MUST NOT exsist" )
+    self.assertFalse( os.path.exists( test_ori_h.getDir() + self.TKTLOG_B ), "tkt file MUST NOT exsist" )
+
+    #remote push did not happen
+    out, errCode = test_ori_h.branch_switch_to_br( self.CREATED_LIV_B )
+    self.util_check_DENY_scenario( out, errCode, 
+                                   "Please specify a valid reference", 
+                                   "switch to %s" % self.CREATED_LIV_B )
+
+    #file content
+    for hlp in [self.sw_clo_h]:
+
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_DEV0, self.CHGLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_DEV0 )
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_DEV1, self.CHGLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_DEV1 )
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_FIX, self.FIXLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_FIX )
+      out, errCode = hlp.system_unix( "grep -e \"^%s$\" %s" % ( ORIG_REPO_aFIX_NAME, self.TKTLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aFIX_NAME )
+
+
+      notexistList = [ self.LBL_B, self.CREATED_STBDEV_B, self.CREATED_STBSTB_B ]
+      for t in notexistList:
+        out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( t, self.CHGLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( t, self.FIXLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"^%s$\" %s" % ( t, self.TKTLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+
+
+    #
+    # Fix hook, reset hard, re-issue
+    #
+    # hook
+    precommit_file = "%s/precommit_file.txt" % self.sw_clo_h.getDir()
+    stabilize = {}
+    stabilize["hook_pre_liv_commit_script"]  = "echo "
+    stabilize["hook_pre_liv_commit_sshuser"] = ""
+    stabilize["hook_pre_liv_commit_sshaddr"] = ""
+    self.sw_clo_h.section_stabilize_define( stabilize )
+    out, errCode = self.sw_clo_h.system_unix( "git commit -a -m 'fixed wrong hook script'" )
+    self.util_check_SUCC_scenario( out, errCode, "", "Committing, fixed wrong hook script" )
+
+    #LIV
+    ################################################
+    out, errCode = self.sw_clo_h.stabilize_liv( self.LBL_B )
+    self.util_check_SUCC_scenario( out, errCode, "", "stabilize another time, now pre-commit returning ok" )
+    ################################################
+
+    devbr_afterB_sha, devbr_afterB_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    devbr_afterB_minus1_sha, devbr_afterB_minus1_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV + "^1" )
+    stbbr_afterB_sha, stbbr_afterB_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+    stbbr_afterB_minus3_sha, stbbr_afterB_minus3_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB + "~3" )
+
+    stbdev_sha, stbdev_err = self.sw_clo_h.ref2sha( self.CREATED_STBDEV_B )
+    stbstb_sha, stbstb_err = self.sw_clo_h.ref2sha( self.CREATED_STBSTB_B )
+    stblivB_sha, stblivB_err = self.sw_clo_h.ref2sha( self.CREATED_LIV_B )
+
+    self.util_check_EQUAL( stbdev_err, 0, "create STB on develop" )
+    self.util_check_EQUAL( stbstb_err, 0, "create STB on stable" )
+    self.util_check_EQUAL( stblivB_err, 0, "create LIV on stable" )
+
+    self.util_check_EQUAL( devbr_before_sha, devbr_afterB_minus1_sha, "develop moved" )
+    self.util_check_EQUAL( stbbr_before_sha, stbbr_afterB_minus3_sha, "stable moved" )
+
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.CHGLOG_B ), "chg file MUST exsist" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.FIXLOG_B ), "fix file MUST exsist" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.TKTLOG_B ), "tkt file MUST exsist" )
+
+    self.assertFalse( os.path.exists( test_ori_h.getDir() + self.CHGLOG_B ), "chg file MUST NOT exsist" )
+    self.assertFalse( os.path.exists( test_ori_h.getDir() + self.FIXLOG_B ), "fix file MUST NOT exsist" )
+    self.assertFalse( os.path.exists( test_ori_h.getDir() + self.TKTLOG_B ), "tkt file MUST NOT exsist" )
+
+
+    out, errCode = test_ori_h.branch_switch_to_br( self.CREATED_LIV_B )
+    self.util_check_SUCC_scenario( out, errCode, "", "switch to %s" % self.CREATED_LIV_B )
+
+    #file content
+    for hlp in ( self.sw_clo_h, test_ori_h ):
+
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_DEV0, self.CHGLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_DEV0 )
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_DEV1, self.CHGLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_DEV1 )
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_FIX, self.FIXLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_FIX )
+      out, errCode = hlp.system_unix( "grep -e \"^%s$\" %s" % ( ORIG_REPO_aFIX_NAME, self.TKTLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aFIX_NAME )
+
+
+      notexistList = [ self.LBL_B, self.CREATED_STBDEV_B, self.CREATED_STBSTB_B ]
+      for t in notexistList:
+        out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( t, self.CHGLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( t, self.FIXLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"^%s$\" %s" % ( t, self.TKTLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+
+
+
+  #
+  # Test:
+  #  in this test hook returns error.
+  #  Not a problem, only chglogs have been evaluated, 
+  #    no commit, no liv, no merge (but --stb one, of course) 
+  #  Just fix, problem with hook, reset --hard and re-issue
+  #
+  def test_Stabilize_08_03_hookssh_preliv_fail( self ):
+
+    out, errCode = swgit__utils.clone_scripts_repo_integrator( self.STABILIZE_CLONE_DIR )
+    self.util_check_SUCC_scenario( out, errCode, "", "clone --integrator" )
+
+    #on ori move away from head (for push)
+    test_ori_h = self.sw_origrepo_h
+    if modetest_morerepos():
+      test_ori_h = self.sw_aremoterepo_h
+
+    out, errCode = test_ori_h.branch_switch_to_br( TEST_REPO_TAG_LIV )
+    self.util_check_SUCC_scenario( out, errCode, "", "switch to %s" % TEST_REPO_TAG_LIV )
+
+    out, errCode = self.sw_clo_h.set_cfg( self.CFG_ANYREF, "True" )
+
+    out, errCode = self.sw_clo_h.int_branch_set( TEST_REPO_BR_DEV )
+    self.util_check_SUCC_scenario( out, errCode, "", "setting intbr" )
+    out, errCode = self.sw_clo_h.branch_switch_to_int()
+    self.util_check_SUCC_scenario( out, errCode, "", "switch on intbr" )
+
+    sha_before, errCode = self.sw_clo_h.get_currsha()
+    devbr_before_sha, devbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    stbbr_before_sha, stbbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+
+    self.util_check_EQUAL( sha_before, devbr_before_sha, "on develop before starting" )
+    self.util_check_NOTEQ( devbr_before_sha, stbbr_before_sha, "develop and stable must differ" )
+
+    # change target repo, by tracking differently stable branch
+    if modetest_morerepos():
+      out, errCode = self.sw_clo_h.branch_track( ORIG_REPO_AREMOTE_NAME + "/" + ORIG_REPO_STABLE_BRANCH )
+      self.util_check_SUCC_scenario( out, errCode, "", "tracking stable int toward %s" % ORIG_REPO_STABLE_BRANCH )
+
+    # define hook
+    stabilize = {}
+    stabilize["hook_pre_liv_commit_script"]  = "return 1"
+    stabilize["hook_pre_liv_commit_sshuser"] = TEST_USER_SSH
+    stabilize["hook_pre_liv_commit_sshaddr"] = TEST_ADDR
+    self.sw_clo_h.section_stabilize_define( stabilize )
+    out, errCode = self.sw_clo_h.system_unix( "git commit -a -m 'stabilize cfg'" )
+    self.util_check_SUCC_scenario( out, errCode, "", "Committing, stabilize cfg" )
+
+    devbr_before_sha, devbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    stbbr_before_sha, stbbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+
+    #make stb liv toghether
+    ################################################
+    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, "HEAD", f_startpointlbl = True )
+    self.util_check_DENY_scenario( out, errCode, 
+                                   "returned error. Abort stabilization.", 
+                                   "stabilize with pre-commit returning error script" )
+    ################################################
+
+    devbr_afterB_sha, devbr_afterB_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    devbr_afterB_minus1_sha, devbr_afterB_minus1_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV + "^1" )
+    stbbr_afterB_sha, stbbr_afterB_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+    stbbr_afterB_minus1_sha, stbbr_afterB_minus1_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB + "~1" )
+
+    stbdev_sha, stbdev_err = self.sw_clo_h.ref2sha( self.CREATED_STBDEV_B )
+    stbstb_sha, stbstb_err = self.sw_clo_h.ref2sha( self.CREATED_STBSTB_B )
+    stblivB_sha, stblivB_err = self.sw_clo_h.ref2sha( self.CREATED_LIV_B )
+
+    self.util_check_EQUAL( stbdev_err, 0, "create STB on develop" )
+    self.util_check_EQUAL( stbstb_err, 0, "create STB on stable" )
+    self.util_check_EQUAL( stblivB_err, 1, "create LIV on stable" )
+
+    self.util_check_EQUAL( devbr_before_sha, devbr_afterB_sha, "develop moved?" )
+    self.util_check_EQUAL( stbbr_before_sha, stbbr_afterB_minus1_sha, "stable not moved?" )
+
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.CHGLOG_B ), "chg file MUST exsist" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.FIXLOG_B ), "fix file MUST exsist" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.TKTLOG_B ), "tkt file MUST exsist" )
+
+    self.assertFalse( os.path.exists( test_ori_h.getDir() + self.CHGLOG_B ), "chg file MUST NOT exsist" )
+    self.assertFalse( os.path.exists( test_ori_h.getDir() + self.FIXLOG_B ), "fix file MUST NOT exsist" )
+    self.assertFalse( os.path.exists( test_ori_h.getDir() + self.TKTLOG_B ), "tkt file MUST NOT exsist" )
+
+    #remote push did not happen
+    out, errCode = test_ori_h.branch_switch_to_br( self.CREATED_LIV_B )
+    self.util_check_DENY_scenario( out, errCode, 
+                                   "Please specify a valid reference", 
+                                   "switch to %s" % self.CREATED_LIV_B )
+
+    #file content
+    for hlp in [self.sw_clo_h]:
+
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_DEV0, self.CHGLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_DEV0 )
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_DEV1, self.CHGLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_DEV1 )
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_FIX, self.FIXLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_FIX )
+      out, errCode = hlp.system_unix( "grep -e \"^%s$\" %s" % ( ORIG_REPO_aFIX_NAME, self.TKTLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aFIX_NAME )
+
+
+      notexistList = [ self.LBL_B, self.CREATED_STBDEV_B, self.CREATED_STBSTB_B ]
+      for t in notexistList:
+        out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( t, self.CHGLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( t, self.FIXLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"^%s$\" %s" % ( t, self.TKTLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+
+
+    # reset --hard, try with wrong ssh config
+    out, errCode = self.sw_clo_h.system_unix( "git reset --hard HEAD" )
+    self.util_check_SUCC_scenario( out, errCode, "", "reset hard to re-try" )
+
+    stabilize = {}
+    stabilize["hook_pre_liv_commit_script"]  = "echo "
+    stabilize["hook_pre_liv_commit_sshuser"] = TEST_USER_SSH
+    stabilize["hook_pre_liv_commit_sshaddr"] = ""
+    self.sw_clo_h.section_stabilize_define( stabilize )
+    out, errCode = self.sw_clo_h.system_unix( "git commit -a -m 'fixed wrong hook script'" )
+    self.util_check_SUCC_scenario( out, errCode, "", "Committing, fixed wrong hook script" )
+
+    #LIV
+    ################################################
+    out, errCode = self.sw_clo_h.stabilize_liv( self.LBL_B )
+    self.util_check_DENY_scenario( out, errCode, 
+                                   "pre-liv-commit hook not well defined.", 
+                                   "stabilize another time, now pre-commit with half ssh config" )
+    ################################################
+
+
+    # reset --hard, try with wrong ssh config
+    out, errCode = self.sw_clo_h.system_unix( "git reset --hard HEAD" )
+    self.util_check_SUCC_scenario( out, errCode, "", "reset hard to re-try" )
+
+    stabilize = {}
+    stabilize["hook_pre_liv_commit_script"]  = "echo "
+    stabilize["hook_pre_liv_commit_sshuser"] = TEST_USER_SSH
+    stabilize["hook_pre_liv_commit_sshaddr"] = "127.a.2.3"
+    self.sw_clo_h.section_stabilize_define( stabilize )
+    out, errCode = self.sw_clo_h.system_unix( "git commit -a -m 'fixed wrong hook script'" )
+    self.util_check_SUCC_scenario( out, errCode, "", "Committing, fixed wrong hook script" )
+
+    #LIV
+    ################################################
+    out, errCode = self.sw_clo_h.stabilize_liv( self.LBL_B )
+    self.util_check_DENY_scenario( out, errCode, 
+                                   "returned error. Abort stabilization.",
+                                   "stabilize another time, now pre-commit with half ssh config" )
+    ################################################
+
+
+
+    #
+    # Fix hook, re-issue
+    #
+    # hook
+    stabilize = {}
+    stabilize["hook_pre_liv_commit_script"]  = "echo "
+    stabilize["hook_pre_liv_commit_sshuser"] = TEST_USER_SSH
+    stabilize["hook_pre_liv_commit_sshaddr"] = TEST_ADDR
+    self.sw_clo_h.section_stabilize_define( stabilize )
+    out, errCode = self.sw_clo_h.system_unix( "git commit -a -m 'fixed wrong hook script'" )
+    self.util_check_SUCC_scenario( out, errCode, "", "Committing, fixed wrong hook script" )
+
+    #LIV
+    ################################################
+    out, errCode = self.sw_clo_h.stabilize_liv( self.LBL_B )
+    self.util_check_SUCC_scenario( out, errCode, "", "stabilize another time, now pre-commit returning ok" )
+    ################################################
+
+    devbr_afterB_sha, devbr_afterB_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    devbr_afterB_minus1_sha, devbr_afterB_minus1_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV + "^1" )
+    stbbr_afterB_sha, stbbr_afterB_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+    stbbr_afterB_minus5_sha, stbbr_afterB_minus5_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB + "~5" )
+
+    stbdev_sha, stbdev_err = self.sw_clo_h.ref2sha( self.CREATED_STBDEV_B )
+    stbstb_sha, stbstb_err = self.sw_clo_h.ref2sha( self.CREATED_STBSTB_B )
+    stblivB_sha, stblivB_err = self.sw_clo_h.ref2sha( self.CREATED_LIV_B )
+
+    self.util_check_EQUAL( stbdev_err, 0, "create STB on develop" )
+    self.util_check_EQUAL( stbstb_err, 0, "create STB on stable" )
+    self.util_check_EQUAL( stblivB_err, 0, "create LIV on stable" )
+
+    self.util_check_EQUAL( devbr_before_sha, devbr_afterB_minus1_sha, "develop moved" )
+    self.util_check_EQUAL( stbbr_before_sha, stbbr_afterB_minus5_sha, "stable moved" )
+
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.CHGLOG_B ), "chg file MUST exsist" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.FIXLOG_B ), "fix file MUST exsist" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.TKTLOG_B ), "tkt file MUST exsist" )
+
+    self.assertFalse( os.path.exists( test_ori_h.getDir() + self.CHGLOG_B ), "chg file MUST NOT exsist" )
+    self.assertFalse( os.path.exists( test_ori_h.getDir() + self.FIXLOG_B ), "fix file MUST NOT exsist" )
+    self.assertFalse( os.path.exists( test_ori_h.getDir() + self.TKTLOG_B ), "tkt file MUST NOT exsist" )
+
+
+    out, errCode = test_ori_h.branch_switch_to_br( self.CREATED_LIV_B )
+    self.util_check_SUCC_scenario( out, errCode, "", "switch to %s" % self.CREATED_LIV_B )
+
+    #file content
+    for hlp in ( self.sw_clo_h, test_ori_h ):
+
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_DEV0, self.CHGLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_DEV0 )
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_DEV1, self.CHGLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_DEV1 )
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_FIX, self.FIXLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_FIX )
+      out, errCode = hlp.system_unix( "grep -e \"^%s$\" %s" % ( ORIG_REPO_aFIX_NAME, self.TKTLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aFIX_NAME )
+
+
+      notexistList = [ self.LBL_B, self.CREATED_STBDEV_B, self.CREATED_STBSTB_B ]
+      for t in notexistList:
+        out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( t, self.CHGLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( t, self.FIXLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"^%s$\" %s" % ( t, self.TKTLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+
+
+  def test_Stabilize_09_00_CHGLOG_file( self ):
+
+    out, errCode = swgit__utils.clone_scripts_repo_integrator( self.STABILIZE_CLONE_DIR )
+    self.util_check_SUCC_scenario( out, errCode, "", "clone --integrator" )
+
+    #on ori move away from head (for push)
+    test_ori_h = self.sw_origrepo_h
+    if modetest_morerepos():
+      test_ori_h = self.sw_aremoterepo_h
+
+    out, errCode = test_ori_h.branch_switch_to_br( TEST_REPO_TAG_LIV )
+    self.util_check_SUCC_scenario( out, errCode, "", "switch to %s" % TEST_REPO_TAG_LIV )
+
+    out, errCode = self.sw_clo_h.set_cfg( self.CFG_ANYREF, "True" )
+
+    out, errCode = self.sw_clo_h.int_branch_set( TEST_REPO_BR_DEV )
+    self.util_check_SUCC_scenario( out, errCode, "", "setting intbr" )
+    out, errCode = self.sw_clo_h.branch_switch_to_int()
+    self.util_check_SUCC_scenario( out, errCode, "", "switch on intbr" )
+
+    sha_before, errCode = self.sw_clo_h.get_currsha()
+    devbr_before_sha, devbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    stbbr_before_sha, stbbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+
+    self.util_check_EQUAL( sha_before, devbr_before_sha, "on develop before starting" )
+    self.util_check_NOTEQ( devbr_before_sha, stbbr_before_sha, "develop and stable must differ" )
+
+    # change target repo, by tracking differently stable branch
+    if modetest_morerepos():
+      out, errCode = self.sw_clo_h.branch_track( ORIG_REPO_AREMOTE_NAME + "/" + ORIG_REPO_STABLE_BRANCH )
+      self.util_check_SUCC_scenario( out, errCode, "", "tracking stable int toward %s" % ORIG_REPO_STABLE_BRANCH )
+
+    # define hook
+    stabilize = {}
+    stabilize["chglog_fmt_file"]  = "MyFmt:  %(refname)"
+    self.sw_clo_h.section_stabilize_chglogfile_define( stabilize )
+    out, errCode = self.sw_clo_h.system_unix( "git commit -a -m 'stabilize cfg'" )
+    self.util_check_SUCC_scenario( out, errCode, "", "Committing, stabilize cfg" )
+
+    devbr_before_sha, devbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    stbbr_before_sha, stbbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+
+    #make stb liv toghether
+    ################################################
+    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, "HEAD" )
+    self.util_check_SUCC_scenario( out, errCode, "", "stabilize with pre-commit script" )
+    ################################################
+
+    devbr_afterB_sha, devbr_afterB_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    devbr_afterB_minus1_sha, devbr_afterB_minus1_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV + "^1" )
+    stbbr_afterB_sha, stbbr_afterB_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+    stbbr_afterB_minus2_sha, stbbr_afterB_minus2_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB + "~2" )
+    stblivB_sha, stblivB_err = self.sw_clo_h.ref2sha( self.CREATED_LIV_B )
+
+    self.util_check_EQUAL( devbr_before_sha, devbr_afterB_minus1_sha, "develop not moved" )
+    self.util_check_EQUAL( stbbr_before_sha, stbbr_afterB_minus2_sha, "develop not moved" )
+    self.util_check_EQUAL( stbbr_afterB_sha,  stblivB_sha, "livB label not created" )
+
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.CHGLOG_B ), "chg file MUST exsist" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.FIXLOG_B ), "fix file MUST exsist" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.TKTLOG_B ), "tkt file MUST exsist" )
+
+    out, errCode = test_ori_h.branch_switch_to_br( self.CREATED_LIV_B )
+    self.util_check_SUCC_scenario( out, errCode, "", "switch to %s" % self.CREATED_LIV_B )
+
+    #file content
+    for hlp in ( self.sw_clo_h, test_ori_h ):
+
+      out, errCode = hlp.system_unix( "grep -e \"MyFmt:.*%s\" %s" % ( ORIG_REPO_aBRANCH_DEV0, self.CHGLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_DEV0 )
+      out, errCode = hlp.system_unix( "grep -e \"MyFmt:.*%s\" %s" % ( ORIG_REPO_aBRANCH_DEV1, self.CHGLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_DEV1 )
+      #Only CHGLOG has customized format => FIXLOG has default one
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_FIX, self.FIXLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_FIX )
+      out, errCode = hlp.system_unix( "grep -e \"^%s$\" %s" % ( ORIG_REPO_aFIX_NAME, self.TKTLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aFIX_NAME )
+
+
+      notexistList = [ self.LBL_B, self.CREATED_STBDEV_B, self.CREATED_STBSTB_B ]
+      for t in notexistList:
+        out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( t, self.CHGLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( t, self.FIXLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"^%s$\" %s" % ( t, self.TKTLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"MyFmt:.*%s\" %s" % ( t, self.CHGLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"MyFmt:.*%s\" %s" % ( t, self.FIXLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+
+
+  #
+  # In ConfigParser when you want to specify multiple lines, 
+  #    those lines must be indented in respect to first line
+  #
+  def test_Stabilize_09_01_CHGLOG_file_multiline( self ):
+
+    out, errCode = swgit__utils.clone_scripts_repo_integrator( self.STABILIZE_CLONE_DIR )
+    self.util_check_SUCC_scenario( out, errCode, "", "clone --integrator" )
+
+    #on ori move away from head (for push)
+    test_ori_h = self.sw_origrepo_h
+    if modetest_morerepos():
+      test_ori_h = self.sw_aremoterepo_h
+
+    out, errCode = test_ori_h.branch_switch_to_br( TEST_REPO_TAG_LIV )
+    self.util_check_SUCC_scenario( out, errCode, "", "switch to %s" % TEST_REPO_TAG_LIV )
+
+    out, errCode = self.sw_clo_h.set_cfg( self.CFG_ANYREF, "True" )
+
+    out, errCode = self.sw_clo_h.int_branch_set( TEST_REPO_BR_DEV )
+    self.util_check_SUCC_scenario( out, errCode, "", "setting intbr" )
+    out, errCode = self.sw_clo_h.branch_switch_to_int()
+    self.util_check_SUCC_scenario( out, errCode, "", "switch on intbr" )
+
+    sha_before, errCode = self.sw_clo_h.get_currsha()
+    devbr_before_sha, devbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    stbbr_before_sha, stbbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+
+    self.util_check_EQUAL( sha_before, devbr_before_sha, "on develop before starting" )
+    self.util_check_NOTEQ( devbr_before_sha, stbbr_before_sha, "develop and stable must differ" )
+
+    # change target repo, by tracking differently stable branch
+    if modetest_morerepos():
+      out, errCode = self.sw_clo_h.branch_track( ORIG_REPO_AREMOTE_NAME + "/" + ORIG_REPO_STABLE_BRANCH )
+      self.util_check_SUCC_scenario( out, errCode, "", "tracking stable int toward %s" % ORIG_REPO_STABLE_BRANCH )
+
+    # define hook
+    stabilize = {}
+    # NOTE: '\n  ' two spaces to indent second line
+    ################################################
+    stabilize["chglog_fmt_file"]  = "MyFmt:  %(refname)\n  Olaaa:  %(refname)"
+    ################################################
+    self.sw_clo_h.section_stabilize_chglogfile_define( stabilize )
+    out, errCode = self.sw_clo_h.system_unix( "git commit -a -m 'stabilize cfg'" )
+    self.util_check_SUCC_scenario( out, errCode, "", "Committing, stabilize cfg" )
+
+    devbr_before_sha, devbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    stbbr_before_sha, stbbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+
+    #make stb liv toghether
+    ################################################
+    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, "HEAD" )
+    self.util_check_SUCC_scenario( out, errCode, "", "stabilize with pre-commit script" )
+    ################################################
+
+    devbr_afterB_sha, devbr_afterB_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    devbr_afterB_minus1_sha, devbr_afterB_minus1_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV + "^1" )
+    stbbr_afterB_sha, stbbr_afterB_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+    stbbr_afterB_minus2_sha, stbbr_afterB_minus2_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB + "~2" )
+    stblivB_sha, stblivB_err = self.sw_clo_h.ref2sha( self.CREATED_LIV_B )
+
+    self.util_check_EQUAL( devbr_before_sha, devbr_afterB_minus1_sha, "develop not moved" )
+    self.util_check_EQUAL( stbbr_before_sha, stbbr_afterB_minus2_sha, "develop not moved" )
+    self.util_check_EQUAL( stbbr_afterB_sha,  stblivB_sha, "livB label not created" )
+
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.CHGLOG_B ), "chg file MUST exsist" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.FIXLOG_B ), "fix file MUST exsist" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.TKTLOG_B ), "tkt file MUST exsist" )
+
+    out, errCode = test_ori_h.branch_switch_to_br( self.CREATED_LIV_B )
+    self.util_check_SUCC_scenario( out, errCode, "", "switch to %s" % self.CREATED_LIV_B )
+
+    #file content
+    for hlp in ( self.sw_clo_h, test_ori_h ):
+
+      out, errCode = hlp.system_unix( "grep -e \"MyFmt:.*%s\" %s" % ( ORIG_REPO_aBRANCH_DEV0, self.CHGLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_DEV0 )
+      out, errCode = hlp.system_unix( "grep -e \"Olaaa:.*%s\" %s" % ( ORIG_REPO_aBRANCH_DEV0, self.CHGLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_DEV0 )
+      out, errCode = hlp.system_unix( "grep -e \"MyFmt:.*%s\" %s" % ( ORIG_REPO_aBRANCH_DEV1, self.CHGLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_DEV1 )
+      out, errCode = hlp.system_unix( "grep -e \"Olaaa:.*%s\" %s" % ( ORIG_REPO_aBRANCH_DEV1, self.CHGLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_DEV1 )
+      #Only CHGLOG has customized format => FIXLOG has default one
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_FIX, self.FIXLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_FIX )
+      out, errCode = hlp.system_unix( "grep -e \"^%s$\" %s" % ( ORIG_REPO_aFIX_NAME, self.TKTLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aFIX_NAME )
+
+
+      notexistList = [ self.LBL_B, self.CREATED_STBDEV_B, self.CREATED_STBSTB_B ]
+      for t in notexistList:
+        out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( t, self.CHGLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( t, self.FIXLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"^%s$\" %s" % ( t, self.TKTLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"MyFmt:.*%s\" %s" % ( t, self.CHGLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"Olaaa:.*%s\" %s" % ( t, self.CHGLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"MyFmt:.*%s\" %s" % ( t, self.FIXLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"Olaaa:.*%s\" %s" % ( t, self.FIXLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+
+
+
+  def test_Stabilize_09_02_FIXLOG_file( self ):
+
+    out, errCode = swgit__utils.clone_scripts_repo_integrator( self.STABILIZE_CLONE_DIR )
+    self.util_check_SUCC_scenario( out, errCode, "", "clone --integrator" )
+
+    #on ori move away from head (for push)
+    test_ori_h = self.sw_origrepo_h
+    if modetest_morerepos():
+      test_ori_h = self.sw_aremoterepo_h
+
+    out, errCode = test_ori_h.branch_switch_to_br( TEST_REPO_TAG_LIV )
+    self.util_check_SUCC_scenario( out, errCode, "", "switch to %s" % TEST_REPO_TAG_LIV )
+
+    out, errCode = self.sw_clo_h.set_cfg( self.CFG_ANYREF, "True" )
+
+    out, errCode = self.sw_clo_h.int_branch_set( TEST_REPO_BR_DEV )
+    self.util_check_SUCC_scenario( out, errCode, "", "setting intbr" )
+    out, errCode = self.sw_clo_h.branch_switch_to_int()
+    self.util_check_SUCC_scenario( out, errCode, "", "switch on intbr" )
+
+    sha_before, errCode = self.sw_clo_h.get_currsha()
+    devbr_before_sha, devbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    stbbr_before_sha, stbbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+
+    self.util_check_EQUAL( sha_before, devbr_before_sha, "on develop before starting" )
+    self.util_check_NOTEQ( devbr_before_sha, stbbr_before_sha, "develop and stable must differ" )
+
+    # change target repo, by tracking differently stable branch
+    if modetest_morerepos():
+      out, errCode = self.sw_clo_h.branch_track( ORIG_REPO_AREMOTE_NAME + "/" + ORIG_REPO_STABLE_BRANCH )
+      self.util_check_SUCC_scenario( out, errCode, "", "tracking stable int toward %s" % ORIG_REPO_STABLE_BRANCH )
+
+    # define hook
+    stabilize = {}
+    stabilize["fixlog_fmt_file"]  = "MyFmt:  %(refname)"
+    self.sw_clo_h.section_stabilize_fixlogfile_define( stabilize )
+    out, errCode = self.sw_clo_h.system_unix( "git commit -a -m 'stabilize cfg'" )
+    self.util_check_SUCC_scenario( out, errCode, "", "Committing, stabilize cfg" )
+
+    devbr_before_sha, devbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    stbbr_before_sha, stbbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+
+    #make stb liv toghether
+    ################################################
+    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, "HEAD" )
+    self.util_check_SUCC_scenario( out, errCode, "", "stabilize with pre-commit script" )
+    ################################################
+
+    devbr_afterB_sha, devbr_afterB_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    devbr_afterB_minus1_sha, devbr_afterB_minus1_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV + "^1" )
+    stbbr_afterB_sha, stbbr_afterB_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+    stbbr_afterB_minus2_sha, stbbr_afterB_minus2_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB + "~2" )
+    stblivB_sha, stblivB_err = self.sw_clo_h.ref2sha( self.CREATED_LIV_B )
+
+    self.util_check_EQUAL( devbr_before_sha, devbr_afterB_minus1_sha, "develop not moved" )
+    self.util_check_EQUAL( stbbr_before_sha, stbbr_afterB_minus2_sha, "develop not moved" )
+    self.util_check_EQUAL( stbbr_afterB_sha,  stblivB_sha, "livB label not created" )
+
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.CHGLOG_B ), "chg file MUST exsist" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.FIXLOG_B ), "fix file MUST exsist" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.TKTLOG_B ), "tkt file MUST exsist" )
+
+    out, errCode = test_ori_h.branch_switch_to_br( self.CREATED_LIV_B )
+    self.util_check_SUCC_scenario( out, errCode, "", "switch to %s" % self.CREATED_LIV_B )
+
+    #file content
+    for hlp in ( self.sw_clo_h, test_ori_h ):
+
+      #Only FIXLOG has customized format => CHGLOG has default one
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_DEV0, self.CHGLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_DEV0 )
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_DEV1, self.CHGLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_DEV1 )
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_FIX, self.FIXLOG_B ) )
+      self.util_check_NOTEQ( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_FIX )
+      out, errCode = hlp.system_unix( "grep -e \"MyFmt:.*%s\" %s" % ( ORIG_REPO_aBRANCH_FIX, self.FIXLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_FIX )
+      out, errCode = hlp.system_unix( "grep -e \"^%s$\" %s" % ( ORIG_REPO_aFIX_NAME, self.TKTLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aFIX_NAME )
+
+
+      notexistList = [ self.LBL_B, self.CREATED_STBDEV_B, self.CREATED_STBSTB_B ]
+      for t in notexistList:
+        out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( t, self.CHGLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( t, self.FIXLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"^%s$\" %s" % ( t, self.TKTLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"MyFmt:.*%s\" %s" % ( t, self.CHGLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"MyFmt:.*%s\" %s" % ( t, self.FIXLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+
+
+  def test_Stabilize_09_03_FIXLOG_file_multiline( self ):
+
+    out, errCode = swgit__utils.clone_scripts_repo_integrator( self.STABILIZE_CLONE_DIR )
+    self.util_check_SUCC_scenario( out, errCode, "", "clone --integrator" )
+
+    #on ori move away from head (for push)
+    test_ori_h = self.sw_origrepo_h
+    if modetest_morerepos():
+      test_ori_h = self.sw_aremoterepo_h
+
+    out, errCode = test_ori_h.branch_switch_to_br( TEST_REPO_TAG_LIV )
+    self.util_check_SUCC_scenario( out, errCode, "", "switch to %s" % TEST_REPO_TAG_LIV )
+
+    out, errCode = self.sw_clo_h.set_cfg( self.CFG_ANYREF, "True" )
+
+    out, errCode = self.sw_clo_h.int_branch_set( TEST_REPO_BR_DEV )
+    self.util_check_SUCC_scenario( out, errCode, "", "setting intbr" )
+    out, errCode = self.sw_clo_h.branch_switch_to_int()
+    self.util_check_SUCC_scenario( out, errCode, "", "switch on intbr" )
+
+    sha_before, errCode = self.sw_clo_h.get_currsha()
+    devbr_before_sha, devbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    stbbr_before_sha, stbbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+
+    self.util_check_EQUAL( sha_before, devbr_before_sha, "on develop before starting" )
+    self.util_check_NOTEQ( devbr_before_sha, stbbr_before_sha, "develop and stable must differ" )
+
+    # change target repo, by tracking differently stable branch
+    if modetest_morerepos():
+      out, errCode = self.sw_clo_h.branch_track( ORIG_REPO_AREMOTE_NAME + "/" + ORIG_REPO_STABLE_BRANCH )
+      self.util_check_SUCC_scenario( out, errCode, "", "tracking stable int toward %s" % ORIG_REPO_STABLE_BRANCH )
+
+    # define hook
+    stabilize = {}
+    stabilize["fixlog_fmt_file"]  = "MyFmt:  %(refname)\n  Olaaa:  %(refname)\n    aaa"
+    self.sw_clo_h.section_stabilize_fixlogfile_define( stabilize )
+    out, errCode = self.sw_clo_h.system_unix( "git commit -a -m 'stabilize cfg'" )
+    self.util_check_SUCC_scenario( out, errCode, "", "Committing, stabilize cfg" )
+
+    devbr_before_sha, devbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    stbbr_before_sha, stbbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+
+    #make stb liv toghether
+    ################################################
+    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, "HEAD" )
+    self.util_check_SUCC_scenario( out, errCode, "", "stabilize with pre-commit script" )
+    ################################################
+
+    devbr_afterB_sha, devbr_afterB_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    devbr_afterB_minus1_sha, devbr_afterB_minus1_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV + "^1" )
+    stbbr_afterB_sha, stbbr_afterB_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+    stbbr_afterB_minus2_sha, stbbr_afterB_minus2_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB + "~2" )
+    stblivB_sha, stblivB_err = self.sw_clo_h.ref2sha( self.CREATED_LIV_B )
+
+    self.util_check_EQUAL( devbr_before_sha, devbr_afterB_minus1_sha, "develop not moved" )
+    self.util_check_EQUAL( stbbr_before_sha, stbbr_afterB_minus2_sha, "develop not moved" )
+    self.util_check_EQUAL( stbbr_afterB_sha,  stblivB_sha, "livB label not created" )
+
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.CHGLOG_B ), "chg file MUST exsist" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.FIXLOG_B ), "fix file MUST exsist" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.TKTLOG_B ), "tkt file MUST exsist" )
+
+    out, errCode = test_ori_h.branch_switch_to_br( self.CREATED_LIV_B )
+    self.util_check_SUCC_scenario( out, errCode, "", "switch to %s" % self.CREATED_LIV_B )
+
+    #file content
+    for hlp in ( self.sw_clo_h, test_ori_h ):
+
+      #Only FIXLOG has customized format => CHGLOG has default one
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_DEV0, self.CHGLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_DEV0 )
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_DEV1, self.CHGLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_DEV1 )
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_FIX, self.FIXLOG_B ) )
+      self.util_check_NOTEQ( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_FIX )
+      out, errCode = hlp.system_unix( "grep -e \"MyFmt:.*%s\" %s" % ( ORIG_REPO_aBRANCH_FIX, self.FIXLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_FIX )
+      out, errCode = hlp.system_unix( "grep -e \"Olaaa:.*%s\" %s" % ( ORIG_REPO_aBRANCH_FIX, self.FIXLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_FIX )
+      out, errCode = hlp.system_unix( "grep -e \"^%s$\" %s" % ( ORIG_REPO_aFIX_NAME, self.TKTLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aFIX_NAME )
+
+
+      notexistList = [ self.LBL_B, self.CREATED_STBDEV_B, self.CREATED_STBSTB_B ]
+      for t in notexistList:
+        out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( t, self.CHGLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( t, self.FIXLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"^%s$\" %s" % ( t, self.TKTLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"MyFmt:.*%s\" %s" % ( t, self.CHGLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"MyFmt:.*%s\" %s" % ( t, self.FIXLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"Olaaa:.*%s\" %s" % ( t, self.FIXLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+
+
+  def test_Stabilize_09_04_CHGLOG_mail_onlyfmt( self ):
+
+    out, errCode = swgit__utils.clone_scripts_repo_integrator( self.STABILIZE_CLONE_DIR )
+    self.util_check_SUCC_scenario( out, errCode, "", "clone --integrator" )
+
+    #on ori move away from head (for push)
+    test_ori_h = self.sw_origrepo_h
+    if modetest_morerepos():
+      test_ori_h = self.sw_aremoterepo_h
+
+    out, errCode = test_ori_h.branch_switch_to_br( TEST_REPO_TAG_LIV )
+    self.util_check_SUCC_scenario( out, errCode, "", "switch to %s" % TEST_REPO_TAG_LIV )
+
+    out, errCode = self.sw_clo_h.set_cfg( self.CFG_ANYREF, "True" )
+
+    out, errCode = self.sw_clo_h.int_branch_set( TEST_REPO_BR_DEV )
+    self.util_check_SUCC_scenario( out, errCode, "", "setting intbr" )
+    out, errCode = self.sw_clo_h.branch_switch_to_int()
+    self.util_check_SUCC_scenario( out, errCode, "", "switch on intbr" )
+
+    sha_before, errCode = self.sw_clo_h.get_currsha()
+    devbr_before_sha, devbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    stbbr_before_sha, stbbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+
+    self.util_check_EQUAL( sha_before, devbr_before_sha, "on develop before starting" )
+    self.util_check_NOTEQ( devbr_before_sha, stbbr_before_sha, "develop and stable must differ" )
+
+    # change target repo, by tracking differently stable branch
+    if modetest_morerepos():
+      out, errCode = self.sw_clo_h.branch_track( ORIG_REPO_AREMOTE_NAME + "/" + ORIG_REPO_STABLE_BRANCH )
+      self.util_check_SUCC_scenario( out, errCode, "", "tracking stable int toward %s" % ORIG_REPO_STABLE_BRANCH )
+
+    # define hook
+    stabilize = {}
+    stabilize["chglog_fmt_mail"]   = "MyFmt:  %(refname)"
+    stabilize["chglog_sort_mail"]  = ""
+    self.sw_clo_h.section_stabilize_chglogmail_define( stabilize )
+    out, errCode = self.sw_clo_h.system_unix( "git commit -a -m 'stabilize cfg'" )
+    self.util_check_SUCC_scenario( out, errCode, "", "Committing, stabilize cfg" )
+
+    devbr_before_sha, devbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    stbbr_before_sha, stbbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+
+    #make stb liv toghether
+    ################################################
+    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, "HEAD" )
+    self.util_check_SUCC_scenario( out, errCode, "", "stabilize with pre-commit script" )
+    ################################################
+
+    devbr_afterB_sha, devbr_afterB_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
+    devbr_afterB_minus1_sha, devbr_afterB_minus1_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV + "^1" )
+    stbbr_afterB_sha, stbbr_afterB_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
+    stbbr_afterB_minus2_sha, stbbr_afterB_minus2_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB + "~2" )
+    stblivB_sha, stblivB_err = self.sw_clo_h.ref2sha( self.CREATED_LIV_B )
+
+    self.util_check_EQUAL( devbr_before_sha, devbr_afterB_minus1_sha, "develop not moved" )
+    self.util_check_EQUAL( stbbr_before_sha, stbbr_afterB_minus2_sha, "develop not moved" )
+    self.util_check_EQUAL( stbbr_afterB_sha,  stblivB_sha, "livB label not created" )
+
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.CHGLOG_B ), "chg file MUST exsist" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.FIXLOG_B ), "fix file MUST exsist" )
+    self.assertTrue( os.path.exists( self.sw_clo_h.getDir() + self.TKTLOG_B ), "tkt file MUST exsist" )
+
+    out, errCode = test_ori_h.branch_switch_to_br( self.CREATED_LIV_B )
+    self.util_check_SUCC_scenario( out, errCode, "", "switch to %s" % self.CREATED_LIV_B )
+
+    #file content
+    for hlp in ( self.sw_clo_h, test_ori_h ):
+
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_DEV0, self.CHGLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_DEV0 )
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_DEV1, self.CHGLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_DEV1 )
+      out, errCode = hlp.system_unix( "grep -e \"MyFmt:.*%s\" %s" % ( ORIG_REPO_aBRANCH_DEV0, self.CHGLOG_B ) )
+      self.util_check_NOTEQ( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_DEV0 )
+      out, errCode = hlp.system_unix( "grep -e \"MyFmt:.*%s\" %s" % ( ORIG_REPO_aBRANCH_DEV1, self.CHGLOG_B ) )
+      self.util_check_NOTEQ( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_DEV1 )
+      #Only CHGLOG has customized format => FIXLOG has default one
+      out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( ORIG_REPO_aBRANCH_FIX, self.FIXLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aBRANCH_FIX )
+      out, errCode = hlp.system_unix( "grep -e \"^%s$\" %s" % ( ORIG_REPO_aFIX_NAME, self.TKTLOG_B ) )
+      self.util_check_EQUAL( errCode, 0, "must exists %s" % ORIG_REPO_aFIX_NAME )
+
+
+      notexistList = [ self.LBL_B, self.CREATED_STBDEV_B, self.CREATED_STBSTB_B ]
+      for t in notexistList:
+        out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( t, self.CHGLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"Ref:.*%s\" %s" % ( t, self.FIXLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"^%s$\" %s" % ( t, self.TKTLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"MyFmt:.*%s\" %s" % ( t, self.CHGLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
+        out, errCode = hlp.system_unix( "grep -e \"MyFmt:.*%s\" %s" % ( t, self.FIXLOG_B ) )
+        self.util_check_NOTEQ( errCode, 0, "must NOT exists %s" % t )
 
 
 if __name__ == '__main__':
