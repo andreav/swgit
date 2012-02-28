@@ -398,7 +398,7 @@ class swgit__utils:
     cmd = "cd %s && %s branch --track %s %s" % ( self.repodir_, SWGIT, br, all )
     return myCommand( cmd )
 
-  def branch_list_track( self, track = False ):
+  def branch_list_track( self ):
     cmd = "cd %s && %s branch --list-tracked" % ( self.repodir_, SWGIT )
     return myCommand( cmd )
 
