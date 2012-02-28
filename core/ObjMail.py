@@ -135,7 +135,7 @@ class ObjMailBase( ObjCfgMail ):
 ################
 class ObjMailStabilize( ObjMailBase ):
   def __init__( self ):
-    super(ObjMailStabilize, self ).__init__( SWFILE_MAILCFG, SWCFG_MAIL_STABILIZE_SECT )
+    super(ObjMailStabilize, self ).__init__( SWFILE_MAILCFG, SWCFG_STABILIZE_SECT )
     self.load_cfg()
 
 #############

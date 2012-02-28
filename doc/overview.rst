@@ -51,7 +51,7 @@ When working with :doc:`projects`, shell access on 'origin' repository must be a
 
 | At the moment, swgit only works on Linux platforms.
 | Thanks to its python nature, Windows porting should be not too difficult. 
-| Anyone who wishes to contribute, can contribute. 
+| Anyone who wishes to contribute is welcome!
 
 
 History full of informations

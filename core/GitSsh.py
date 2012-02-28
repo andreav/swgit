@@ -24,21 +24,6 @@ import ObjCfg
 from Common import *
 from ObjLog import *
 
-DEFAULT_SSH_CFG = """\
-#
-# Please run
-#   swgit ssh --show-local-cfg
-# for more informations
-#
-#[ssh]
-#bin            = (default: ssh)
-#identity-1     = A private identity to be provided
-#identity-2     =      "              "
-# ... 
-#use-nopassw-id = True/False: use default no-passw identity, if created
-
-"""
-
 
 def create_git_key():
   if os.path.exists( Defines.SWGIT_SSH_IDENTITY_NOPASS_PRIV ):
