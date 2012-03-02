@@ -336,6 +336,7 @@ Usage: swgit commit -m <message> [-a] [--dev] [--fix] [<repository>...] """
   parser.add_option_group( mgt_group )
   parser.add_option_group( output_group )
   (options, args)  = parser.parse_args()
+  args = parser.largs
 
   global g_args
   g_args = args

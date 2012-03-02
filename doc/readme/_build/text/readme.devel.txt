@@ -230,7 +230,7 @@ Pushing
       * assure only few HEADs exist in repository. Every HEAD has a
         precise role:
 
-           1. develop/stabel branches
+           1. develop/stable branches
 
            2. team feature branches
 

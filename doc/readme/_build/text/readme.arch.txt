@@ -1,6 +1,6 @@
 
-Repository Structure
-********************
+Repository Lifeclycle
+*********************
 
 Every numbered point is commented below.
 

@@ -846,8 +846,12 @@ class Test_Branch( Test_Base ):
     self.assertEqual( errCode, 0, "swgitUtil_.branch_delete_d( %s ) FAILED - \n%s\n" % ( self.CREATED_BR, out ) )
 
     # delete remote branch
-    out, errCode = self.swgitUtil_.branch_delete_d( ORIG_REPO_STABLE_BRANCH )
-    self.util_check_DENY_scenario( out, errCode, "Not existing local branch, try using -e/-E option instead", "delete remote branch" )
+    if modetest_morerepos():
+      out, errCode = self.swgitUtil_.branch_delete_d( ORIG_REPO_STABLE_BRANCH )
+      self.util_check_DENY_scenario( out, errCode, "Multiple matches found, please specify one among", "delete remote branch" )
+    else:
+      out, errCode = self.swgitUtil_.branch_delete_d( ORIG_REPO_STABLE_BRANCH )
+      self.util_check_DENY_scenario( out, errCode, "Not existing local branch, try using -e/-E option instead", "delete remote branch" )
 
     #
     # delete branch with contributes
@@ -1251,7 +1255,7 @@ class Test_Branch( Test_Base ):
 
     #craete 
     out, errCode = self.swgitUtil_.branch_create( self.BRANCH_NAME )
-    self.util_check_DENY_scenario( out, errCode, "Without integration branch set, plese specify --src", "create br from detahced" ) 
+    self.util_check_DENY_scenario( out, errCode, "Without integration branch set, plese specify --source", "create br from detahced" ) 
 
     #craete 
     out, errCode = self.swgitUtil_.branch_create_src( self.BRANCH_NAME, src = "HEAD" )
@@ -1297,7 +1301,7 @@ class Test_Branch( Test_Base ):
 
     #craete 
     out, errCode = self.swgitUtil_.branch_create( self.BRANCH_NAME )
-    self.util_check_DENY_scenario( out, errCode, "In 'detached head', plese specify --src", "create br from detahced" ) 
+    self.util_check_DENY_scenario( out, errCode, "In 'detached head', plese specify --source", "create br from detahced" ) 
 
     #craete 
     out, errCode = self.swgitUtil_.branch_create_src( self.BRANCH_NAME, src = "HEAD" )
@@ -1347,10 +1351,10 @@ class Test_Branch( Test_Base ):
     #craete 
     if modetest_morerepos():
       out, errCode = self.swgitUtil_.branch_create( self.BRANCH_NAME )
-      self.util_check_DENY_scenario( out, errCode, "Without integration branch set, plese specify --src while creating branch.", "create br from detahced" ) 
+      self.util_check_DENY_scenario( out, errCode, "Without integration branch set, plese specify --source while creating branch.", "create br from detahced" ) 
     else:
       out, errCode = self.swgitUtil_.branch_create( self.BRANCH_NAME )
-      self.util_check_DENY_scenario( out, errCode, "In 'detached head', plese specify --src", "create br from detahced" ) 
+      self.util_check_DENY_scenario( out, errCode, "In 'detached head', plese specify --source", "create br from detahced" ) 
 
     #craete 
     out, errCode = self.swgitUtil_.branch_create_src( self.BRANCH_NAME, src = "HEAD" )
@@ -1405,7 +1409,7 @@ class Test_Branch( Test_Base ):
 
     #craete 
     out, errCode = self.swgitUtil_.branch_create( self.BRANCH_NAME )
-    self.util_check_DENY_scenario( out, errCode, "Without integration branch set, plese specify --src", "create br from detahced" ) 
+    self.util_check_DENY_scenario( out, errCode, "Without integration branch set, plese specify --source", "create br from detahced" ) 
 
     #craete 
     out, errCode = self.swgitUtil_.branch_create_src( self.BRANCH_NAME, src = "HEAD" )

@@ -81,7 +81,7 @@ Reporting on *INT/stable* (STB labels)
    Periodically Integrator will report a worth *INT/develop* commit
    onto *INT/stable* by:
 
-         swgit stabilize --stb --src <reference> Drop.A
+         swgit stabilize --stb --source <reference> Drop.A
 
    *Drop.A* is the name of next delivery. This name will be matched
    against STB label regexp configuration parameter; default value is:
@@ -93,14 +93,14 @@ Reporting on *INT/stable* (STB labels)
 
    This command will:
 
-   * Merge --src <reference> argument into target *INT/stable*
+   * Merge --source <reference> argument into target *INT/stable*
 
    * Create 1/0/0/0/andreav/INT/develop/STB/Drop.A - This mark *INT/develop* starting point.Only if --start-point-label option is provided.
 
    * Create 1/0/0/0/andreav/INT/stable/STB/Drop.A  - This mark
      *INT/stable* arrival point.
 
-   Note: By default, --src argument must be a NGT tag.
+   Note: By default, --source argument must be a NGT tag.
      This encourages continuous testing agile principle.If you need to stabilize any reference, please issue inside you repository:
 
         **swgit config swgit.stabilize-anyref True**
@@ -245,7 +245,7 @@ Configurations
 
          swgit stabilize --stb --start-point-label
 
-      If user wants to mark --src reference, he/she can provide
+      If user wants to mark --source reference, he/she can provide
       previous option in order to create /INT/develop/STB label.
 
       This option is ignored when stabilizing onto CST branches.

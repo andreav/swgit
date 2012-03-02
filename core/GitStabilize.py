@@ -39,6 +39,7 @@ g_fixes = []
 g_chgfname = None
 g_fixfname = None
 g_tktfname = None
+_g_rargs   = []
 
 
 # 1. eval from cb
@@ -128,6 +129,34 @@ def create_rel_path():
     return 1 
   return 0
 
+def show_preview( options ):
+
+  for (dir, tbs_ref) in g_srcoptions_map.items():
+
+    if dir == '.': #root
+
+      dir = os.getcwd()
+      bound = '='*len(dir)
+      strhead = "\n%s\n\n" % "\n".join( (bound,dir,bound) )
+
+      prev_ref = g_targetbr
+
+    else: #submods
+
+      dir = dir2reponame( dir )
+      bound = '='*len(dir)
+      strhead = "\n%s\n\n" % "\n".join( (bound,dir,bound) )
+
+      prev_ref, errCode = submod_getrepover_atref( Env.getLocalRoot(), dir, g_targetbr )
+      if errCode != 0:
+        GLog.f( GLog.E, strhead + smodref )
+        return 1
+
+    cmd_diff = "cd %s && git diff %s %s %s" % ( dir, prev_ref, tbs_ref, " ".join( _g_rargs ) )
+    out, errCode = myCommand( cmd_diff )
+    GLog.f( GLog.E, strhead + out )
+
+  return 0
 
 def touch_file( fname ):
   FILE = open( fname, "w" )
@@ -367,7 +396,7 @@ def check(options):
   if options.testmail:
     om = ObjMailPush()
     if om.isValid() == False:
-      GLog.f( GLog.E, "FAILED - Mail not well configured." )
+      GLog.f( GLog.E, "\tMail not well configured." )
       GLog.f( GLog.E, om.dump() )
       return 1
     return 0
@@ -380,7 +409,17 @@ def check(options):
   # mail checks END #####
 
   if options.stb and options.src == None:
-    GLog.f( GLog.E, "Option --src-reference mandatory with --stb/--stb-label" )
+    options.src =  ".:HEAD"
+    GLog.f( GLog.E, "\t(No option -S/--source specified, using HEAD)" )
+    #GLog.f( GLog.E, "Option -S/--source mandatory with --stb/--stb-label" )
+    #return 1
+
+  if options.preview and not options.stb:
+    GLog.f( GLog.E, "\t-p/--preview option can only be provided with --stb" )
+    return 1
+
+  if len( _g_rargs) > 0 and not options.preview:
+    GLog.f( GLog.E, "\tCan specify additional arguments (after -- ) only with -p/--preview" )
     return 1
 
   tagDsc = None
@@ -392,13 +431,13 @@ def check(options):
   if not tagDsc.check_valid_value( g_labelname ):
     strerr  = "Please specify a valid name for label %s" % tagDsc.get_type()
     strerr += "  (i.e. satisfying at least 1 regexp inside: %s)" % tagDsc.get_regexp()
-    GLog.f( GLog.E, strerr )
+    GLog.f( GLog.E, indentOutput(strerr,1) )
     return 1
 
   # never on origin
   out, errCode = myCommand( "git remote show" )
   if len( out ) == 0:
-    GLog.f( GLog.E, "Cannot execute this script on repository origin" )
+    GLog.f( GLog.E, "\tCannot execute this script on repository origin" )
     return 1 
 
   cb = Branch.getCurrBr()
@@ -413,7 +452,7 @@ def check(options):
   tb = Branch( g_targetbr )
 
   if not tb.isValid():
-    GLog.f( GLog.E, "Please specify a valid branch onto which to make stb/liv.")
+    GLog.f( GLog.E, "\tPlease specify a valid branch onto which to make stb/liv.")
     GLog.f( GLog.E, tb.getNotValidReason() )
     return 1 
 
@@ -424,7 +463,7 @@ def check(options):
     strerr += "    1. providing an <INT/stable> or <CST/customer> target branch on command line\n"
     strerr += "    2. moving on target branch with 'swgit branch --switch'\n"
     strerr += "    3. setting an 'INT/develop' integration branch by 'swgit branch --set-integration-br'\n"
-    GLog.f( GLog.E, strerr )
+    GLog.f( GLog.E, indentOutput( strerr, 1 ) )
     return 1 
 
   trackedInfo, tracked = tb.get_track_info()
@@ -435,11 +474,11 @@ def check(options):
     return 1 
 
   if options.merge_back and not options.liv:
-    GLog.f( GLog.E, "option --merge-back must be provided only with --liv one.")
+    GLog.f( GLog.E, "\toption --merge-back must be provided only with --liv one.")
     return 1 
 
   if options.merge_back and not tb.isStable(): #liv for CST branch
-    GLog.f( GLog.E, "option --merge-back must be provided only when stabilizing onto INT/stable branches.")
+    GLog.f( GLog.E, "\toption --merge-back must be provided only when stabilizing onto INT/stable branches.")
     return 1 
 
   if options.merge_back:
@@ -449,39 +488,29 @@ def check(options):
     if not tracked:
       strerr  = "When needing to merge LIV back on INT/develop, target branch (here, %s) must be tracked." % devBr.getFullRef()
       strerr += "You can track it with swgit branch --track <brname>"
-      GLog.f( GLog.E, strerr )
+      GLog.f( GLog.E, indentOutput( strerr, 1 ) )
       return 1 
 
   #
   # src management
   #
-#  if options.src == None:
-#    options.src =  "./:HEAD"
-
   if options.src != None:
 
-    if Env.is_aproj():
+    ret, options.src = src_reference_check( options.src, options.batch )
+    if ret != 0:
+      GLog.f( GLog.E, options.src )
+      return 1
 
-      ret, options.src = src_reference_check( options.src, options.batch )
-      if ret != 0:
-        GLog.f( GLog.E, options.src )
-        return 1
-
-    else: #inside repo
-
-      if options.src.find( ',' ) != -1:
-        GLog.f( GLog.E, "Outside root project directory, " + \
-                         "you can stabilize only current repository, " + \
-                         "do not specify multiple values inside options.src, " + \
-                         "or move to root project (%s)" % Env.getLocalRoot() )
-        return 1
-
-    options.src = options.src.replace( '.:', './:' )
+    options.src = options.src.replace( './:', '.:' )
 
     if options.src.find( ':' ) == -1: #only 1 val
-      options.src = "./:%s" % options.src
-    if options.src.find( './:' ) == -1: #not currdir listed
-      options.src = "./:HEAD," + options.src
+      options.src = ".:%s" % options.src
+    if options.src.find( '.:' ) == -1: #not currdir listed
+      options.src = ".:HEAD," + options.src
+      GLog.f( GLog.E, "\t(Option -S/--source not conatining '.' entry, using HEAD)" )
+      #strerr = "Option -S/--source not containing '.' entry. Mandatory."
+      #GLog.f( GLog.E, strerr )
+      #return 1
 
     global g_srcoptions_map
 
@@ -497,33 +526,46 @@ def check(options):
 
     options.src = new_opt_str[:-1] #last ','
 
+    inits_notsnaps = submod_list_initialized_notsnapshot()
+
     for currentry in options.src.split( ',' ):
       dir, ref = currentry.split(':')
-      if ref == "HEAD":
-        GLog.f( GLog.E, "Please specify a valid source reference (HEAD it is not) inside repo: %s" % dir )
+      rn = dir2reponame( dir )
+
+      #substututed before
+      #if ref == "HEAD":
+      #  GLog.f( GLog.E, "Please specify a valid source reference (HEAD it is not) inside repo: %s" % rn )
+      #  return 1
+
+      if rn != "." and rn not in inits_notsnaps:
+        strerr  = "Repository '%s' is not directly contained into current project.\n" % rn
+        strerr += "It is not possible to stabilize repositories deeper than 1 level.\n"
+        strerr += "You must stabilize '%s' inside its container project,\n" % rn
+        strerr += "then provied here that stabilized sha/label."
+        GLog.f( GLog.E, indentOutput( strerr, 1 ) )
         return 1
 
-      g_srcoptions_map[ dir ] = ref
+      g_srcoptions_map[ rn ] = ref
 
-      err, sha = getSHAFromRef( ref, dir )
+      err, sha = getSHAFromRef( ref, rn )
       if err != 0:
-        GLog.f( GLog.E, "Please specify a valid source reference inside repo: %s" % dir )
+        GLog.f( GLog.E, "\tPlease specify a valid source reference inside repo: %s" % rn )
         return 1
 
       # stabilize anyref
-      if get_repo_cfg_bool( SWCFG_STABILIZE_ANYREF, dir ) == False:
+      if get_repo_cfg_bool( SWCFG_STABILIZE_ANYREF, rn ) == False:
         if ref.find( "/NGT/" ) == -1:
-          strerr  = "Inside repository %s, only NGT labels are allowed to be stabilized.\n" % dir
+          strerr  = "Inside repository %s, only NGT labels are allowed to be stabilized.\n" % rn
           strerr += "You can change this behaviour by issueing:\n"
           strerr += "    git config --bool swgit.stabilize-anyref True"
-          GLog.f( GLog.E, strerr )
+          GLog.f( GLog.E, indentOutput( strerr,1 ) )
           return 1
 
 
   # generic checks
   err, errstr = Status.checkLocalStatus_rec( ignoreSubmod = True )
   if err != 0:
-    GLog.f( GLog.E, errstr )
+    GLog.f( GLog.E, indentOutput( errstr, 1 ) )
     return 1 
 
   if not is_integrator_repo():
@@ -533,31 +575,31 @@ def check(options):
     strerr += "   clone with --integrator\n"
     strerr += "  or\n"
     strerr += "   convert this repo with 'git config --bool swgit.integrator True'"
-    GLog.f( GLog.E, strerr )
+    GLog.f( GLog.E, indentOutput( strerr, 1 ) )
     return 1 
 
   # stabilizing only new commits except if --force is provided
   if options.stb:
 
-    err, srcsha = getSHAFromRef( g_srcoptions_map[ "./" ] )
+    err, srcsha = getSHAFromRef( g_srcoptions_map[ "." ] )
     if err != 0:
-      GLog.f( GLog.E, "Please specify a valid --src-reference." )
+      GLog.f( GLog.E, "\tPlease specify a valid -S/--source for top repository." )
       return 1
 
     errCode, f_ret = AisparentofB( srcsha, tb.getShortRef() )
     if errCode != 0:
-      GLog.f( GLog.E, "Internal error. (%s/%s)" % (srcsha, tb.getShortRef()) )
+      GLog.f( GLog.E, "\tInternal error. (%s/%s)" % (srcsha, tb.getShortRef()) )
       return 1
     
     if f_ret == True:
       if not options.force:
-        strerr  = "Reference '%s' has already been reported on '%s'\n" % (g_srcoptions_map[ "./" ], tb.getShortRef())
+        strerr  = "Reference '%s' has already been reported on '%s'\n" % (g_srcoptions_map[ "." ], tb.getShortRef())
         strerr += "If you really want to continue (for instance to create new labels)\n"
         strerr += "   please provide --force option."
-        GLog.f( GLog.E, strerr )
+        GLog.f( GLog.E, indentOutput( strerr, 1 ) )
         return 1
       else:
-        GLog.s( GLog.I, "Stabilizing reference %s, already merged into %s" % (srcsha,tb.getShortRef()) )
+        GLog.s( GLog.I, "\tStabilizing reference %s, already merged into %s" % (srcsha,tb.getShortRef()) )
 
 
   # Only 1 STB per DROP 
@@ -568,7 +610,7 @@ def check(options):
 
   tbcTag = Tag( to_be_created_tag )
   if tbcTag.isValid():
-    GLog.f( GLog.E, "Already exists a tag named '%s'" % to_be_created_tag )
+    GLog.f( GLog.E, "\tAlready exists a tag named '%s'" % to_be_created_tag )
     return 1 
 
   ret = 0
@@ -631,6 +673,8 @@ def execute( options ):
     return show_chglogs_cfg()
   #output cfg END
 
+  if options.preview:
+    return show_preview( options )
 
   if options.stb:
     ret = execute_stb( options )
@@ -651,7 +695,7 @@ def execute( options ):
 def execute_stb( options ):
 
   cb       = Branch.getCurrBr()
-  startref = g_srcoptions_map[ "./" ]
+  startref = g_srcoptions_map[ "." ]
 
   str_begin = ""
   err, beginning_sha = getSHAFromRef( "HEAD" )
@@ -709,17 +753,24 @@ def execute_stb( options ):
     return 1 
   GLog.logRet( 0, indent="\t" )
 
+  #
+  # Inside a project, after merge update subrepos according to new .gitmodules
+  #
+  if Env.is_aproj():
+    cmd_resethead = "SWINDENT=%d %s proj --reset HEAD" % ( GLog.tab+1, SWGIT )
+    errCode = os.system( cmd_resethead )
+    if errCode != 0 :
+      return 1
 
   #
-  # If you are a proj, move on src input references inside subrepos
+  # Inside a project, move on src input references inside subrepos
   #   and comit proj to freeze repos alignment
   #
   if Env.is_aproj():
 
-    for currentry in options.src.split( ',' ):
-      dir, ref = currentry.split(':')
-      if dir == "./":
-        continue
+    srcoptions_map_noroot = g_srcoptions_map
+    del srcoptions_map_noroot['.']
+    for (dir, ref) in srcoptions_map_noroot.items():
 
       cmd_selectref_subrepo = "cd %s && %s branch --switch %s" % ( dir, SWGIT, ref )
       out, errCode = myCommand( cmd_selectref_subrepo )
@@ -727,22 +778,33 @@ def execute_stb( options ):
         GLog.f( GLog.E, out )
         return 1
 
-    # now commit repositories changes
-    cmd_commitmodules = "git commit -a -m \"Submodules commit\" --allow-empty"
-    out, errCode = myCommand( cmd_commitmodules )
-    if errCode != 0 :
-      GLog.f( GLog.E, out )
-      return 1
+    # commit repositories changes only if any
+    if len( srcoptions_map_noroot ) > 0:
+
+      maxlen = len( max( srcoptions_map_noroot.keys(), key = len ) )
+
+      cmt_body = ""
+      for (dir, ref) in srcoptions_map_noroot.items():
+        cmt_body += ("%s" % dir).ljust( maxlen )
+        cmt_body += " : %s\n" % ref
+
+      comment = "'Submodules commit - rel: %s - drop: %s_%s\n\n%s'" % \
+                ( cb.getRel().replace( "/","." ), 
+                  SWCFG_TAG_LIV, g_labelname, 
+                  cmt_body
+                )
+      cmd_commitmodules = "git commit -a --allow-empty -m %s" % comment
+      out, errCode = myCommand( cmd_commitmodules )
+      if errCode != 0 :
+        GLog.f( GLog.E, out )
+        return 1
 
 
   #
   # Create Tag on g_targetbr
   #
   fullTagName_target = "%s/%s/%s" % ( cb.getShortRef(), SWCFG_TAG_STB, g_labelname )
-  #cmd_chk_back       = "%s branch --quiet -s %s" % (SWGIT, cb.getShortRef())
   cmd_tag_create     = "SWINDENT=%d %s tag -m \"%s\" %s %s" % (GLog.tab+1, SWGIT, fullTagName_target, SWCFG_TAG_STB, g_labelname)
-  #cmd_create_tag_target = "%s && %s" % ( cmd_chk_back, cmd_tag_create )
-  #errCode = os.system( cmd_create_tag_target )
   errCode = os.system( cmd_tag_create )
   if errCode != 0:
     GLog.f( GLog.E, "\tError while creating label %s on branch %s" % ( g_labelname, cb.getShortRef() ) )
@@ -882,7 +944,7 @@ def execute_liv( options ):
     GLog.s( GLog.S, "\tCreating LIV commit" )
 
     cmd_liv_commit = "git commit -a --allow-empty -m \"rel: %s - drop: %s_%s\"" % \
-                     (cb.getRel().replace( "/","." ), SWCFG_TAG_LIV, g_labelname, )
+                     (cb.getRel().replace( "/","." ), SWCFG_TAG_LIV, g_labelname )
 
     out, errCode = myCommand( cmd_liv_commit )
     if errCode != 0:
@@ -1011,9 +1073,10 @@ def execute_liv( options ):
 #########
 def main():
   usagestr =  """\
-Usage: swgit stabilize [--force] --stb [--src <startpoint>] <label> [<dst-br>]
-       swgit stabilize [--force] --liv <label> [<dst-br>]
-       swgit stabilize [--force] --stb --liv --src <startpoint> <label> [<dst-br>]
+Usage: swgit stabilize --stb [-f] [-S <ref>] <label> [<dst-br>]
+       swgit stabilize --stb [-f] [-S <ref>] <label> [<dst-br>] --preview [-- <diff options>...]
+       swgit stabilize --liv [-f] <label> [<dst-br>]
+       swgit stabilize --stb --liv [-f] [-S <ref>] <label> [<dst-br>]
        swgit stabilize --show-mail-cfg|--test-mail-cfg|--show-cfg"""
 
   parser       = OptionParser( usage = usagestr,
@@ -1030,11 +1093,14 @@ Usage: swgit stabilize [--force] --stb [--src <startpoint>] <label> [<dst-br>]
   parser.add_option_group( mail_group )
   parser.add_option_group( output_group )
   (options, args)  = parser.parse_args()
+  args = parser.largs
 
   help_mac( parser )
 
   global g_labelname
   global g_targetbr
+  global _g_rargs
+  _g_rargs = parser.rargs
 
   if options.showmailcfg or options.testmail or options.showcfg:
     if len( args ) != 0:
@@ -1081,12 +1147,12 @@ gitstabilize_mgt_options = [
         "action"  : "store_true",
         "dest"    : "stb",
         "default" : False,
-        "help"    : 'Reports --src argument on \"/INT/stable\" or \"/CST/customer\" branches according to starting branch. Labelize merge boundaries with STB label.'
+        "help"    : 'Reports --source argument on \"/INT/stable\" or \"/CST/customer\" branches according to starting branch. Labelize merge boundaries with STB label.'
         }
       ],
     [
-      "--src",
-      "--src-reference",
+      "-S",
+      "--source",
       {
         "nargs"   : 1,
         "type"    : "string",
@@ -1105,6 +1171,16 @@ gitstabilize_mgt_options = [
         "dest"    : "liv",
         "default" : False,
         "help"    : 'Create LIV label on \"/INT/stable\" or \"/CST/customer\" branches according to starting branch. Evaluates changelog, fixlog from last LIV.'
+        }
+      ],
+    [
+      "-p",
+      "--preview",
+      {
+        "action"  : "store_true",
+        "dest"    : "preview",
+        "default" : False,
+        "help"    : 'With --stb. Only makes checks and shows differences between current target branch and current stabilizing sources.'
         }
       ],
     [

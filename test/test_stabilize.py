@@ -201,7 +201,7 @@ class Test_Stabilize( Test_ProjBase ):
 
     out, errCode = self.sw_clo_h.set_cfg( "swgit.integrator", "True" )
 
-    out, errCode = self.sw_clo_h.stabilize_stb( "Drop.B", "HEAD", f_startpointlbl = True )
+    out, errCode = self.sw_clo_h.stabilize_stb( "Drop.B", "HEAD" )
     self.util_check_SUCC_scenario( out, errCode,
                                    "",
                                    "stabilize inside develop repo" )
@@ -232,7 +232,10 @@ class Test_Stabilize( Test_ProjBase ):
 
     out, errCode = self.sw_ori_h.stabilize_stb( "Drop.A", "" )
     self.util_check_DENY_scenario( out, errCode,
-                                   "--src-reference mandatory",
+                                   "No option -S/--source specified, using HEAD",
+                                   "stabilize with wrong regexp" )
+    self.util_check_DENY_scenario( out, errCode,
+                                   "Cannot execute this script on repository origin",
                                    "stabilize with wrong regexp" )
 
     out, errCode = self.sw_ori_h.stabilize_stb( "Drop.A", "HEAD" )
@@ -260,11 +263,6 @@ class Test_Stabilize( Test_ProjBase ):
                                    "Please specify a valid name for label STB",
                                    "stabilize with wrong regexp" )
 
-    out, errCode = self.sw_clo_h.stabilize_stb( "Drop.A", "" )
-    self.util_check_DENY_scenario( out, errCode,
-                                   "--src-reference mandatory",
-                                   "stabilize without src" )
-
     devbr_before_sha, devbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_DEV )
     stbbr_before_sha, stbbr_err = self.sw_clo_h.ref2sha( TEST_REPO_BR_STB )
 
@@ -276,9 +274,9 @@ class Test_Stabilize( Test_ProjBase ):
     out, errCode = self.sw_clo_h.set_cfg( "swgit.integrator", "True" )
     self.util_check_SUCC_scenario( out, errCode, "", "changing repo into integrator" )
 
-    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, "HEAD", f_startpointlbl = True )
+    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, "" )
     self.util_check_SUCC_scenario( out, errCode,
-                                   "",
+                                   "(No option -S/--source specified, using HEAD)",
                                    "stabilize without stable branch tracked" )
 
     stbdev_sha, stbdev_err = self.sw_clo_h.ref2sha( self.CREATED_STBDEV_B )
@@ -336,7 +334,7 @@ class Test_Stabilize( Test_ProjBase ):
     self.util_check_SUCC_scenario( out, errCode, "", "switch" )
     #############
 
-    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, "HEAD", f_startpointlbl = True )
+    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, "HEAD" )
     self.util_check_SUCC_scenario( out, errCode, "", "stabilize from another branch" )
 
     stbdev_sha, stbdev_err = self.sw_clo_h.ref2sha( self.CREATED_STBDEV_B )
@@ -389,7 +387,7 @@ class Test_Stabilize( Test_ProjBase ):
                                    "stabilize from detached, with FTR intbr" )
 
     ##################
-    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, TEST_REPO_BR_DEV, TEST_REPO_BR_STB, f_startpointlbl = True )
+    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, TEST_REPO_BR_DEV, TEST_REPO_BR_STB )
     self.util_check_SUCC_scenario( out, errCode, "", "stabilize from detached head, without intbr set, specifying target" )
     ##################
 
@@ -425,7 +423,7 @@ class Test_Stabilize( Test_ProjBase ):
     out, errCode = self.sw_clo_h.branch_switch_to_br( self.FULL_BRANCH_NAME + "~1" )
     self.util_check_SUCC_scenario( out, errCode, "", "switch detached head" )
 
-    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, TEST_REPO_BR_DEV, TEST_REPO_BR_STB, f_startpointlbl = True )
+    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, TEST_REPO_BR_DEV, TEST_REPO_BR_STB )
     self.util_check_SUCC_scenario( out, errCode, "", "stabilize from detached head, without intbr set, specifying target" )
     ##################
 
@@ -471,7 +469,10 @@ class Test_Stabilize( Test_ProjBase ):
 
     out, errCode = self.sw_ori_h.stabilize_stb( "Drop.A", "" )
     self.util_check_DENY_scenario( out, errCode,
-                                   "--src-reference mandatory",
+                                   "No option -S/--source specified, using HEAD",
+                                   "stabilize with wrong regexp" )
+    self.util_check_DENY_scenario( out, errCode,
+                                   "Cannot execute this script on repository origin",
                                    "stabilize with wrong regexp" )
 
     out, errCode = self.sw_ori_h.stabilize_stb( "Drop.A", "HEAD" )
@@ -499,11 +500,6 @@ class Test_Stabilize( Test_ProjBase ):
                                    "Please specify a valid name for label STB",
                                    "stabilize with wrong regexp" )
 
-    out, errCode = self.sw_clo_h.stabilize_stb( "Drop.A", "" )
-    self.util_check_DENY_scenario( out, errCode,
-                                   "--src-reference mandatory",
-                                   "stabilize without src" )
-
     out, errCode = self.sw_clo_h.branch_switch_to_br( self.BRANCH_NAME )
     self.util_check_SUCC_scenario( out, errCode, "", "switch to br" )
 
@@ -517,9 +513,9 @@ class Test_Stabilize( Test_ProjBase ):
                                    "Already exists a tag named",
                                    "stabilize without stable branch tracked" )
 
-    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, "HEAD", f_startpointlbl = True )
+    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, "" )
     self.util_check_SUCC_scenario( out, errCode,
-                                   "",
+                                   "(No option -S/--source specified, using HEAD)",
                                    "stabilize without stable branch tracked" )
 
 
@@ -586,7 +582,7 @@ class Test_Stabilize( Test_ProjBase ):
     self.util_check_EQUAL( self.sw_clo_h.ref2sha( self.CREATED_STBSTB_B )[1], 1, "must not be craeted STB tag" )
 
     #re-issue, forced
-    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, ORIG_REPO_DEVEL_BRANCH, force = True, f_startpointlbl = True )
+    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, ORIG_REPO_DEVEL_BRANCH, force = True )
     self.util_check_SUCC_scenario( out, errCode, "",
                                    "re-issue same stabilize after resolving conflict" )
 
@@ -611,7 +607,7 @@ class Test_Stabilize( Test_ProjBase ):
                                    "Already exists a tag named",
                                    "re-issue same stabilize after just done stabilize" )
 
-    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_C, ORIG_REPO_DEVEL_BRANCH, force = True, f_startpointlbl = True )
+    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_C, ORIG_REPO_DEVEL_BRANCH, force = True )
     self.util_check_SUCC_scenario( out, errCode, "",
                                    "re-issue same stabilize after just done stabilize" )
 
@@ -1042,7 +1038,7 @@ class Test_Stabilize( Test_ProjBase ):
 
     #make stb
     ################################################
-    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, "HEAD", f_startpointlbl = True )
+    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, "HEAD" )
     self.util_check_SUCC_scenario( out, errCode, "", "stabilize --stb" )
     ################################################
 
@@ -1197,7 +1193,7 @@ class Test_Stabilize( Test_ProjBase ):
 
     #make stb liv toghether
     ################################################
-    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, "HEAD", f_startpointlbl = True )
+    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, "HEAD" )
     self.util_check_SUCC_scenario( out, errCode, "", "stabilize --stb" )
     ################################################
 
@@ -1241,7 +1237,7 @@ class Test_Stabilize( Test_ProjBase ):
     # Another stb+liv (must be same result as previous test (splitted operations)
     #
     ################################################
-    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_C, TEST_REPO_BR_DEV, f_startpointlbl = True )
+    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_C, TEST_REPO_BR_DEV )
     self.util_check_SUCC_scenario( out, errCode, "", "issue Another LIV without no contributes" )
     ################################################
 
@@ -1278,7 +1274,7 @@ class Test_Stabilize( Test_ProjBase ):
                                    "please provide --force option.", 
                                    "issue Another LIV reporting INT/stable" )
 
-    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_D, TEST_REPO_BR_STB, force = True, f_startpointlbl = True )
+    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_D, TEST_REPO_BR_STB, force = True )
     self.util_check_SUCC_scenario( out, errCode, "", "issue Another LIV reporting INT/stable" )
 
 
@@ -1308,7 +1304,7 @@ class Test_Stabilize( Test_ProjBase ):
                                    "stabilize --cst" )
 
     #make stb
-    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, self.BUILTIN_DEV_0, f_startpointlbl = True )
+    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, self.BUILTIN_DEV_0 )
     self.util_check_SUCC_scenario( out, errCode,
                                    "",
                                    "stabilize --cst" )
@@ -1359,7 +1355,7 @@ class Test_Stabilize( Test_ProjBase ):
     ##################
     cstbr_before_sha, cstbr_err = self.sw_clo_h.ref2sha( self.MYCST_FULL_BR )
 
-    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, TEST_REPO_BR_DEV, f_startpointlbl = True )
+    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, TEST_REPO_BR_DEV )
     self.util_check_SUCC_scenario( out, errCode, "", "stabilize from another branch" )
 
     stbdev_sha, stbdev_err = self.sw_clo_h.ref2sha( self.CREATED_STBDEV_B )
@@ -1414,7 +1410,7 @@ class Test_Stabilize( Test_ProjBase ):
 
     ##################
     out, errCode = self.sw_clo_h.branch_switch_to_br( self.MYCST_FULL_BR + "~1" ) #go detached
-    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, TEST_REPO_BR_DEV, self.MYCST_FULL_BR, f_startpointlbl = True )
+    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, TEST_REPO_BR_DEV, self.MYCST_FULL_BR )
     self.util_check_SUCC_scenario( out, errCode, "", "stabilize from another branch" )
     ##################
 
@@ -1495,7 +1491,7 @@ class Test_Stabilize( Test_ProjBase ):
 
 
     #re-issue, forced
-    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, ORIG_REPO_DEVEL_BRANCH, force = True, f_startpointlbl = True )
+    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_B, ORIG_REPO_DEVEL_BRANCH, force = True )
     self.util_check_SUCC_scenario( out, errCode, "",
                                    "re-issue same stabilize after resolving conflict" )
 
@@ -1521,7 +1517,7 @@ class Test_Stabilize( Test_ProjBase ):
                                    "Already exists a tag named",
                                    "re-issue same stabilize after resolving conflict" )
 
-    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_C, ORIG_REPO_DEVEL_BRANCH, force = True, f_startpointlbl = True )
+    out, errCode = self.sw_clo_h.stabilize_stb( self.LBL_C, ORIG_REPO_DEVEL_BRANCH, force = True )
     self.util_check_SUCC_scenario( out, errCode, "",
                                    "re-issue same stabilize after resolving conflict" )
 
@@ -1627,7 +1623,7 @@ class Test_Stabilize( Test_ProjBase ):
     cst1br_before_sha, cst1br_err = self.sw_clo_h.ref2sha( self.MYCST_FULL_BR )
 
     ################################################
-    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, TEST_REPO_BR_DEV, self.MYCST_FULL_BR, f_mergeback = False, f_startpointlbl = True )
+    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, TEST_REPO_BR_DEV, self.MYCST_FULL_BR, f_mergeback = False )
     self.util_check_SUCC_scenario( out, errCode, "", "stabilize both, cb = FTR, intbr = develop, targetB = CST1" )
     ################################################
 
@@ -1671,7 +1667,7 @@ class Test_Stabilize( Test_ProjBase ):
 
     #make stb liv toghether
     ################################################
-    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, "HEAD", f_startpointlbl = True )
+    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, "HEAD" )
     self.util_check_SUCC_scenario( out, errCode, "", "stabilize both" )
     ################################################
 
@@ -1719,7 +1715,7 @@ class Test_Stabilize( Test_ProjBase ):
     # Another stb+liv (must be same result as splitted operations
     #
     ################################################
-    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_C, TEST_REPO_BR_DEV, f_startpointlbl = True )
+    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_C, TEST_REPO_BR_DEV )
     self.util_check_SUCC_scenario( out, errCode, "", "issue Another LIV without no contributes" )
     ################################################
 
@@ -1761,7 +1757,7 @@ class Test_Stabilize( Test_ProjBase ):
                                    "please provide --force option.", 
                                    "issue Another LIV reporting INT/stable" )
 
-    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_D, TEST_REPO_BR_STB, force = True, f_startpointlbl = True )
+    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_D, TEST_REPO_BR_STB, force = True )
     self.util_check_SUCC_scenario( out, errCode, "", "issue Another LIV reporting INT/stable" )
 
 
@@ -1801,7 +1797,7 @@ class Test_Stabilize( Test_ProjBase ):
 
     #make stb liv toghether
     ################################################
-    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, "HEAD", f_nochglogs = True, f_startpointlbl = True )
+    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, "HEAD", f_nochglogs = True )
     self.util_check_SUCC_scenario( out, errCode, "", "stabilize both no chglogs" )
     ################################################
 
@@ -1893,7 +1889,7 @@ class Test_Stabilize( Test_ProjBase ):
 
     #make stb liv toghether
     ################################################
-    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, "HEAD", f_startpointlbl = True )
+    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, "HEAD" )
     self.util_check_SUCC_scenario( out, errCode, "", "stabilize with pre-commit script" )
     self.util_check_SUCC_scenario( out, errCode, "swtest-output- %s" % self.LBL_B, "stabilize with pre-commit script" )
     ################################################
@@ -1985,7 +1981,7 @@ class Test_Stabilize( Test_ProjBase ):
 
     #make stb liv toghether
     ################################################
-    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, "HEAD", f_startpointlbl = True )
+    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, "HEAD" )
     self.util_check_SUCC_scenario( out, errCode, "", "stabilize with pre-commit script" )
     self.util_check_SUCC_scenario( out, errCode, "swtest-output- %s" % self.LBL_B, "stabilize with pre-commit script" )
     ################################################
@@ -2084,7 +2080,7 @@ class Test_Stabilize( Test_ProjBase ):
 
     #make stb liv toghether
     ################################################
-    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, "HEAD", f_startpointlbl = True )
+    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, "HEAD" )
     self.util_check_DENY_scenario( out, errCode, 
                                    "returned error. Abort stabilization.", 
                                    "stabilize with pre-commit returning error script" )
@@ -2267,7 +2263,7 @@ class Test_Stabilize( Test_ProjBase ):
 
     #make stb liv toghether
     ################################################
-    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, "HEAD", f_startpointlbl = True )
+    out, errCode = self.sw_clo_h.stabilize_both( self.LBL_B, "HEAD" )
     self.util_check_DENY_scenario( out, errCode, 
                                    "returned error. Abort stabilization.", 
                                    "stabilize with pre-commit returning error script" )

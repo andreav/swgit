@@ -24,15 +24,15 @@
 ssh management
 ##############
 
-swgit supports any git url (because it transparently passes them to git)
+swgit supports any git url (because it transparently passes them below to git).
 
 | However swgit pays special attention to company workflows.
 | Companies, often rely on ssh communication. Thus swgit foresees 
   some special ssh handling.
 
-First of all, ssh can of course be configured by changing ~/.ssh/ssh_config file
+First of all, ssh can of course be configured by changing ~/.ssh/ssh_config file.
 
-Instead, swgit leverages SSH_GIT environment variable:
+swgit instead leverages SSH_GIT environment variable:
 
   | This variable in used by git during ssh communication.
   | We can think to it as a 'ssh alias'.

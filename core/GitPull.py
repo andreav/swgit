@@ -174,6 +174,7 @@ Usage: swgit pull [-I][--no-stat][--no-side-merge] """
   load_command_options( output_group, arr_output_options )
   parser.add_option_group( output_group )
   (options, args)  = parser.parse_args()
+  args = parser.largs
 
   help_mac( parser )
 

@@ -116,13 +116,13 @@ def create_protorepo():
     cmd_makecommit_10 = "cd %s && git checkout 1/0/0/0/%s/INT/develop && echo \"aa\" > a.txt && git add a.txt && git commit -m \"file 1.0\"" % \
         ( r["abspath"], ORIG_REPO_GITUSER )
 
-    cmd_create_20 = "cd %s && %s init -r 2.0.0.0 -l Drop.A --src 1/0/0/0/%s/INT/develop --git-user %s %s" % \
+    cmd_create_20 = "cd %s && %s init -r 2.0.0.0 -l Drop.A --source 1/0/0/0/%s/INT/develop --git-user %s %s" % \
         ( r["abspath"], SWGIT, ORIG_REPO_GITUSER, ORIG_REPO_GITUSER, r["initopt"] )
 
     cmd_makecommit_20 = "cd %s && git checkout 2/0/0/0/%s/INT/develop && echo \"bb\" > b.txt && git add b.txt && git commit -m \"file 2.0\"" % \
         ( r["abspath"], ORIG_REPO_GITUSER )
 
-    cmd_makebranch_20 = "cd %s && %s branch -c %s --src %s && echo \"cc\" > c.txt && git add c.txt && git commit -m \"file from FTR branch\" && git tag -m \"test dev tag\" %s/DEV/000 &&  echo \"cc2\" >> c.txt && git add c.txt && git commit -m \"file from FTR branch second\" && git tag -m \"test fix tag\" %s/FIX/Issue12345 && echo \"cc3\" >> c.txt && git add c.txt && git commit -m \"file from FTR branch third\" && git tag -m \"test dev tag\" %s/DEV/001 && git checkout %s && git merge --no-ff %s/DEV/001 " % \
+    cmd_makebranch_20 = "cd %s && %s branch -c %s --source %s && echo \"cc\" > c.txt && git add c.txt && git commit -m \"file from FTR branch\" && git tag -m \"test dev tag\" %s/DEV/000 &&  echo \"cc2\" >> c.txt && git add c.txt && git commit -m \"file from FTR branch second\" && git tag -m \"test fix tag\" %s/FIX/Issue12345 && echo \"cc3\" >> c.txt && git add c.txt && git commit -m \"file from FTR branch third\" && git tag -m \"test dev tag\" %s/DEV/001 && git checkout %s && git merge --no-ff %s/DEV/001 " % \
         ( r["abspath"], SWGIT, ORIG_REPO_aBRANCH_NAME, ORIG_REPO_DEVEL_BRANCH, ORIG_REPO_aBRANCH, ORIG_REPO_aBRANCH, ORIG_REPO_aBRANCH, ORIG_REPO_DEVEL_BRANCH, ORIG_REPO_aBRANCH )
 
     o, e = myCommand_fast( cmd_create_10 )

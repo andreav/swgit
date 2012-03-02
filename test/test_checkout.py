@@ -202,7 +202,7 @@ class Test_Checkout( unittest.TestCase ):
 
     #create branche 2 modify commit
     out, errCode = self.swgith_.branch_create_src( self.BRANCH_NAME_2, ORIG_REPO_DEVEL_BRANCH )
-    self.assertEqual( errCode, 0, "FAILED create branch [%s] --src [%s] - out:\n%s" % (self.BRANCH_NAME_2, ORIG_REPO_DEVEL_BRANCH, out) )
+    self.assertEqual( errCode, 0, "FAILED create branch [%s] --source [%s] - out:\n%s" % (self.BRANCH_NAME_2, ORIG_REPO_DEVEL_BRANCH, out) )
     out, errCode = echo_on_file( self.BFILE_ONCLONE, msg = "frombr2" )
     self.assertEqual( errCode, 0, "FAILED modify file %s - \n%s\n" % (self.BFILE_ONCLONE,out) )
     out, errCode = self.swgith_.commit_minusA()

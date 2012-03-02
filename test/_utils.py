@@ -66,6 +66,17 @@ def tss100_name2file( name ):
   if name == "CSTAPP":  return "app.txt"
   return "NOTFOUND"
 
+def tss100_name2intbr( name ):
+  if name == "TSS100":  return REPO_TSS100__DEVBRANCH
+  if name == "DEVTDM":  return REPO_TDM__DEVBRANCH
+  if name == "DEVPLAT": return REPO_PLAT__DEVBRANCH
+  if name == "CSTPLAT": return CST_BRANCH_FULLNAME
+  if name == "CSTTDM":  return CST_BRANCH_FULLNAME
+  if name == "DEVFS":   return REPO_FS__DEVBRANCH
+  if name == "DEVAPP":  return REPO_APP__DEVBRANCH
+  #if name == "CSTFS":   return 
+  #if name == "CSTAPP":  return 
+  return "NOTFOUND"
 
 
 #

@@ -94,6 +94,7 @@ Usage: swgit ssh --create-nopassw-id
   load_command_options( gitkey_group, gitkey_options )
   parser.add_option_group( gitkey_group )
   (options, args)  = parser.parse_args()
+  args = parser.largs
 
   help_mac( parser )
 

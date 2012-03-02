@@ -19,7 +19,8 @@
 
 from ObjProj import *
 from ObjSnapshotRepo import *
-import Utils_Submod
+#import Utils_Submod
+from ObjStatus import *
 
 #
 # Utils
@@ -62,6 +63,10 @@ class SwOperation( object ):
     self.debug_ = debug
     self._maxdepth = int(maxdepth)
     self._depth = 0
+    self._abort = False
+
+  def abort( self ):
+    self._abort = True
 
   def dump( self ):
     return "(SwOp %s)" % self._name
@@ -91,7 +96,10 @@ class SwOperation( object ):
     return False
 
   def visit( self, SwComponent ):
-    pass
+    if self._abort:
+      return
+    self.visit_int( SwComponent )
+
 
 
 ######################################
@@ -102,7 +110,7 @@ class SwOp_Dump( SwOperation ):
     super( SwOp_Dump, self ).__init__( "Dump", maxdepth = maxdepth, debug = debug )
     self.indent_ = 0
 
-  def visit( self, swComp ):
+  def visit_int( self, swComp ):
     pprint( swComp.__dict__ )
     if swComp.isProj():
       pprint( swComp.getMapObj() )
@@ -257,7 +265,7 @@ class SwOp_DumpProj( SwOperation ):
   #        |  '--R
   #        '--R
 
-  def visit( self, swComp ):
+  def visit_int( self, swComp ):
 
     #pprint( self.__dict__ )
     mydepth = self._depth
@@ -371,7 +379,7 @@ class SwOp_GetAll_SectObjs_Base( SwOperation ):
   def get_sect_objs( self ):
     return self._sect_objs
 
-  def visit( self, swComp ):
+  def visit_int( self, swComp ):
     pass
 
 
@@ -382,7 +390,7 @@ class SwOp_GetAll_SectObjs( SwOp_GetAll_SectObjs_Base ):
   def __init__( self, maxdepth = -1, debug = False ):
     super( SwOp_GetAll_SectObjs, self ).__init__( "GetAll_SectObjs", maxdepth = maxdepth, debug = debug )
 
-  def visit( self, swComp ):
+  def visit_int( self, swComp ):
 
     #self.log( "depth %s" % ( self._depth ) )
     if self._depth == 0:
@@ -409,7 +417,7 @@ class SwOp_GetAll_SectObjs_NOCHK( SwOp_GetAll_SectObjs_Base ):
   def __init__( self, maxdepth = -1, debug = False ):
     super( SwOp_GetAll_SectObjs_NOCHK, self ).__init__( "GetAll_SectObjs_NOCHK", maxdepth = maxdepth, debug = debug )
 
-  def visit( self, swComp ):
+  def visit_int( self, swComp ):
 
     if swComp.isProj():
       self.log( "proj %s" % ( swComp.getRootDir() ) )
@@ -430,7 +438,7 @@ class SwOp_GetAll_SectObjs_ONLYCHK( SwOp_GetAll_SectObjs_Base ):
   def __init__( self, maxdepth = -1, debug = False ):
     super( SwOp_GetAll_SectObjs_ONLYCHK, self ).__init__( "GetAll_SectObjs_ONLYCHK", maxdepth = maxdepth, debug = debug )
 
-  def visit( self, swComp ):
+  def visit_int( self, swComp ):
 
     if swComp.isProj():
       self.log( "proj %s" % ( swComp.getRootDir() ) )
@@ -454,7 +462,7 @@ class SwOp_System_All( SwOperation ):
     super( SwOp_System_All, self ).__init__( "os.system( %s )" % cmd, maxdepth = maxdepth, debug = debug )
     self.cmd_ = cmd
 
-  def visit( self, swComp ):
+  def visit_int( self, swComp ):
 
     self.log( "Executing system (%s) over repo: [%s]" % ( self.cmd_, swComp.getRootDir() ) )
     errCode = os.system( "cd %s; %s" % ( swComp.getRootDir(), self.cmd_ ) )
@@ -464,6 +472,226 @@ class SwOp_System_All( SwOperation ):
     return 0
 
 
+######################################
+# SwOp_ProjConfSpec
+######################################
+class SwOp_ProjConfSpec( SwOperation ):
+  def __init__( self, ref, maxdepth = -1, debug = False ):
+    super( SwOp_ProjConfSpec, self ).__init__( "ProjConfSpec", maxdepth = maxdepth, debug = debug )
+    self.res_list_  = []
+    self.base_dir_  = ""
+    self.start_ref_ = ref
+    self.ref_map_   = {}
+    self.curr_init_ = []
+
+  def getRetList( self ):
+    return self.res_list_
+  def getFormattedOutput( self ):
+    paths = [ l.split(":")[0] for l in self.res_list_ ]
+    maxlen = len( max( paths, key = len ) )
+    retval = []
+    for r in self.res_list_:
+      (path, ver) = r.split(':')
+      retval.append( "%s : %s" % (path.ljust(maxlen), ver.strip()) )
+    return retval
+
+  def visit_int( self, swComp ):
+
+    if self._depth == 0:
+      self.base_dir_ = swComp.getRootDir()
+      self.ref_map_[ swComp.getRootDir() ] = self.start_ref_
+
+      prootref = "HEAD"
+      if self.start_ref_ != None:
+        prootref = self.start_ref_
+      errCode, currsha =  getSHAFromRef( prootref )
+      self.res_list_.append( "./ : %s" % ( currsha ) )
+
+    father = swComp.getFatherDir()
+    if father in self.ref_map_.keys(): #already processed father proj 
+
+      rn = os.path.relpath( swComp.getRootDir(), father )
+      repover, errCode = Utils_Submod.submod_getrepover_atref( father, rn, self.ref_map_[father] )
+      if errCode != 0:
+        self.res_list_.append( "%s : ERROR - %s" % (swComp.getRootDir(), repover) )
+        return
+
+      if swComp.isProj(): #set repover for children
+        #if user specified at top None (current subrepo position)
+        # must propagate it beneath
+        pref = repover
+        if self.start_ref_ == None:
+          pref = None
+
+        self.ref_map_[ swComp.getRootDir() ] = pref
+
+      relpath2root = os.path.relpath( swComp.getRootDir(), self.base_dir_ )
+      aline = "%s : %s" % (relpath2root, repover )
+
+      labels = ( SWCFG_TAG_LIV, SWCFG_TAG_STB, SWCFG_TAG_NGT, SWCFG_TAG_FIX, SWCFG_TAG_DEV, SWCFG_TAG_RDY )
+
+      for t in labels:
+        cmd_describe_commit = "cd %s && git describe --tags --long --exact-match %s --match '*/*/*/*/*/*/*/%s/*'" % ( swComp.getRootDir(), repover, t )
+        lbl, errCode = myCommand_fast( cmd_describe_commit )
+        if errCode == 0:
+          #lbl: label-0-g2bab7e0
+          aline += " # %s" % lbl[:-1].split('-')[0]
+          break
+
+      self.res_list_.append( aline )
+
+    return
+
+
+######################################
+# SwOp_ProjDiff
+######################################
+class SwOp_ProjDiff( SwOperation ):
+  def __init__( self, pref1, pref2, smod_list, diff_args, maxdepth = -1, debug = False ):
+    super( SwOp_ProjDiff, self ).__init__( "ProjDiff", maxdepth = maxdepth, debug = debug )
+    self.base_dir_       = ""
+    self.start_pref1_    = pref1
+    self.start_pref2_    = pref2
+    self.smod_list_      = smod_list
+    self.str_diff_args_  = " ".join( diff_args )
+    self.ref1_map_       = {}
+    self.ref2_map_       = {}
+    self.resout_         = ""
+
+  def getResult( self ):
+    return self.resout_
+
+  def valid_ref( self, ref, swComp ):
+
+    errCode, sha = getSHAFromRef( ref, swComp.getRootDir() )
+    if errCode != 0:
+      relpath2root = os.path.relpath( swComp.getRootDir(), self.base_dir_ )
+      strerr  = "Reference %s not existing into repository %s.\n" % ( ref, relpath2root )
+      strerr += "In order to download some new commit, you could issue:\n"
+      strerr += "  cd %s && swgit submodule update\n" % ( swComp.getFatherDir() )
+      strerr += "  or\n"
+      strerr += "  cd %s && swgit proj --update" % ( swComp.getFatherDir() )
+      strerr += "  or\n"
+      strerr += "  cd %s && swgit pull" % ( swComp.getFatherDir() )
+      return 1, strerr
+
+    return 0, sha
+
+
+  def visit_int( self, swComp ):
+
+    self.log( "visit: %s" % swComp.getRootDir() )
+
+    if self._depth == 0:
+      self.base_dir_ = swComp.getRootDir()
+      self.ref1_map_[ swComp.getRootDir() ] = self.start_pref1_
+      self.ref2_map_[ swComp.getRootDir() ] = self.start_pref2_
+      pref1 = self.start_pref1_
+      pref2 = self.start_pref2_
+
+    relpath2root = os.path.relpath( swComp.getRootDir(), self.base_dir_ )
+    self.log( relpath2root )
+    #under first level, enter everiwhere
+    print self.smod_list_
+    if self._depth == 0:
+      if len( self.smod_list_ ) > 0 and relpath2root not in self.smod_list_:
+        return
+
+    str_tit1 = "REF1:    "
+    str_tit2 = "REF2:    "
+    str_cmd  = "CMD:     git diff $REF1 $REF2 %s" % self.str_diff_args_
+
+    #
+    # eval project references
+    #
+    #print swComp.getRootDir()
+
+    father = swComp.getFatherDir()
+    if father in self.ref1_map_.keys(): #already processed father proj 
+      pref1 = self.ref1_map_[father]
+      pref2 = self.ref2_map_[father]
+
+    if Status.pendingMerge( swComp.getRootDir() ):
+      self.resout_ += "Conflict is present, ignoring <ref1> and/or <ref2> arguments and showing merge differences."
+      pref1    = "HEAD"
+      pref2    = "MERGE_HEAD"
+      str_tit1 = "HEAD:       "
+      str_tit2 = "MERGE_HEAD: "
+      str_cmd  = "CMD:        git diff HEAD MERGE_HEAD %s" % self.str_diff_args_
+
+    #
+    # eval diff references
+    #
+    if self._depth == 0:
+
+      diffref1 = pref1
+      diffref2 = pref2
+
+    else:
+
+      relpath2father = os.path.relpath( swComp.getRootDir(), father )
+
+      #print father
+      #print relpath2father
+      #print pref1
+      #print pref2
+      diffref1, errCode = submod_getrepover_atref( father, relpath2father, pref1 )
+      if errCode != 0:
+        self.resout_ += indentOutput( diffref1, self._depth ) + "\n"
+        self.abort()
+        return
+
+      diffref2 = "" #i.e. swgit proj -D HEAD
+      if pref2 != "":
+        diffref2, errCode = submod_getrepover_atref( father, relpath2father, pref2 )
+        if errCode != 0:
+          self.resout_ += indentOutput( diffref2, self._depth ) + "\n"
+          self.abort()
+          return
+
+    #i.e. after pulling proj but not subrepos
+    for dref in (diffref1, diffref2):
+      if dref != "":
+        errCode, sha = self.valid_ref( dref, swComp )
+        if errCode != 0:
+          self.resout_ += indentOutput( diffref2, self._depth ) + "\n"
+          self.abort()
+          return
+
+    if swComp.isProj():
+      self.ref1_map_[ swComp.getRootDir() ] = diffref1
+      self.ref2_map_[ swComp.getRootDir() ] = diffref2
+
+
+    #
+    # Prepare title section
+    #
+    if swComp.isProj():
+      if self._depth == 0:
+        row0  = "proj:    %s" % self.base_dir_
+      else:
+        row0  = "proj:    %s" % relpath2root
+    else:
+      row0  = "repo:    %s" % relpath2root
+
+    row1 = str_tit1 + diffref1
+    row2 = str_tit2 + diffref2
+    if diffref2 == "":
+      row2 = str_tit2 + "working dir"
+    maxlen = len( max( row0, row1, row2, str_cmd, key=len ) )
+    bound = "="*maxlen
+    strout = "\n%s" % "\n".join( (bound,row0, row1, row2, str_cmd, bound) )
+
+    self.resout_ += indentOutput( strout, self._depth )
+    self.resout_ += "\n\n"
+
+    cmd_proj_diff = "cd %s && git diff %s %s %s" % ( swComp.getRootDir(), diffref1, diffref2, self.str_diff_args_ )
+    out, errCode = myCommand( cmd_proj_diff )
+
+    self.resout_ += indentOutput( out, self._depth )
+    self.resout_ += "\n"
+
+    return
 
 
 test_opmap = (
@@ -473,6 +701,8 @@ test_opmap = (
     SwOp_GetAll_SectObjs,
     SwOp_GetAll_SectObjs_NOCHK,
     SwOp_GetAll_SectObjs_ONLYCHK,
+    SwOp_ProjConfSpec,
+    SwOp_ProjDiff
     )
 
 
@@ -496,7 +726,7 @@ def main():
   depth = -1
   opargs = ""
 
-  if opnum != 1:
+  if opnum != 1 and opnum != 6:
 
     if len( sys.argv ) == 4:
       depth = sys.argv[3]
@@ -521,10 +751,12 @@ def main():
 
   #proj = create_swproj( startp )
   proj = create_swproj( startp, debug = True )
-  if opnum != 1:
-    op = test_opmap[opnum]( maxdepth = depth, debug = True )
-  else:
+  if opargs == 1:
     op = test_opmap[opnum]( opargs, maxdepth = depth, debug = True )
+  elif opnum == 6:
+    op = test_opmap[opnum]( opargs, maxdepth = depth, debug = True )
+  else:
+    op = test_opmap[opnum]( maxdepth = depth, debug = True )
 
   print "%s\nTesting ObjOperation [%s]\n\tstartpoint: %s%s\n\tdepth: %s\n%s" % \
       ( "="*40, op.dump(), startp, stroptargs, depth, "="*40 )
@@ -537,6 +769,8 @@ def main():
       isinstance( op, SwOp_GetAll_SectObjs_ONLYCHK ):
     pprint( op.get_sect_objs() )
 
+  if isinstance( op, SwOp_ProjConfSpec ):
+    print "\n".join( op.getFormattedOutput() )
 
   #projetcs = get_all_sections( alsoRootDir = True, debug = True )
   #pprint( projetcs )
