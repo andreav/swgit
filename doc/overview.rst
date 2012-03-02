@@ -21,6 +21,8 @@
 Overview
 ########
 
+**The primary goal of swgit is to provide git users with a complete solution
+for managing projects with developers' team.**
 
 swgit organizes your git repository in a structured way
 -------------------------------------------------------

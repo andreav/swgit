@@ -30,8 +30,8 @@ This is a key concept to leverage `swRepositories`.
 When creating a branch, pulling, pushing or merging, 
 everything happens in relation to the current integration branch.
 
-You can also do a subset of operation without it, but sooner or later 
-an error message will appear requesting for setting it.
+You can also perform a subset of operations without it, but sooner or later 
+a "Deny Scenario" will appear requesting to set it.
 
 On the other side, when working with an integration branch many operations 
 will considerably speed up.
@@ -47,7 +47,7 @@ You can set an integration branch in different ways:
 
     this is like declaring:
 
-      `Inside this repository I will work around this release or feature`
+      `Inside this repository I will work around this release or feature branch`
 
   * By issuing the command::
 
@@ -57,14 +57,15 @@ All necessary operations will be carried on by swgit tool.
 
 You can set any valid branch as an integration branch.
 
-| Normally, you specify an INT `develop` branch.
-| In this way you declare to be a 'conventional' developer 
+| Normally, you specify an `INT/develop` branch.
+| In this way you declare to be a normal developer 
   interested in contributing to the project in a general way.
 
 | Sometimes, like in :doc:`workflow_team_feature`, you specify a FTR branch.
 | In this way you will see the project history flows independently 
   from your contributes.
-| Only develops regarding your feature will be merged to you.
+| Only developments regarding your feature branch pushed by some colleague
+  of yours will be merged to you.
 
 
 Taking advantage of it
@@ -72,9 +73,11 @@ Taking advantage of it
 
 Here some examples for speeding up your develop work.
 
-Integration branch is especially useful when on a side branch 
-(a FTR branch for instance) and wanting to merge, push to origin, 
-updating from origin in one shot command.
+| When developer needs to contribute, he/she must create a branch.
+| Here, onto a *side branch* (a FTR branch for instance) 
+  integration branch is especially useful.
+| Every developer operation (branch creation, branch switch, merge, 
+  pull and push) is speeded up.
 
   .. note::
   
@@ -85,7 +88,7 @@ updating from origin in one shot command.
     #. user needs to create a FTR/topic branch
   
     #. user tags with ``swgit tag dev -m 'ready'`` before 
-       trying merge or push operations
+       trying merge or push operations (refer to :doc:`developing`)
 
 1. **branch creation**::
 
@@ -93,7 +96,7 @@ updating from origin in one shot command.
 
    instead of::
 
-      swgit branch -c "topic" --src 1/0/0/0/andreav/INT/develop
+      swgit branch -c "topic" --source 1/0/0/0/andreav/INT/develop
 
 .. _lbl_repo_sidemerge:
 

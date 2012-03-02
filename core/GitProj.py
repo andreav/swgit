@@ -406,8 +406,8 @@ Usage: swgit proj --add-repo [-b branch] [--snapshot] <url> [<localname>]
    or: swgit proj --update [-I|-N] [--snapshot] [<snapshotrepo>...]
    or: swgit proj --reset <proj-reference> [<reponame>...]
    or: swgit proj --list|--list-all
-   or: swgit proj --get-configspec [--pretty]
-   or: swgit proj --diff [<ref1>] [<ref2>] [<reponame>...]
+   or: swgit proj --get-configspec [-R] <ref>
+   or: swgit proj --diff [-R] [<ref1>] [<ref2>] [<reponame>...] [-- <diff options>...]
 """
 
   parser       = OptionParser( usage = usagestr,
@@ -435,6 +435,7 @@ Usage: swgit proj --add-repo [-b branch] [--snapshot] <url> [<localname>]
   parser.add_option_group( output_group )
   
   (options, args)  = parser.parse_args()
+  args = parser.largs
 
   help_mac( parser )
  
@@ -1243,7 +1244,7 @@ Usage: swgit proj --add-repo [-b branch] [--snapshot] <url> [<localname>]
   ##########
   elif options.get_cs == True:
 
-    ref = "HEAD"
+    ref = None
     if len(args) == 1:
       ref = args[0]
     if len(args) > 1:
@@ -1254,52 +1255,39 @@ Usage: swgit proj --add-repo [-b branch] [--snapshot] <url> [<localname>]
       GLog.f( GLog.E, out )
       sys.exit( 1 )
 
-    errCode, sha = getSHAFromRef( ref )
+    prootref = "HEAD"
+    if ref != None:
+      prootref = ref
+
+    errCode, sha = getSHAFromRef( prootref )
     if errCode != 0:
       GLog.f( GLog.E, "Reference %s not existing into project %s." % ( ref, map.getDir() ) )
       sys.exit( 1 )
 
-    if options.pretty == False:
-      retstr = "./:%s" % sha
-    else:
-      retstr = "%s\n\t%s" % ( os.getcwd(), sha )
-      desc = cs_desribe_ref( map.getDir(), sha )
-      retstr += indentOutput( desc, 2 )
+    depth = 1
+    if options.recursive:
+      depth = -1
 
-
-    localrepos = submod_list_all_default( map.getDir() )
-    for rn in localrepos:
-      rn = dir2reponame( rn )
-      #print rn
-      repover, errCode = submod_getrepover_atref( map.getDir(), rn, ref )
-      if errCode != 0:
-        GLog.f( GLog.E, repover )
-        sys.exit( 1 )
-
-      if options.pretty == False:
-
-        retstr += "\n%s:%s" % ( rn, repover ) 
-
-      else:
-
-        retstr += "\n%s\n\t%s" % ( rn, repover )
-
-        desc = cs_desribe_ref( "%s/%s" % (map.getDir(), rn), repover )
-        retstr += indentOutput( desc, 2 )
-
-    print retstr[:-1]
+    proj = create_swproj( debug = options.debug )
+    getcs_op = SwOp_ProjConfSpec( ref, depth )
+    proj.accept( getcs_op )
+    GLog.f( GLog.E, "\n".join( getcs_op.getFormattedOutput() ) )
+    sys.exit( 0 )
 
   ########
   # DIFF #
   ########
   elif options.diff == True:
 
-    out, err = check_allowed_options_p( "--diff", proj_allowmap, parser )
+    diff_args   = parser.rargs
+    args_submod = parser.largs #args without ref1 and ref2
+    args        = parser.largs
+
+    out, err = check_allowed_options_p( "--diff", proj_allowmap, parser, input = parser.largs )
     if err != 0:
       GLog.f( GLog.E, out )
       sys.exit( 1 )
 
-    args_submod = args #args without ref1 and ref2
     ref1 = "HEAD"
     ref2 = ""
     if len( args ) == 0:
@@ -1330,11 +1318,22 @@ Usage: swgit proj --add-repo [-b branch] [--snapshot] <url> [<localname>]
         GLog.f( GLog.E, "Reference '%s' not existing into project %s." % ( ref2, map.getDir() ) )
         sys.exit( 1 )
 
+    row0_skel = "repo  %s"
+    row1_skel = "REF1: %s"
+    row2_skel = "REF2: %s"
+    row_cmd   = "CMD:  git diff $REF1 $REF2 %s" % " ".join(diff_args)
+
     if Status.pendingMerge( map.getDir() ):
-      if ref1 != "HEAD" or ref2 != "":
-        GLog.f( GLog.E, "Conflict is present, ignoring <ref1> and/or <ref2> arguments and showing merge differences." )
-      ref1 = "HEAD"
-      ref2 = "MERGE_HEAD"
+      # With merge conflict, show them.
+      # But when diffing 2 past versions, ignore merge conflicts
+      #curr_dif_refs = ( "", "HEAD" )
+      #if ref1 in curr_dif_refs or ref2 in curr_dif_refs:
+      GLog.f( GLog.E, "Conflict is present, ignoring <ref1> and/or <ref2> arguments and showing merge differences." )
+      ref1      = "HEAD"
+      ref2      = "MERGE_HEAD"
+      row1_skel = "HEAD:       %s"
+      row2_skel = "MERGE_HEAD: %s"
+      row_cmd   = "CMD:        git diff HEAD MERGE_HEAD %s" % " ".join(diff_args)
 
     for rn in args_submod:
       rn = dir2reponame( rn )
@@ -1348,32 +1347,51 @@ Usage: swgit proj --add-repo [-b branch] [--snapshot] <url> [<localname>]
         GLog.f( GLog.E, "ERROR: repository '%s' it is not initialized." % ( rn ) )
         sys.exit( 1 )
 
+    alsoroot = False
+    if os.environ.get("SWINDENT") == None and len( args_submod ) == 0: #only inside root repo, and when all repo is asked
+      alsoroot = True
     if len( args_submod ) == 0:
       args_submod = submod_list_initialized( map.getDir() )
 
-    #print "ref1: ", ref1
-    #print "ref2: ", ref2
-    #print "args: ", args_submod
+    #print "ref1:     ", ref1
+    #print "ref2:     ", ref2
+    #print "args:     ", args_submod
+    #print "diffargs: ", diff_args
 
-    strbody = "project  %s" % map.getDir()
-    str_tit1 = "REF1:       "
-    str_tit2 = "REF2:       "
-    str_ref_2 = ref2
-    if ref2 == "":
-      str_ref_2 = "working dir"
-    print "%s\n%s\n%s%s\n%s%s\n%s" % ( "-"*len(strbody), strbody, str_tit1, ref1, str_tit2, str_ref_2, "-"*len(strbody) )
+    #
+    # Proj dir only when diffing all
+    #
+    if alsoroot:
 
+      row0 = row0_skel % map.getDir()
+      row1 = row1_skel % ref1
+      row2 = row2_skel % ref2
+      if ref2 == "":
+        row2 = row2_skel % "working dir"
+      maxlen = len( max( row0, row1, row2, row_cmd, key=len ) )
+      bound = "="*maxlen
+      strout = "\n%s" % "\n".join( (bound,row0, row1, row2, row_cmd, bound) )
+
+      GLog.f( GLog.E, strout )
+
+      cmd_proj_diff = "cd %s && git diff %s %s %s" % ( map.getDir(), ref1, ref2, " ".join(diff_args) )
+      out, errCode = myCommand( cmd_proj_diff )
+      GLog.f( GLog.E, out )
+
+    #
+    # submods
+    #
     for rn in args_submod:
       rn = dir2reponame( rn )
       smodref_1, errCode = submod_getrepover_atref( map.getDir(), rn, ref1 )
       if errCode != 0:
         GLog.f( GLog.E, smodref_1 )
-        return 1
+        continue
       if ref2 != "":
         smodref_2, errCode = submod_getrepover_atref( map.getDir(), rn, ref2 )
         if errCode != 0:
           GLog.f( GLog.E, smodref_2 )
-          return 1
+          continue
       else: #i.e. swgit proj -D HEAD
         smodref_2 = ""
 
@@ -1390,23 +1408,31 @@ Usage: swgit proj --add-repo [-b branch] [--snapshot] <url> [<localname>]
             GLog.f( GLog.E, strerr )
             return 1
 
-      strbody = "submodule  %s" % rn
-      if ref2 == "MERGE_HEAD":
-        str_tit1 = "HEAD:       "
-        str_tit2 = "MERGE_HEAD: "
-      else:
-        str_tit1 = "REF1:       "
-        str_tit2 = "REF2:       "
-      str_smodref_2 = smodref_2
+      row0 = row0_skel % rn
+      row1 = row1_skel % smodref_1
+      row2 = row2_skel % smodref_2
       if smodref_2 == "":
-        str_smodref_2 = "working dir"
+        row2 = row2_skel % "working dir"
+      maxlen = len( max( row0, row1, row2, row_cmd, key=len ) )
+      bound = "="*maxlen
+      strout = "\n%s" % "\n".join( (bound,row0, row1, row2, row_cmd, bound) )
 
-      print "%s\n%s\n%s%s\n%s%s\n%s" % ( "="*len(strbody), strbody, str_tit1, smodref_1, str_tit2, str_smodref_2, "="*len(strbody) )
+      GLog.f( GLog.E, strout )
 
-      #cmd_submod_diff = "git --git-dir=%s/%s/.git diff %s %s" % ( map.getDir(), rn, smodref_1, smodref_2 )
-      cmd_submod_diff = "cd %s/%s && git diff %s %s" % ( map.getDir(), rn, smodref_1, smodref_2 )
+      submod_dir = "%s/%s" % (map.getDir(), rn)
+
+      cmd_submod_diff = "cd %s && git diff %s %s %s %s" % ( submod_dir, " ".join(diff_args), smodref_1, smodref_2, " ".join( diff_args ) )
       out, errCode = myCommand( cmd_submod_diff )
-      print out
+      GLog.f( GLog.E, out )
+
+      if Env.is_aproj( submod_dir ) and options.recursive:
+
+        str_diff_opts = ""
+        if len( diff_args ) > 0:
+          str_diff_opts = "-- %s" % " ".join( diff_args )
+
+        cmd_submod_diff_rec = "cd %s && SWINDENT=%s %s proj --diff --recursive %s %s %s %s" % ( submod_dir, GLog.tab + 1, SWGIT, getOutputOpt(options), smodref_1, smodref_2, str_diff_opts )
+        ret = os.system( cmd_submod_diff_rec )
 
 
   sys.exit( 0 )
@@ -1623,16 +1649,6 @@ list_options = [
         }
       ],
     [
-      "-C",
-      "--get-configspec",
-      {
-        "action"  : "store_true",
-        "dest"    : "get_cs",
-        "default" : False,
-        "help"    : "Given a proj commit (default HEAD), shows commit selected in any repository"
-        }
-      ],
-    [
       "-D",
       "--diff",
       {
@@ -1643,15 +1659,25 @@ list_options = [
         }
       ],
     [ 
-      "--pretty",
+      "-R",
+      "--recursive",
       {
         "action"  : "store_true",
-        "dest"    : "pretty",
+        "dest"    : "recursive",
         "default" : False,
-        "help"    : "Only woth --get-configspec option, show more infos. Howeve its output is not suitable for using with swgit stabilize --src."
+        "help"    : 'With --diff, descend contained projects.'
         }
       ],
-
+    [
+      "-C",
+      "--get-configspec",
+      {
+        "action"  : "store_true",
+        "dest"    : "get_cs",
+        "default" : False,
+        "help"    : "Given a proj commit (default HEAD), shows commit selected in any repository"
+        }
+      ],
     ]
 
 
@@ -1679,8 +1705,8 @@ proj_allowmap = {
       #"--freeze"          : proj_opt_allowed,
       "--list"            : proj_opt_allowed,
       "--list-all"        : proj_opt_allowed,
-      "--diff"            : proj_opt_allowed,
-      "--get-config-spec" : proj_opt_allowed + [  "--pretty" ],
+      "--diff"            : proj_opt_allowed + [ "--recursive" ],
+      "--get-config-spec" : proj_opt_allowed + [ "--recursive" ],
       }
 
 

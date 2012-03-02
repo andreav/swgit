@@ -293,13 +293,13 @@ When inside a project, ``swgit stabilize --stb`` enriches its meaning.
 Not only it stabilizes project as a normal repo,
 it also reports subrepos state on stable branch.
 
-You can use different --src values:
+You can use different --source values:
 
   1. TAG DROP WITH HEAD
 
      ::
 
-        swgit stabilize --stb --src HEAD
+        swgit stabilize --stb --source HEAD
 
      The behavior is:
 
@@ -311,21 +311,21 @@ You can use different --src values:
 
      ::
 
-       swgit stabilize --stb --src ./:HEAD,A/SUBREPO:af2145bc
+       swgit stabilize --stb --source ./:HEAD,A/SUBREPO:af2145bc
 
      In this way you can choose to freeze a different commit for every repo.
 
      The behavior is:
 
        every repo into src    : checked out before stabilizing project
-       every repo NOT into src: same as --src HEAD (see previous point)
+       every repo NOT into src: same as --source HEAD (see previous point)
 
 
   3. TAG DROP WITH "CONFIG SPEC"
 
      ::
 
-       swgit stabilize --stb --src filename.cs
+       swgit stabilize --stb --source filename.cs
 
      filename.cs is a file containing output formatted as command output::
 

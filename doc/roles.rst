@@ -53,7 +53,7 @@ Integrator will report INT/develop contributes onto INT/stable thus obtaining ma
 
 When reporting contributes on INT/stable he/she will issue a command::
 
-  swgit stabilize --stb --src <stabilized_reference> Drop.A
+  swgit stabilize --stb --source <stabilized_reference> Drop.A
 
 After packaging a new drop, he/she will collect changelogs and fixlogs, 
 and will tag *INT/stable* commit with a LIV label by the command::
@@ -92,7 +92,7 @@ Customers are represented in a swRepository by *CST* branch types.
 Every time an Integrator decides to support a new customer, he/she issues a 
 command like this::
 
-  swgit init --rel 1.0.0.0 --cst <google> --src 1/0/0/0/andreav/INT/stable
+  swgit init --rel 1.0.0.0 --cst <google> --source 1/0/0/0/andreav/INT/stable
 
 This command creates this branch::
 
@@ -103,7 +103,7 @@ this branch.
 
 Once again, Integrator best friend command is *stabilize*::
 
-  swgit stabilize --stb --src <stabilized_reference_for_customer> Drop.A
+  swgit stabilize --stb --source <stabilized_reference_for_customer> Drop.A
 
 This branch behaves similarly to INT/stable branch, but essentially stores all 
 customer specific requirements.

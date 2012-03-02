@@ -21,22 +21,57 @@
 Features/Documentation
 ++++++++++++++++++++++
 
+Generic aspects
+---------------
+
 .. toctree::
    :maxdepth: 2
 
    scripting.rst
    ssh.rst
-   configure.rst
+
+Repository structure
+--------------------
+
+.. toctree::
+   :maxdepth: 2
+
    references.rst
    roles.rst
    repository_structure.rst
+
+Source code management
+----------------------
+
+.. toctree::
+   :maxdepth: 2
+
    intbr.rst
    developing.rst
    stabilizing.rst
-   custom_tags.rst
+
+Repository modularization
+-------------------------
+
+.. toctree::
+   :maxdepth: 2
+
    projects
    stabilizing_projects.rst
+
+Repository configurability
+--------------------------
+
+.. toctree::
+   :maxdepth: 2
+
+   configure.rst
+   custom_tags.rst
    mail.rst
+
+
+Help utilities
+--------------
 
 .. toctree::
    :maxdepth: 3

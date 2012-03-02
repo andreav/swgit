@@ -247,8 +247,8 @@ def create_cst_branch_exec( options ):
 def main():
   usagestr =  """\
 Usage: swgit init -r <x.y.z.t> [-u <user>] [-l <label>] [-c <int-br-name>] 
-   or: swgit init -r <x.y.z.t> [-u <user>] [-l <label>] --src <startpoint> [-c <int-br-name>]
-   or: swgit init -r <x.y.z.t> [-u <user>] [-l <label>] --cst -c <int-br-name> --src <startpoint>"""
+   or: swgit init -r <x.y.z.t> [-u <user>] [-l <label>] --source <startpoint> [-c <int-br-name>]
+   or: swgit init -r <x.y.z.t> [-u <user>] [-l <label>] --cst -c <int-br-name> --source <startpoint>"""
 
   parser       = OptionParser( usage = usagestr,
                                description='>>>>>>>>>>>>>> swgit - Init repository <<<<<<<<<<<<<<' )
@@ -260,6 +260,7 @@ Usage: swgit init -r <x.y.z.t> [-u <user>] [-l <label>] [-c <int-br-name>]
   parser.add_option_group( output_group )
     
   (options, args)  = parser.parse_args()
+  args = parser.largs
   help_mac( parser )
 
   if len(args) != 0:
@@ -680,8 +681,8 @@ init_mgt_options = [
         }
       ],
     [ 
-        "--src",
-        "--source-reference",
+        "-S",
+        "--source",
         {
           "nargs"   : 1,
           "type"    : "string",

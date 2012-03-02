@@ -85,7 +85,7 @@ Reporting on *INT/stable* (STB labels)
 
     ::
 
-      swgit stabilize --stb --src <reference> Drop.A 
+      swgit stabilize --stb --source <reference> Drop.A 
 
 
   `Drop.A` is the name of next delivery. This name will be matched against
@@ -100,7 +100,7 @@ Reporting on *INT/stable* (STB labels)
 
   This command will:
 
-  * Merge --src <reference> argument into target *INT/stable*
+  * Merge --source <reference> argument into target *INT/stable*
 
   * | Create 1/0/0/0/andreav/INT/develop/STB/Drop.A - This mark *INT/develop* starting point.
     | Only if --start-point-label option is provided.
@@ -109,7 +109,7 @@ Reporting on *INT/stable* (STB labels)
 
 
   .. note::
-    | By default, --src argument must be a NGT tag. 
+    | By default, --source argument must be a NGT tag. 
       This encourages continuous testing agile principle.
     | If you need to stabilize any reference, please issue inside you repository:
 
@@ -256,7 +256,7 @@ Reporting on CST/customer
 
     ::
 
-      swgit stabilize --stb --liv --src <reference> Drop.A 2/0/0/0/andreav/CST/customer
+      swgit stabilize --stb --liv --source <reference> Drop.A 2/0/0/0/andreav/CST/customer
 
 
   This command will:
@@ -272,7 +272,7 @@ Reporting on CST/customer
 
     ::
 
-      swgit stabilize --stb --src <reference> Drop.A
+      swgit stabilize --stb --source <reference> Drop.A
     
       swgit stabilize --liv Drop.A
 
@@ -290,7 +290,7 @@ Configurations
 
        swgit stabilize --stb --start-point-label
 
-     If user wants to mark --src reference, he/she can provide previous option
+     If user wants to mark --source reference, he/she can provide previous option
      in order to create /INT/develop/STB label.
 
      This option is ignored when stabilizing onto CST branches.
