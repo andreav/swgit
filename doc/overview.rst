@@ -24,6 +24,10 @@ Overview
 **The primary goal of swgit is to provide git users with a complete solution
 for managing projects with developers' team.**
 
+  .. image:: images/static/swgit_overview_repo.gif
+    :scale: 40 %
+
+
 swgit organizes your git repository in a structured way
 -------------------------------------------------------
 
@@ -31,21 +35,20 @@ swgit provides and supports application level workflows over git repositories.
 
 It is built turning special attention to:
 
-  * software products organization, build, management
+  * releases management
+
+  * periodically delivering software packages 
 
   * team working
 
+  * supported customers
+
 It chooses a 'Shared Repository' collaborative model:
 
-  * team members are responsible for integrating their work
+  * team members are responsible for integrating and pushing to 'origin' their work
 
-  * team members push their contributes to 'origin'
-
-It leverages as far as possible git features like:
-
-  * git namespaces
-
-  * git partial commits
+  * however central integrator figure still exists, responsible for delivering software 
+    packages
 
 Preferred communication mechanism is :doc:`ssh <ssh>`.
 
@@ -92,11 +95,11 @@ Defining Integrator and Developers Roles
   without  getting in each others way:
  
   * | *Developers* do not interfere with build/delivery process.
-    | *INT/develop* branches free *Developers*.
+    | *Developers* work around *INT/develop* branch.
  
   * | *Integrator* can take his time to build/deliver
       without stopping developers at all.
-    | *INT/stable* branches free Integrators.
+    | *Integrator* work around *INT/stable* branch.
  
   .. image:: images/static/swgit_stb.png
     :align: center
@@ -157,7 +160,7 @@ Repository modularity
   
     * They introduce 2 new workflows:
   
-      * **Local submodule** encourage the user to adopt submodules not only 
+      * **Local submodule** encourage users to adopt submodules not only 
         for third-party libraries but above all for splitting his/her 
         repositories in modules (see :ref:`lbl_proj_local_submodules`)
   
@@ -173,31 +176,31 @@ Repository modularity
 Simplifying git usage for newbies
 ---------------------------------
 
-  1. When I first met git, together with the great power of the tool, 
-     immediately I perceived the possibility of inadvertently destroying my
-     'origin' repository with a *wrong push*.
- 
-     Many *Deny Scenarios* are implemented to:
+  1.  Many *Deny Scenarios* are implemented to:
 
        * Avoid dangerous behaviors/commands
 
        * Force user following built-in workflows
 
-  2. Moreover, I think git sometimes groups any SCM functionality 
-     under unnatural commands.
+  2. Some operations are automatically carried out by the tool:
 
-       * Deleting a tag remotely is done by pushing an empty reference on 'origin'
+       * tracking branches when necessary
 
-       * Despite of *git branch* command, switching branch is done by *git checkout*
+       * pulling repository to guarantee fast-forward pushes
 
        * ...
 
-     | It is perfectly understandable when accepting git philosophy, but
-       at the beginning, I spent so much time looking for the correct command
-       to invoke.
-     | swgit also endeavors reducing these aspects, tricky for newbies.
+  3. Some functionalities are moved under logical command they belong to:
 
-  3. Well defined workflows are supported in order to shorten and simplify 
+       * Deleting a tag remotely is done by ``swgit tag`` command instead of 
+         pushing an empty reference on 'origin'
+
+       * Moving around repository is realized by ``swgit branch`` command,
+         instead of ``git checkout``
+
+       * ...
+
+  4. Well defined workflows are supported in order to shorten and simplify 
      development when following them. (:doc:`workflows`)
 
 
@@ -211,6 +214,8 @@ Customization
     * changing tags behaviors
   
     * specifying pre- and post- tagging hooks
+
+    * ...
 
 
 Automatic mail delivery

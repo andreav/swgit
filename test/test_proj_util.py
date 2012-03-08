@@ -333,6 +333,29 @@ class Test_ProjBase( Test_Base ):
 
     return retshas
 
+  # Given helper map (directories)
+  #  returns intbrmap:
+  #    same keys
+  #    intbr as value
+  def util_map2_tss100intbrshas( self, helpermap ):
+    retshas = {}
+    for name, helper in helpermap.items():
+      #print name, helper
+      #print tss100_name2intbr(name)
+      intbr = tss100_name2intbr(name)
+      if intbr != "":
+        sha, errCode = helper.ref2sha( intbr )
+        self.assertEqual( errCode, 0, "Error retrieving intbr inside repo %s - \n%s\n" %
+                          ( helper.getDir(), name ) )
+
+        retshas[ name ] = sha
+      else:
+        #depth2 CST repos have no intbr
+        retshas[ name ] = "CSTdepth2 DOES NOT HAVE INTBR"
+
+    return retshas
+
+
 
   ##################
   # FACTORY HELPER #

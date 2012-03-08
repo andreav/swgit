@@ -36,6 +36,7 @@ Welcome to swgit
    Developers Mailing List <http://groups.google.com/group/swgit-dev>
    Bug / Feature Request <https://github.com/andreav/swgit/issues>
    glossary.rst
+   faq.rst
 
 .. todo.rst
 

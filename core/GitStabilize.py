@@ -136,8 +136,8 @@ def show_preview( options ):
     if dir == '.': #root
 
       dir = os.getcwd()
-      bound = '='*len(dir)
-      strhead = "\n%s\n\n" % "\n".join( (bound,dir,bound) )
+      #bound = '='*len(dir)
+      #strhead = "\n%s\n\n" % "\n".join( (bound,dir,bound) )
 
       prev_ref = g_targetbr
 
@@ -149,12 +149,34 @@ def show_preview( options ):
 
       prev_ref, errCode = submod_getrepover_atref( Env.getLocalRoot(), dir, g_targetbr )
       if errCode != 0:
-        GLog.f( GLog.E, strhead + smodref )
+        GLog.f( GLog.E, strhead + prev_ref )
         return 1
 
-    cmd_diff = "cd %s && git diff %s %s %s" % ( dir, prev_ref, tbs_ref, " ".join( _g_rargs ) )
-    out, errCode = myCommand( cmd_diff )
-    GLog.f( GLog.E, strhead + out )
+    if Env.is_aproj( dir ) and dir != os.getcwd():
+
+      str_opt_diff = ""
+      if len( _g_rargs ) > 0:
+        str_opt_diff = "-- %s" % " ".join( _g_rargs )
+
+      cmd_diff = "cd %s && %s proj --diff %s %s %s" % ( dir, SWGIT, prev_ref, tbs_ref, str_opt_diff )
+      #out, errCode = myCommand( cmd_diff )
+      errCode = os.system( cmd_diff )
+
+    else:
+
+      row0 = "repo  %s" % dir
+      row1 = "REF1: %s" % prev_ref
+      row2 = "REF2: %s" % tbs_ref
+      row_cmd   = "CMD:  git diff $REF1 $REF2 %s" % " ".join(_g_rargs)
+
+      cmd_diff = "cd %s && git diff %s %s %s" % ( dir, prev_ref, tbs_ref, " ".join( _g_rargs ) )
+      out, errCode = myCommand( cmd_diff )
+
+      maxlen = len( max( row0, row1, row2, row_cmd, key=len ) )
+      bound = "="*maxlen
+      strout = "\n%s\n\n" % "\n".join( (bound,row0, row1, row2, row_cmd, bound) )
+
+      GLog.f( GLog.E, strout + out )
 
   return 0
 
@@ -453,7 +475,7 @@ def check(options):
 
   if not tb.isValid():
     GLog.f( GLog.E, "\tPlease specify a valid branch onto which to make stb/liv.")
-    GLog.f( GLog.E, tb.getNotValidReason() )
+    GLog.f( GLog.E, indentOutput(tb.getNotValidReason(),1) )
     return 1 
 
   if not tb.isStable() and tb.getType() != SWCFG_BR_CST:
