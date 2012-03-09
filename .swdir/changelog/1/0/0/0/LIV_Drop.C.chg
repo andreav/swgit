@@ -1,0 +1,30 @@
+From:    swgit <andreav.pub@gmail.com>
+Date:    Fri Feb 24 14:27:34 2012 +0100
+Ref:     refs/tags/1/0/0/0/swgit/FTR/stabil_morerem/DEV/000
+
+    stabilize will deduce remote iduring push from tracked stable branch
+
+From:    swgit <andreav.pub@gmail.com>
+Date:    Tue Feb 28 12:37:53 2012 +0100
+Ref:     refs/tags/1/0/0/0/swgit/FTR/stabilizing_cfg/DEV/000
+
+    stabilize doc; other stabilize config
+
+From:    swgit <andreav.pub@gmail.com>
+Date:    Tue Feb 28 15:46:55 2012 +0100
+Ref:     refs/tags/1/0/0/0/swgit/FTR/stabilizing_cfg/DEV/001
+
+    push bug: tracking wrong branch
+
+From:    swgit <andreav.pub@gmail.com>
+Date:    Fri Mar 2 14:33:17 2012 +0100
+Ref:     refs/tags/1/0/0/0/swgit/FTR/stabilizing_cfg/DEV/002
+
+    swgit proj --diff and --get-configspec powered; stabilize --src -> -S/--source
+
+From:    swgit <andreav.pub@gmail.com>
+Date:    Thu Mar 8 12:07:08 2012 +0100
+Ref:     refs/tags/1/0/0/0/swgit/FTR/stabilizing_cfg/DEV/003
+
+    stabilize - preview fixes, images and documentation
+
