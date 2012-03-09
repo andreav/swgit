@@ -102,7 +102,7 @@ def check( options ):
     tbdTagDsc = create_tag_dsc( tbdTag.getType() )
     if not tbdTagDsc.isValid():
       strerr  = "FAILED - Tag \"%s\" is not well defined.\n" % tbdTag.getType()
-      strerr += "         Try issueing 'swgit tag --custom-tag-show-cfg %s'." % tbdTag.getType()
+      strerr += "         Try issueing 'swgit tag --show-cfg %s'." % tbdTag.getType()
       GLog.f( GLog.E, strerr )
       return 1
 
@@ -158,7 +158,7 @@ def check( options ):
   tagDsc = create_tag_dsc( g_tag_type )
   if not tagDsc.isValid():
     strerr  = "FAILED - Tag \"%s\" is not well defined.\n" % tagDsc.getType()
-    strerr += "         Try issueing 'swgit tag --custom-tag-show-cfg %s'." % tagDsc.getType()
+    strerr += "         Try issueing 'swgit tag --show-cfg %s'." % tagDsc.getType()
     GLog.f( GLog.E, strerr )
     return 1
 
@@ -178,7 +178,7 @@ def check( options ):
     if not tagDsc.get_tag_in_past():
       strerr  = "ERROR - You are in deatched head or onto a non valid branch."
       strerr  = "        Label \"%s\" is not configured to be put in past.\n" % tagDsc.get_type()
-      strerr += "        Issue 'swgit tag --custom-tag-show-cfg %s' to investigate" % tagDsc.get_type()
+      strerr += "        Issue 'swgit tag --show-cfg %s' to investigate" % tagDsc.get_type()
       GLog.f( GLog.E, strerr )
       return 1
     if not g_cb.isValid():
@@ -231,7 +231,7 @@ def check( options ):
     if not tagDsc.get_tag_in_past():
       strerr  = "ERROR - Commit you are tagging is already pushed on origin.\n"
       strerr += "        Label \"%s\" is not configured to be put in past.\n" % tagDsc.get_type()
-      strerr += "        Issue 'swgit tag --custom-tag-show-cfg %s' to investigate" % tagDsc.get_type()
+      strerr += "        Issue 'swgit tag --show-cfg %s' to investigate" % tagDsc.get_type()
       GLog.f( GLog.E, strerr )
       return 1
     else:
@@ -583,6 +583,7 @@ Usage: swgit tag [list options]
   parser.add_option_group( output_group )
   
   (options, args)  = parser.parse_args()
+  args = parser.largs
 
   help_mac( parser )
 
@@ -816,7 +817,7 @@ gittag_custtag_options = [
         }
       ],
     [ 
-      "--custom-tag-show-cfg",
+      "--show-cfg",
       {
         "nargs"   : 1,
         "type"    : "string",

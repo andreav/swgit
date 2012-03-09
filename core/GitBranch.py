@@ -470,13 +470,13 @@ def check_create( options ):
     sb = Branch.getStableBr()
     cb = Branch.getCurrBr()
     if ib.isValid() == False:
-      GLog.f( GLog.E, "ERROR: Without integration branch set, plese specify --src while creating branch." )
+      GLog.f( GLog.E, "ERROR: Without integration branch set, plese specify --source while creating branch." )
       return 1
     if cb.isValid() == False:
-      GLog.f( GLog.E, "ERROR: In 'detached head', plese specify --src while creating branch." )
+      GLog.f( GLog.E, "ERROR: In 'detached head', plese specify --source while creating branch." )
       return 1
     if ib.getShortRef() != cb.getShortRef() and not cb.isStable():
-      GLog.f( GLog.E, "ERROR: Outside integration or stable branch, --src-reference is mandatory." )
+      GLog.f( GLog.E, "ERROR: Outside integration or stable branch, --source is mandatory." )
       return 1
 
   #src
@@ -927,7 +927,7 @@ def main():
 Usage: swgit branch         (show all local branches)
    or: swgit branch -l      (show my  local branches)
    or: swgit branch [other list filters]
-   or: swgit branch --create <brname> [--src <startpoint>]
+   or: swgit branch --create <brname> [--source <startpoint>]
    or: swgit branch --delete|--delete-all|--erase|--erase-all  <brname>
    or: swgit branch -m|-M  <newbrname>
    or: swgit branch --switch <brname>
@@ -949,6 +949,7 @@ Usage: swgit branch         (show all local branches)
   parser.add_option_group( rtrv_group )
   parser.add_option_group( output_group )
   (options, args)  = parser.parse_args()
+  args = parser.largs
   
   help_mac( parser )
 
@@ -993,8 +994,8 @@ gitbranch_mgt_options = [
         }
       ],
     [ 
-      "--src",
-      "--src-reference",
+      "-S",
+      "--source",
       {
         "nargs"   : 1,
         "type"    : "string",
@@ -1071,7 +1072,7 @@ gitbranch_mgt_options = [
         }
       ],
     [ 
-      "-S",
+      "-b",
       "--switch-back",
       {
         "action"  : "store_true",
@@ -1272,7 +1273,7 @@ gitbranch_rtrv_options = [
 
 branch_opt_aliases  = {
     "-c"        : "--create",
-    "--src"     : "--src-reference",
+    "-S"        : "--source",
     "-d"        : "--delete",
     "-D"        : "--delete-all",
     "-e"        : "--erase",
@@ -1280,7 +1281,7 @@ branch_opt_aliases  = {
     "-m"        : "--move",
     "-M"        : "--move-deep",
     "-s"        : "--switch",
-    "-S"        : "--switch-back",
+    "-b"        : "--switch-back",
     "-I"        : "--get-integration-br",
     "-i"        : "--to-integration",
     "-t"        : "--track",
@@ -1299,7 +1300,7 @@ branch_opt_aliases  = {
 branch_opt_allowed  = [ "--quiet", "--verbose", "--debug" ]
 branch_opt_list_all = [ "--list", "--all-releases", "--release-selector", "--user-selector", "--branch-type-selector", "--branch-name-selector", "--local-remote", "--remote-branches" ]
 branch_allowmap = {
-      "--create"               : branch_opt_allowed + [  "--src-reference" ],
+      "--create"               : branch_opt_allowed + [  "--source" ],
       "--delete"               : branch_opt_allowed,
       "--delete-all"           : branch_opt_allowed,
       "--erase"                : branch_opt_allowed,

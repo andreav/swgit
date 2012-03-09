@@ -256,7 +256,7 @@ class TagDsc( ObjCfgTag ):
     j = self.justify_
     retstr = ""
     retstr += "Tag Type".ljust( j )              + self.type_
-    retstr += "\n" + "Is Deafult Tag".ljust( j ) + str( self.isDefault_ )
+    retstr += "\n" + "Is Default Tag".ljust( j ) + str( self.isDefault_ )
     retstr += "\n" + super(TagDsc, self ).dump()
     return retstr
 

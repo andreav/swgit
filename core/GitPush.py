@@ -120,6 +120,19 @@ def check( options ):
     GLog.f( GLog.E, strerr )
     return 1
 
+  # Avoid remote but not tracked => pull will fail with:
+  #		Fetching tags only, you probably meant:
+  #   git fetch --tags
+  rem_logib = Branch( "%s/%s" % (g_remote,logib.getShortRef()) )
+  if rem_logib.isValid():
+    trackedInfo, tracked = logib.get_track_info()
+    if not tracked:
+      strerr  = "FAILED - Your current integration branch remotely exists but is not tracked.\n"
+      strerr += "         Please use swgit branch --track %s/%s" % (g_remote,logib.getShortRef())
+      GLog.f( GLog.E, strerr )
+      return 1
+
+
   #
   # side push checks
   #
@@ -156,7 +169,7 @@ def check( options ):
       GLog.f( GLog.E, "FAILED - You must have at least a DEV label on "+startb.getShortRef() )
       return 1
 
-  if options.noMail == False:
+  if not options.noMail:
     om = ObjMailPush()
     if not om.isValid():
       str_out_err = "WARNING cannot send mail due to wrong configuration.\n"
@@ -442,7 +455,7 @@ def execute( options ):
   #if you have pushed now on origin intbr => track it
   if not rem_logib.isValid():
     cmd_tarck_local_int_br = ""
-    errCode = os.system("SWINDENT=%d %s branch --track %s/%s %s" % ( GLog.tab+1, SWGIT, g_remote, startb.getShortRef(), output_opt ) )
+    errCode = os.system("SWINDENT=%d %s branch --track %s/%s %s" % ( GLog.tab+1, SWGIT, g_remote, logib.getShortRef(), output_opt ) )
 
   #delete past tags
   past_tags,errCode = get_tag_in_past_list()
@@ -505,6 +518,7 @@ Usage: swgit push [-I][--no-mail] [<remote>]"""
   parser.add_option_group( output_group )
 
   (options, args)  = parser.parse_args()
+  args = parser.largs
 
   help_mac( parser )
 

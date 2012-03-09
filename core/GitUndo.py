@@ -43,6 +43,7 @@ Usage: swgit undo <file>... """
   parser.add_option_group( output_group )
 
   (options, args)  = parser.parse_args()
+  args = parser.largs
   
   help_mac( parser )
 

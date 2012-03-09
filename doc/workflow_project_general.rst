@@ -123,15 +123,20 @@ COMMITTING REPOSITORY PROGRESS
 
 When you commit a repository inside a project, you freeze its state.
 From now on, if you come back to this just created commit, that repository will be
-restored to the its state when it has been committed::
+restored to the state it was when committed::
 
   swgit commit -a -m "freezing subrepo" --dev <SUBREPO>
 
 Remember specifying <SUBREPO> name when committing any subrepo upgrade.
 
-If you do not specify <SUBREPO>, you will commit ONLY all file inside proj.
+If you do not specify <SUBREPO>, you will commit ONLY files inside current proj.
 
-By this way, when you work inside project repository, you can ignore SUBREPO presence.
+| A common problem when splitting repository using submodules is the value stored 
+  inside higher repo regarding lower repo HEAD. Often, that value conflicts.
+| By this way, you will no more be scared of this. You will commit like in any plain 
+  repository.
+| Only during stabilization, someone will freeze submodules status 
+  into project.
 
 
 UPDATING PROJECT
@@ -279,64 +284,93 @@ This ClearCase-stolen term is used here with this purpose:
 This command shows you, for each repo, the sha registered inside project on commit
 you specified. The format is
 
-  REPOPATH : SHA
+  REPOPATH : SHA [# LABEL]
 
-You can add --pretty option to obtain a more human readable output.
-Every sha is described regarding to last LIV and STB inside that repo.
+`LABEL` is specified only when any one exists on that sha.
 
 
 STABILIZE --STB FOR A PROJECT
 -----------------------------
 
-When inside a project, ``swgit stabilize --stb`` enriches its meaning.
+:doc:`Stabilizing process <stabilizing>` enriches its meaning when 
+inside a project.
 
-Not only it stabilizes project as a normal repo,
-it also reports subrepos state on stable branch.
+Projects (like any plain repository with submodules), also store contained
+repositories references.
 
-You can use different --src values:
+| Stabilization freezes project as a normal repo.
+| Stabilization also reports submodules state on *INT/stable* branch.
 
-  1. TAG DROP WITH HEAD
+User can select submodule version to be frozen by -S/--source parameter:
+
+  1. No -S/--source parameter:
 
      ::
 
-        swgit stabilize --stb --src HEAD
+        swgit stabilize --stb Drop.A
 
-     The behavior is:
+     This branch is:
 
      *  proj repo: stabilize proj HEAD
-     *  dev repos: register current subrepo HEAD into project commit
-     *  cst repos: not affected. Register last registered commit
+     *  dev repos: not affected. Continue referring last registered commit.
+     *  cst repos: not affected. Continue referring last registered commit.
 
-  2. TAG DROP WITH COMMA-SEPARED LIST
+  2. COMMA-SEPARED -S/--source parameter:
 
      ::
 
-       swgit stabilize --stb --src ./:HEAD,A/SUBREPO:af2145bc
+       swgit stabilize --stb --source ./:HEAD,SUBREPO:1/0/0/0/andreav/INT/develop/LIV/Drop.Z
 
-     In this way you can choose to freeze a different commit for every repo.
+     | This format is well suited for scripting.
+     | For any submodule, user can choose its version.
+
+     Format is:
+
+       REPO:VER[,REPO:VER]...
+
+     | Root project is addressed with '.' repository.
+     | Actually, when no parameter is specified, `--source .:HEAD` is used instead.
 
      The behavior is:
 
        every repo into src    : checked out before stabilizing project
-       every repo NOT into src: same as --src HEAD (see previous point)
+       every repo NOT into src: Continue referring last registered commit.
 
 
-  3. TAG DROP WITH "CONFIG SPEC"
+  3. FILE -S/--source parameter:
 
      ::
 
-       swgit stabilize --stb --src filename.cs
+       swgit stabilize --stb --source filename.cs
 
-     filename.cs is a file containing output formatted as command output::
+     | This format is more human-readable.
+     | filename.cs is any file containing output formatted like this:
+
+       REPO:VER [#comments]
+       REPO:VER [#comments]
+
+     This output is the same produced by command::
 
          swgit proj --get-configspec <any_valid_reference>
 
-     Inside that file you can more neatly write commits
-     you want to select for each repo.
+     Inside that file user can more neatly write commits
+     he/she wants to select for each repo.
 
-     The behavior is 
+     The behavior is: 
 
-       same as comma separed list.
+       same as comma-separed list.
+
+When specifying any submodule with --source parameter, 
+another commit will be created on *INT/stable* branch:
+
+  * One commit for merging root repository source reference
+
+  * One commit (only when necessary) for storing changelogs and/or 
+    pre-liv-commit processing
+
+  * One commit (only when necessary) for storing submodules upgrades. 
+    This last commit is the new one.
+
 
 
 

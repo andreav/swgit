@@ -132,8 +132,12 @@ def info_eval_changelog( upstream, downstream, rel ):
   if ret != 0:
     return out, 1
 
-  cmd_show_commitmsg = " git for-each-ref \
-  --format='From:    %(*authorname) %(*authoremail)\nDate:    %(*authordate)\nRef:     %(refname)\n\n    %(subject)\n\n'"
+  chglog_fmt_file = SWCFG_STABILIZE_CHGLOG_FILE_FORMAT
+  obj_chglog_fmt_file = ObjCfgStabilize_CHGLOG_fmt_file()
+  if obj_chglog_fmt_file.isValid():
+    chglog_fmt_file = obj_chglog_fmt_file.get_chglog_fmt_file()
+
+  cmd_show_commitmsg = 'git for-each-ref --format="%s"' % chglog_fmt_file
 
   result = "x"
   devs = out.splitlines()
@@ -153,8 +157,12 @@ def info_eval_fixlog( upstream, downstream, rel ):
   if ret != 0:
     return out, 1
 
-  cmd_show_commitmsg = " git for-each-ref \
-  --format='From:    %(*authorname) %(*authoremail)\nDate:    %(*authordate)\nRef:     %(refname)\n\n    %(subject)\n\n'"
+  fixlog_fmt_file = SWCFG_STABILIZE_FIXLOG_FILE_FORMAT
+  obj_fixlog_fmt_file = ObjCfgStabilize_FIXLOG_fmt_file()
+  if obj_fixlog_fmt_file.isValid():
+    fixlog_fmt_file = obj_fixlog_fmt_file.get_fixlog_fmt_file()
+
+  cmd_show_commitmsg = "git for-each-ref --format='%s'" % fixlog_fmt_file
 
   result = "x"
   fixes = out.splitlines()
@@ -304,6 +312,7 @@ def main():
   parser.add_option_group( output_group )
 
   (options, args)  = parser.parse_args()
+  args = parser.largs
 
   help_mac( parser )
 

@@ -240,7 +240,7 @@ class Test_NoIntBr( Test_Base ):
     #cannot create br
     out, errCode = self.sw_Clo_h.branch_create( self.BRANCH_NAME )
     self.util_check_DENY_scenario( out, errCode, 
-                                   "Without integration branch set, plese specify --src",
+                                   "Without integration branch set, plese specify --source",
                                    "tag dev from /INT/ without intbr set" )
 
     self.assertEqual( errCode, 1, "MUST FAIL branch create - \n%s\n" % out )
@@ -401,7 +401,7 @@ class Test_NoIntBr( Test_Base ):
     #cannot create br
     out, errCode = self.sw_Clo_h.branch_create( self.BRANCH_NAME )
     self.util_check_DENY_scenario( out, errCode, 
-                                   "Without integration branch set, plese specify --src",
+                                   "Without integration branch set, plese specify --source",
                                    "tag dev from /CST/ without intbr set" )
 
     #no pull

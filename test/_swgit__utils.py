@@ -87,7 +87,7 @@ class swgit__utils:
 
     str_src_opt = ""
     if src != "":
-      str_src_opt = " --src %s " % src
+      str_src_opt = " --source %s " % src
 
     cmd = "cd %s && %s init -r %s/%s %s --git-user %s %s %s %s" % ( dir, SWGIT, r, s, str_liv_opt, u, str_c_opt, str_cst_opt, str_src_opt )
     return myCommand( cmd )
@@ -137,11 +137,16 @@ class swgit__utils:
   # Clone
   #
   @staticmethod
-  def clone_scripts_repo( dst ):
+  def clone_scripts_repo( dst, f_integrator = False ):
     #print "rm %s" % dst
     orig_bkp  = TEST_ORIG_REPO + ".BKP"
     clone     = TEST_ORIG_REPO + "_CLONE"
-    clone_bkp = clone          + ".BKP"
+
+    if f_integrator:
+      clone_bkp = clone          + ".INTEGRATOR.BKP"
+    else:
+      clone_bkp = clone          + ".BKP"
+
     aremote     = TEST_ORIG_REPO + AREMOTE_PATH + ".PARK"
     aremote_bkp = aremote        + ".BKP"
     aremote_dst = TEST_ORIG_REPO + AREMOTE_PATH
@@ -154,7 +159,7 @@ class swgit__utils:
     #
     # PROTOREPO
     #
-    if os.path.exists( orig_bkp ) == False:
+    if not os.path.exists( orig_bkp ):
       #orig first time
       create_protorepo()
       shutil.copytree( TEST_ORIG_REPO, orig_bkp )
@@ -164,9 +169,9 @@ class swgit__utils:
     #
     # PROTOREPO_AREMOTE
     #
-    if os.path.exists( aremote_bkp ) == False:
+    if not os.path.exists( aremote_bkp ):
       # clone first time
-      cmd = "%s clone -r %s %s -b %s " % ( SWGIT, ORIG_REPO_URL, aremote, ORIG_REPO_DEVEL_BRANCH )
+      cmd = "%s clone -R %s %s -b %s " % ( SWGIT, ORIG_REPO_URL, aremote, ORIG_REPO_DEVEL_BRANCH )
       out, retcode = myCommand( cmd )
       if retcode != 0:
         return out, retcode
@@ -192,9 +197,17 @@ class swgit__utils:
     #
     # PROTOREPO_CLONE
     #
-    if os.path.exists( clone_bkp ) == False:
+    if not os.path.exists( clone_bkp ):
       # clone first time
-      cmd = "%s clone %s %s -b %s " % ( SWGIT, ORIG_REPO_URL, clone, ORIG_REPO_DEVEL_BRANCH )
+      opt_branch = "-b %s" % ORIG_REPO_DEVEL_BRANCH
+      if f_integrator:
+        opt_branch = ""
+
+      opt_integrator = ""
+      if f_integrator:
+        opt_integrator = "--integrator"
+
+      cmd = "%s clone %s %s %s %s" % ( SWGIT, ORIG_REPO_URL, clone, opt_branch, opt_integrator )
       out, retcode = myCommand( cmd )
       if retcode != 0:
         return out, retcode
@@ -211,16 +224,12 @@ class swgit__utils:
       shutil.copytree( clone_bkp, dst )
 
 
-
     return "OK", 0
 
   
-
   @staticmethod
   def clone_scripts_repo_integrator( dst, append="" ):
-    #cmd = "%s clone -r %s %s --integrator -b %s %s" % ( SWGIT, ORIG_REPO_URL, dst, ORIG_REPO_DEVEL_BRANCH, append )
-    cmd = "%s clone -r %s %s --integrator %s" % ( SWGIT, ORIG_REPO_URL, dst, append )
-    return myCommand( cmd )
+    return swgit__utils.clone_scripts_repo( dst, f_integrator = True )
 
   @staticmethod
   def clone_repo( src, dst, br="", user="", addr="" ):
@@ -232,9 +241,9 @@ class swgit__utils:
       br=TEST_REPO_BR_DEV
 
     if os.environ.get( SWENV_TESTMODE ) == SWENV_LOCALREPOS:
-      cmd = "%s clone -r %s %s -b %s" % ( SWGIT, src, dst, br )
+      cmd = "%s clone -R %s %s -b %s" % ( SWGIT, src, dst, br )
     else:
-      cmd = "%s clone -r ssh://%s@%s%s %s -b %s" % ( SWGIT, user, addr, src, dst, br )
+      cmd = "%s clone -R ssh://%s@%s%s %s -b %s" % ( SWGIT, user, addr, src, dst, br )
 
     out, retcode = myCommand( cmd )
     return out, retcode
@@ -249,9 +258,9 @@ class swgit__utils:
       br=TEST_REPO_BR_DEV
 
     if os.environ.get( SWENV_TESTMODE ) == SWENV_LOCALREPOS:
-      cmd = "%s clone --integrator -r %s %s -b %s" % ( SWGIT, src, dst, br )
+      cmd = "%s clone --integrator -R %s %s -b %s" % ( SWGIT, src, dst, br )
     else:
-      cmd = "%s clone --integrator -r ssh://%s@%s%s %s -b %s" % ( SWGIT, user, addr, src, dst, br )
+      cmd = "%s clone --integrator -R ssh://%s@%s%s %s -b %s" % ( SWGIT, user, addr, src, dst, br )
 
     out, retcode = myCommand( cmd )
     return out, retcode
@@ -259,7 +268,7 @@ class swgit__utils:
 
   @staticmethod
   def clone_repo_url( url, dst, br, opt = "" ):
-    cmd = "%s clone -r %s %s -b %s %s" % ( SWGIT, url, dst, br, opt )
+    cmd = "%s clone -R %s %s -b %s %s" % ( SWGIT, url, dst, br, opt )
     out, retcode = myCommand( cmd )
     return out, retcode
   @staticmethod
@@ -281,9 +290,9 @@ class swgit__utils:
       addr = TEST_ADDR
 
     if os.environ.get( SWENV_TESTMODE ) == SWENV_LOCALREPOS:
-      cmd = "%s clone -r %s  %s --integrator -b %s" % ( SWGIT, src, dst, TEST_REPO_BR_DEV )
+      cmd = "%s clone -R %s  %s --integrator -b %s" % ( SWGIT, src, dst, TEST_REPO_BR_DEV )
     else:
-      cmd = "%s clone -r ssh://%s@%s%s  %s --integrator -b %s" % ( SWGIT, user, addr,src, dst, TEST_REPO_BR_DEV )
+      cmd = "%s clone -R ssh://%s@%s%s  %s --integrator -b %s" % ( SWGIT, user, addr,src, dst, TEST_REPO_BR_DEV )
     return myCommand( cmd )
 
 
@@ -345,7 +354,7 @@ class swgit__utils:
     return myCommand( cmd )
 
   def branch_create_src( self, name, src, all = ""  ):
-    cmd = "cd %s && %s branch -c %s --src %s %s" % ( self.repodir_, SWGIT, name, src, all )
+    cmd = "cd %s && %s branch -c %s --source %s %s" % ( self.repodir_, SWGIT, name, src, all )
     return myCommand( cmd )
 
   def branch_switch_to_int( self, all="" ):
@@ -357,7 +366,7 @@ class swgit__utils:
     return myCommand( cmd )
 
   def branch_switch_back( self, all="" ):
-    cmd = "cd %s && %s branch -S %s" % ( self.repodir_, SWGIT, all )
+    cmd = "cd %s && %s branch -b %s" % ( self.repodir_, SWGIT, all )
     return myCommand( cmd )
 
   def branch_delete_d( self, tbdbr, all="" ):
@@ -389,7 +398,7 @@ class swgit__utils:
     cmd = "cd %s && %s branch --track %s %s" % ( self.repodir_, SWGIT, br, all )
     return myCommand( cmd )
 
-  def branch_list_track( self, track = False ):
+  def branch_list_track( self ):
     cmd = "cd %s && %s branch --list-tracked" % ( self.repodir_, SWGIT )
     return myCommand( cmd )
 
@@ -1018,10 +1027,10 @@ denied-brtypes          =
   #
   # stabilize
   #
-  def stabilize_stb( self, labelname, src, dstbr = None, force = False ):
+  def stabilize_stb( self, labelname, src, dstbr = None, force = False, f_startpointlbl = True, f_preview = False ):
     opt_src = ""
     if src != "":
-      opt_src = "--src %s" % src
+      opt_src = "--source %s" % src
 
     opt_force = ""
     if force:
@@ -1031,25 +1040,37 @@ denied-brtypes          =
     if dstbr != None:
       opt_dstbr = dstbr
 
-    cmd = "cd %s && %s stabilize --batch --stb %s %s %s %s" % ( self.repodir_, SWGIT, opt_force, labelname, opt_src, opt_dstbr )
+    opt_startpointlabel = ""
+    if f_startpointlbl:
+      opt_startpointlabel = "--start-point-label"
+
+    opt_preview = ""
+    if f_preview:
+      opt_preview = "--preview"
+
+    cmd = "cd %s && %s stabilize --batch --stb %s %s %s %s %s %s" % ( self.repodir_, SWGIT, opt_force, labelname, opt_src, opt_dstbr, opt_startpointlabel, opt_preview )
     return myCommand( cmd )
 
-  def stabilize_liv( self, liv, dstbr = None, nomergeback = False ):
-    str_nomergeback = ""
-    if nomergeback:
-      str_nomergeback = "--no-merge-back"
+  def stabilize_liv( self, liv, dstbr = None, f_mergeback = True, f_nochglogs = False ):
+    opt_mergeback = ""
+    if f_mergeback:
+      opt_mergeback = "--merge-back"
 
     opt_dstbr = ""
     if dstbr != None:
       opt_dstbr = dstbr
 
-    cmd = "cd %s && %s stabilize --batch --liv %s %s %s" % ( self.repodir_, SWGIT, liv, str_nomergeback, opt_dstbr )
+    opt_nochglogs = ""
+    if f_nochglogs:
+      opt_nochglogs = "--no-chglogs"
+
+    cmd = "cd %s && %s stabilize --batch --liv %s %s %s %s" % ( self.repodir_, SWGIT, liv, opt_mergeback, opt_dstbr, opt_nochglogs )
     return myCommand( cmd )
 
-  def stabilize_both( self, labelname, src, dstbr = None, force = False ):
+  def stabilize_both( self, labelname, src, dstbr = None, force = False, f_nochglogs = False,f_mergeback = True, f_startpointlbl = True, f_preview = False ):
     opt_src = ""
     if src != "":
-      opt_src = "--src %s" % src
+      opt_src = "--source %s" % src
 
     opt_force = ""
     if force:
@@ -1059,7 +1080,23 @@ denied-brtypes          =
     if dstbr != None:
       opt_dstbr = dstbr
 
-    cmd = "cd %s && %s stabilize --stb --liv --batch %s %s %s %s" % ( self.repodir_, SWGIT, opt_force, labelname, opt_src, opt_dstbr )
+    opt_nochglogs = ""
+    if f_nochglogs:
+      opt_nochglogs = "--no-chglogs"
+
+    opt_startpointlabel = ""
+    if f_startpointlbl:
+      opt_startpointlabel = "--start-point-label"
+
+    opt_mergeback = ""
+    if f_mergeback:
+      opt_mergeback = "--merge-back"
+
+    opt_preview = ""
+    if f_preview:
+      opt_preview = "--preview"
+
+    cmd = "cd %s && %s stabilize --stb --liv --batch %s %s %s %s %s %s %s %s" % ( self.repodir_, SWGIT, opt_mergeback, opt_force, labelname, opt_src, opt_dstbr, opt_nochglogs, opt_startpointlabel, opt_preview )
     return myCommand( cmd )
 
   
@@ -1072,7 +1109,7 @@ denied-brtypes          =
 
     str_src_opt = ""
     if src != "":
-      str_src_opt = " --src %s " % src
+      str_src_opt = " --source %s " % src
 
     str_liv_opt = ""
     if l != "":
@@ -1096,7 +1133,7 @@ denied-brtypes          =
 
   @staticmethod
   def init_cst_dst( dir, src, cstname, rel ):
-    cmd = "cd %s && %s init --create %s --cst --src %s -r %s --git-user %s" % ( dir, SWGIT, cstname, src, rel.replace( '/','.' ), ORIG_REPO_GITUSER )
+    cmd = "cd %s && %s init --create %s --cst --source %s -r %s --git-user %s" % ( dir, SWGIT, cstname, src, rel.replace( '/','.' ), ORIG_REPO_GITUSER )
     return myCommand( cmd )
 
   def init_cst( self, src, cstname, rel ):
@@ -1108,4 +1145,68 @@ denied-brtypes          =
   def remote_add( self, name, url ):
     cmd = "cd %s && git remote add %s %s" % (self.repodir_, name, url)
     return myCommand( cmd )
+
+
+
+  stabilize_template = Template("""
+[stabilize]
+hook-pre-liv-commit-script  = $hook_pre_liv_commit_script
+hook-pre-liv-commit-sshuser = $hook_pre_liv_commit_sshuser
+hook-pre-liv-commit-sshaddr = $hook_pre_liv_commit_sshaddr
+""" )
+
+  def section_stabilize_define( self, stabilizeCfg ):
+    stabilize_file = self.repodir_ + SWSTABILIZE_FILE
+
+    stabilize_cfg = self.stabilize_template.substitute( stabilizeCfg )
+
+    tagf = open( stabilize_file, "w" )
+    tagf.write( stabilize_cfg )
+    tagf.close()
+
+  stabilize_template_chglog_file = Template("""
+[stabilize]
+chglog-fmt-file  = $chglog_fmt_file
+""" )
+
+  def section_stabilize_chglogfile_define( self, stabilizeCfg ):
+    stabilize_file = self.repodir_ + SWSTABILIZE_FILE
+
+    stabilize_cfg = self.stabilize_template_chglog_file.substitute( stabilizeCfg )
+
+    tagf = open( stabilize_file, "w" )
+    tagf.write( stabilize_cfg )
+    tagf.close()
+
+
+  stabilize_template_fixlog_file = Template("""
+[stabilize]
+fixlog-fmt-file  = $fixlog_fmt_file
+""" )
+
+  def section_stabilize_fixlogfile_define( self, stabilizeCfg ):
+    stabilize_file = self.repodir_ + SWSTABILIZE_FILE
+
+    stabilize_cfg = self.stabilize_template_fixlog_file.substitute( stabilizeCfg )
+
+    tagf = open( stabilize_file, "w" )
+    tagf.write( stabilize_cfg )
+    tagf.close()
+
+
+  stabilize_template_chglog_mail = Template("""
+[stabilize]
+chglog-fmt-mail   = $chglog_fmt_mail
+chglog-sort-mail  = $chglog_sort_mail
+""" )
+
+  def section_stabilize_chglogmail_define( self, stabilizeCfg ):
+    stabilize_file = self.repodir_ + SWSTABILIZE_FILE
+
+    stabilize_cfg = self.stabilize_template_chglog_mail.substitute( stabilizeCfg )
+
+    tagf = open( stabilize_file, "w" )
+    tagf.write( stabilize_cfg )
+    tagf.close()
+
 

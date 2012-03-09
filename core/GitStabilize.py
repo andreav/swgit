@@ -30,9 +30,6 @@ from ObjTag import *
 from ObjStatus import *
 from ObjMail import *
 
-#TODO allow user make a --liv with ANY tag user defined tag (not only LIV)
-#TODO option to merge back customizable as repo option
-
 g_srcoptions_map = {}
 g_labelname = None
 g_targetbr = None
@@ -42,6 +39,8 @@ g_fixes = []
 g_chgfname = None
 g_fixfname = None
 g_tktfname = None
+_g_rargs   = []
+
 
 # 1. eval from cb
 # 2. eval from intbr
@@ -130,6 +129,56 @@ def create_rel_path():
     return 1 
   return 0
 
+def show_preview( options ):
+
+  for (dir, tbs_ref) in g_srcoptions_map.items():
+
+    if dir == '.': #root
+
+      dir = os.getcwd()
+      #bound = '='*len(dir)
+      #strhead = "\n%s\n\n" % "\n".join( (bound,dir,bound) )
+
+      prev_ref = g_targetbr
+
+    else: #submods
+
+      dir = dir2reponame( dir )
+      bound = '='*len(dir)
+      strhead = "\n%s\n\n" % "\n".join( (bound,dir,bound) )
+
+      prev_ref, errCode = submod_getrepover_atref( Env.getLocalRoot(), dir, g_targetbr )
+      if errCode != 0:
+        GLog.f( GLog.E, strhead + prev_ref )
+        return 1
+
+    if Env.is_aproj( dir ) and dir != os.getcwd():
+
+      str_opt_diff = ""
+      if len( _g_rargs ) > 0:
+        str_opt_diff = "-- %s" % " ".join( _g_rargs )
+
+      cmd_diff = "cd %s && %s proj --diff %s %s %s" % ( dir, SWGIT, prev_ref, tbs_ref, str_opt_diff )
+      #out, errCode = myCommand( cmd_diff )
+      errCode = os.system( cmd_diff )
+
+    else:
+
+      row0 = "repo  %s" % dir
+      row1 = "REF1: %s" % prev_ref
+      row2 = "REF2: %s" % tbs_ref
+      row_cmd   = "CMD:  git diff $REF1 $REF2 %s" % " ".join(_g_rargs)
+
+      cmd_diff = "cd %s && git diff %s %s %s" % ( dir, prev_ref, tbs_ref, " ".join( _g_rargs ) )
+      out, errCode = myCommand( cmd_diff )
+
+      maxlen = len( max( row0, row1, row2, row_cmd, key=len ) )
+      bound = "="*maxlen
+      strout = "\n%s\n\n" % "\n".join( (bound,row0, row1, row2, row_cmd, bound) )
+
+      GLog.f( GLog.E, strout + out )
+
+  return 0
 
 def touch_file( fname ):
   FILE = open( fname, "w" )
@@ -147,13 +196,18 @@ def eval_changelog_content():
     touch_file( g_changelog )
     return 0
 
-  #TODO customize format
-  cmd_show_commitmsg = "git for-each-ref --format='%s'" % SWCFG_STABILIZE_CHGLOG_FILE_FORMAT
+  chglog_fmt_file = SWCFG_STABILIZE_CHGLOG_FILE_FORMAT
+  obj_chglog_fmt_file = ObjCfgStabilize_CHGLOG_fmt_file()
+  if obj_chglog_fmt_file.isValid():
+    chglog_fmt_file = obj_chglog_fmt_file.get_chglog_fmt_file()
+
+  cmd_show_commitmsg = 'git for-each-ref --format="%s"' % chglog_fmt_file
   cmd_redirectfile = "tee %s" % ( g_changelog )
 
   out, errCode = myCommand( "%s %s | %s" % ( cmd_show_commitmsg, " ".join( [ "refs/tags/" + d for d in g_devs] ), cmd_redirectfile ) )
   if errCode != 0:
     GLog.f( GLog.E, "\tError executing command retrieving changelog" )
+    GLog.f( GLog.E, indentOutput( out[:-1], 1 ) )
     GLog.logRet(errCode)
     return 1 
   return 0
@@ -168,8 +222,12 @@ def eval_fixlog_content():
     touch_file( g_fixlog )
     return 0
 
-  #TODO customize format
-  cmd_show_commitmsg = "git for-each-ref --format='%s'" % SWCFG_STABILIZE_FIXLOG_FILE_FORMAT
+  fixlog_fmt_file = SWCFG_STABILIZE_FIXLOG_FILE_FORMAT
+  obj_fixlog_fmt_file = ObjCfgStabilize_FIXLOG_fmt_file()
+  if obj_fixlog_fmt_file.isValid():
+    fixlog_fmt_file = obj_fixlog_fmt_file.get_fixlog_fmt_file()
+
+  cmd_show_commitmsg = "git for-each-ref --format='%s'" % fixlog_fmt_file
   cmd_redirectfile = "tee %s" % ( g_fixlog )
   
   out, errCode = myCommand( "%s %s | %s" % ( cmd_show_commitmsg, " ".join( [ "refs/tags/" + d for d in g_fixes] ), cmd_redirectfile ) )
@@ -193,7 +251,7 @@ def eval_tktlog_content():
   return 0
 
 
-def eval_create_commit_logs( upstream ):
+def eval_create_add_logs( upstream ):
 
   cb = Branch.getCurrBr()
 
@@ -239,17 +297,55 @@ def eval_create_commit_logs( upstream ):
   GLog.s( GLog.S, stradd )
 
   cmd_add    = "git add %s %s %s " % ( g_changelog, g_fixlog, g_tktlog )
-  cmd_commit = "git commit  --allow-empty  -m \"Added Changelog, Fixlog and Ticketlog for drop %s_%s, release %s )\"" % \
-                            (SWCFG_TAG_LIV, g_labelname, cb.getRel().replace( "/","." ))
-  
-  out, errCode = myCommand( "%s && %s" % ( cmd_add, cmd_commit ) )
+  out, errCode = myCommand( cmd_add )
   if errCode != 0:
-    GLog.f( GLog.E, "Error while adding and committing Changelog, Fixlog and Ticketlog" )
+    GLog.f( GLog.E, "Error while adding Changelog, Fixlog and Ticketlog" )
     GLog.logRet(out)
     GLog.logRet(errCode)
     return 1 
   GLog.logRet( 0, indent="\t" )
   return 0
+
+
+def execute_pre_liv_commit_hook():
+
+  obj_prelivcommit_hook = ObjCfgStabilize_PreLivCommit_Hook()
+  if not obj_prelivcommit_hook.isValid(): #no scripts configured
+    return "", 0
+
+  hook_script = obj_prelivcommit_hook.get_hook_precommit_script()
+  cmd_hook_precommit = "%s %s %s" % ( hook_script, g_labelname, g_targetbr )
+
+  hook_sshuser = obj_prelivcommit_hook.get_hook_precommit_sshuser()
+  hook_sshaddr = obj_prelivcommit_hook.get_hook_precommit_sshaddr()
+
+  ssherr = ""
+  if hook_sshuser != "" and hook_sshaddr != "":
+
+    ssherr = "%s@%s " % (hook_sshuser, hook_sshaddr)
+    GLog.s( GLog.S, "\tExecuting pre-liv-commit hook %s%s ..." %  (ssherr, cmd_hook_precommit) )
+    precommitout,precommiterr = mySSHCommand( cmd_hook_precommit, hook_sshuser, hook_sshaddr )
+
+  elif hook_sshuser == "" and hook_sshaddr == "":
+
+    GLog.s( GLog.S, "\tExecuting pre-liv-commit hook %s ..." %  (cmd_hook_precommit) )
+    precommitout,precommiterr = myCommand( cmd_hook_precommit )
+
+  else:
+    strerr = "\tERROR - pre-liv-commit hook not well defined. Specify both or nothing among sshuser and sshaddr."
+    return strerr, 1
+
+  if precommitout[:-1] != "":
+    GLog.f( GLog.E, indentOutput(precommitout[:-1], 2) )
+
+  if precommiterr != 0:
+    strerr = "\tFAILED - pre-liv-commit hook (%s%s) returned error. Abort stabilization." % (ssherr, cmd_hook_precommit)
+    return strerr, 1
+
+  GLog.s( GLog.S, "\tDONE" )
+  return "", 0
+
+
 
 
 
@@ -260,8 +356,18 @@ def eval_body_mail():
   body_mail_tickets += "\n".join( g_fixes )
   GLog.f( GLog.I, body_mail_tickets )
 
+  chglog_fmt_mail = SWCFG_STABILIZE_CHGLOG_MAIL_FORMAT
+  obj_chglog_fmt_mail = ObjCfgStabilize_CHGLOG_fmt_mail()
+  if obj_chglog_fmt_mail.isValid():
+    chglog_fmt_mail = obj_chglog_fmt_mail.get_chglog_fmt_mail()
+
+  chglog_sort_mail = SWCFG_STABILIZE_CHGLOG_MAIL_SORT
+  obj_chglog_sort_mail = ObjCfgStabilize_CHGLOG_sort_mail()
+  if obj_chglog_sort_mail.isValid():
+    chglog_sort_mail = obj_chglog_sort_mail.get_chglog_sort_mail()
+
   #Devs
-  cmd_show_commitmsg = "git for-each-ref --format='%s' --sort='%s'" % (SWCFG_STABILIZE_CHGLOG_MAIL_FORMAT,SWCFG_STABILIZE_CHGLOG_MAIL_SORT)
+  cmd_show_commitmsg = "git for-each-ref --format='%s' --sort='%s'" % (chglog_fmt_mail, chglog_sort_mail)
   out_devs, errCode = myCommand( "%s %s" % ( cmd_show_commitmsg, " ".join( [ "refs/tags/" + d for d in g_fixes] ) ) )
   if errCode != 0:
     GLog.f( GLog.E, "\tError executing command retrieving changelog" )
@@ -272,6 +378,31 @@ def eval_body_mail():
 
   return body_mail_tickets + "\n" + body_mail_devs
 
+def show_chglogs_cfg():
+
+  objs = []
+  objs.append( ( "* PRE-COMMIT-HOOK"   ,        ObjCfgStabilize_PreLivCommit_Hook()) )
+  objs.append( ( "* CHGLOG FILE FORMAT",        ObjCfgStabilize_CHGLOG_fmt_file()  ) )
+  objs.append( ( "* FIXLOG FILE FORMAT",        ObjCfgStabilize_FIXLOG_fmt_file()  ) )
+  objs.append( ( "* CHGLOG MAIL FORMAT",        ObjCfgStabilize_CHGLOG_fmt_mail()  ) )
+  objs.append( ( "* CHGLOG MAIL SORT CRITERIA", ObjCfgStabilize_CHGLOG_sort_mail() ) )
+
+  strout = ""
+
+  for t, o in objs:
+    strout += "\n%s\n%s\n%s\n" % ( "="*len(t), t, "="*len(t) )
+
+    strval  = "%s\n" % ("-"*50)
+    strval += o.dump( f_short = True )
+    strval += "%s\n" % ("-"*50)
+    strval += o.show_config_options()
+    strval += "\n"
+
+    strout += indentOutput( strval, 1)
+
+  print strout
+  return 0
+
 
 ########################
 # GENERIC CHECKS
@@ -281,13 +412,13 @@ def check(options):
   GLog.s( GLog.S, "Check " + dumpRepoName("your local") + " repository stabilize ..." )
 
   # mail checks #####
-  if options.showmailcfg == True:
+  if options.showmailcfg or options.showcfg:
     return 0
 
   if options.testmail:
     om = ObjMailPush()
     if om.isValid() == False:
-      GLog.f( GLog.E, "FAILED - Mail not well configured." )
+      GLog.f( GLog.E, "\tMail not well configured." )
       GLog.f( GLog.E, om.dump() )
       return 1
     return 0
@@ -300,7 +431,17 @@ def check(options):
   # mail checks END #####
 
   if options.stb and options.src == None:
-    GLog.f( GLog.E, "Option --src-reference mandatory with --stb/--stb-label" )
+    options.src =  ".:HEAD"
+    GLog.f( GLog.E, "\t(No option -S/--source specified, using HEAD)" )
+    #GLog.f( GLog.E, "Option -S/--source mandatory with --stb/--stb-label" )
+    #return 1
+
+  if options.preview and not options.stb:
+    GLog.f( GLog.E, "\t-p/--preview option can only be provided with --stb" )
+    return 1
+
+  if len( _g_rargs) > 0 and not options.preview:
+    GLog.f( GLog.E, "\tCan specify additional arguments (after -- ) only with -p/--preview" )
     return 1
 
   tagDsc = None
@@ -312,13 +453,13 @@ def check(options):
   if not tagDsc.check_valid_value( g_labelname ):
     strerr  = "Please specify a valid name for label %s" % tagDsc.get_type()
     strerr += "  (i.e. satisfying at least 1 regexp inside: %s)" % tagDsc.get_regexp()
-    GLog.f( GLog.E, strerr )
+    GLog.f( GLog.E, indentOutput(strerr,1) )
     return 1
 
   # never on origin
   out, errCode = myCommand( "git remote show" )
   if len( out ) == 0:
-    GLog.f( GLog.E, "Cannot execute this script on repository origin" )
+    GLog.f( GLog.E, "\tCannot execute this script on repository origin" )
     return 1 
 
   cb = Branch.getCurrBr()
@@ -333,8 +474,8 @@ def check(options):
   tb = Branch( g_targetbr )
 
   if not tb.isValid():
-    GLog.f( GLog.E, "Please specify a valid branch onto which to make stb/liv.")
-    GLog.f( GLog.E, tb.getNotValidReason() )
+    GLog.f( GLog.E, "\tPlease specify a valid branch onto which to make stb/liv.")
+    GLog.f( GLog.E, indentOutput(tb.getNotValidReason(),1) )
     return 1 
 
   if not tb.isStable() and tb.getType() != SWCFG_BR_CST:
@@ -344,7 +485,7 @@ def check(options):
     strerr += "    1. providing an <INT/stable> or <CST/customer> target branch on command line\n"
     strerr += "    2. moving on target branch with 'swgit branch --switch'\n"
     strerr += "    3. setting an 'INT/develop' integration branch by 'swgit branch --set-integration-br'\n"
-    GLog.f( GLog.E, strerr )
+    GLog.f( GLog.E, indentOutput( strerr, 1 ) )
     return 1 
 
   trackedInfo, tracked = tb.get_track_info()
@@ -354,54 +495,44 @@ def check(options):
     GLog.f( GLog.E, strerr )
     return 1 
 
-  if options.no_merge_back and not options.liv:
-    GLog.f( GLog.E, "option --no-merge-back must be provided only whith --liv one.")
+  if options.merge_back and not options.liv:
+    GLog.f( GLog.E, "\toption --merge-back must be provided only with --liv one.")
     return 1 
 
-  if options.no_merge_back and not tb.isStable(): #liv for CST branch
-    GLog.f( GLog.E, "option --no-merge-back must be provided only when stabilizing INT/develop branches.")
+  if options.merge_back and not tb.isStable(): #liv for CST branch
+    GLog.f( GLog.E, "\toption --merge-back must be provided only when stabilizing onto INT/stable branches.")
     return 1 
 
-  if not options.no_merge_back:
+  if options.merge_back:
     literal_develop = tb.getShortRef().replace( "stable", "develop" )
     devBr = Branch( literal_develop )
     trackedInfo, tracked = devBr.get_track_info()
     if not tracked:
       strerr  = "When needing to merge LIV back on INT/develop, target branch (here, %s) must be tracked." % devBr.getFullRef()
       strerr += "You can track it with swgit branch --track <brname>"
-      GLog.f( GLog.E, strerr )
+      GLog.f( GLog.E, indentOutput( strerr, 1 ) )
       return 1 
 
   #
   # src management
   #
-#  if options.src == None:
-#    options.src =  "./:HEAD"
-
   if options.src != None:
 
-    if Env.is_aproj():
+    ret, options.src = src_reference_check( options.src, options.batch )
+    if ret != 0:
+      GLog.f( GLog.E, options.src )
+      return 1
 
-      ret, options.src = src_reference_check( options.src, options.batch )
-      if ret != 0:
-        GLog.f( GLog.E, options.src )
-        return 1
-
-    else: #inside repo
-
-      if options.src.find( ',' ) != -1:
-        GLog.f( GLog.E, "Outside root project directory, " + \
-                         "you can stabilize only current repository, " + \
-                         "do not specify multiple values inside options.src, " + \
-                         "or move to root project (%s)" % Env.getLocalRoot() )
-        return 1
-
-    options.src = options.src.replace( '.:', './:' )
+    options.src = options.src.replace( './:', '.:' )
 
     if options.src.find( ':' ) == -1: #only 1 val
-      options.src = "./:%s" % options.src
-    if options.src.find( './:' ) == -1: #not currdir listed
-      options.src = "./:HEAD," + options.src
+      options.src = ".:%s" % options.src
+    if options.src.find( '.:' ) == -1: #not currdir listed
+      options.src = ".:HEAD," + options.src
+      GLog.f( GLog.E, "\t(Option -S/--source not conatining '.' entry, using HEAD)" )
+      #strerr = "Option -S/--source not containing '.' entry. Mandatory."
+      #GLog.f( GLog.E, strerr )
+      #return 1
 
     global g_srcoptions_map
 
@@ -417,30 +548,46 @@ def check(options):
 
     options.src = new_opt_str[:-1] #last ','
 
+    inits_notsnaps = submod_list_initialized_notsnapshot()
+
     for currentry in options.src.split( ',' ):
       dir, ref = currentry.split(':')
-      if ref == "HEAD":
-        GLog.f( GLog.E, "Please specify a valid source reference (HEAD it is not) inside repo: %s" % dir )
+      rn = dir2reponame( dir )
+
+      #substututed before
+      #if ref == "HEAD":
+      #  GLog.f( GLog.E, "Please specify a valid source reference (HEAD it is not) inside repo: %s" % rn )
+      #  return 1
+
+      if rn != "." and rn not in inits_notsnaps:
+        strerr  = "Repository '%s' is not directly contained into current project.\n" % rn
+        strerr += "It is not possible to stabilize repositories deeper than 1 level.\n"
+        strerr += "You must stabilize '%s' inside its container project,\n" % rn
+        strerr += "then provied here that stabilized sha/label."
+        GLog.f( GLog.E, indentOutput( strerr, 1 ) )
         return 1
 
-      g_srcoptions_map[ dir ] = ref
+      g_srcoptions_map[ rn ] = ref
 
-      err, sha = getSHAFromRef( ref, dir )
+      err, sha = getSHAFromRef( ref, rn )
       if err != 0:
-        GLog.f( GLog.E, "Please specify a valid source reference inside repo: %s" % dir )
+        GLog.f( GLog.E, "\tPlease specify a valid source reference inside repo: %s" % rn )
         return 1
 
       # stabilize anyref
-      if get_repo_cfg_bool( SWCFG_STABILIZE_ANYREF, dir ) == False:
+      if get_repo_cfg_bool( SWCFG_STABILIZE_ANYREF, rn ) == False:
         if ref.find( "/NGT/" ) == -1:
-          GLog.f( GLog.E, "iside repo %s, according to swgit.stabilize-anyref option, only NGT labels are allowed to be stabilized" % dir )
+          strerr  = "Inside repository %s, only NGT labels are allowed to be stabilized.\n" % rn
+          strerr += "You can change this behaviour by issueing:\n"
+          strerr += "    git config --bool swgit.stabilize-anyref True"
+          GLog.f( GLog.E, indentOutput( strerr,1 ) )
           return 1
 
 
   # generic checks
   err, errstr = Status.checkLocalStatus_rec( ignoreSubmod = True )
   if err != 0:
-    GLog.f( GLog.E, errstr )
+    GLog.f( GLog.E, indentOutput( errstr, 1 ) )
     return 1 
 
   if not is_integrator_repo():
@@ -450,31 +597,31 @@ def check(options):
     strerr += "   clone with --integrator\n"
     strerr += "  or\n"
     strerr += "   convert this repo with 'git config --bool swgit.integrator True'"
-    GLog.f( GLog.E, strerr )
+    GLog.f( GLog.E, indentOutput( strerr, 1 ) )
     return 1 
 
   # stabilizing only new commits except if --force is provided
   if options.stb:
 
-    err, srcsha = getSHAFromRef( g_srcoptions_map[ "./" ] )
+    err, srcsha = getSHAFromRef( g_srcoptions_map[ "." ] )
     if err != 0:
-      GLog.f( GLog.E, "Please specify a valid --src-reference." )
+      GLog.f( GLog.E, "\tPlease specify a valid -S/--source for top repository." )
       return 1
 
     errCode, f_ret = AisparentofB( srcsha, tb.getShortRef() )
     if errCode != 0:
-      GLog.f( GLog.E, "Internal error. (%s/%s)" % (srcsha, tb.getShortRef()) )
+      GLog.f( GLog.E, "\tInternal error. (%s/%s)" % (srcsha, tb.getShortRef()) )
       return 1
     
     if f_ret == True:
       if not options.force:
-        strerr  = "Reference '%s' has already been reported on '%s'\n" % (g_srcoptions_map[ "./" ], tb.getShortRef())
+        strerr  = "Reference '%s' has already been reported on '%s'\n" % (g_srcoptions_map[ "." ], tb.getShortRef())
         strerr += "If you really want to continue (for instance to create new labels)\n"
         strerr += "   please provide --force option."
-        GLog.f( GLog.E, strerr )
+        GLog.f( GLog.E, indentOutput( strerr, 1 ) )
         return 1
       else:
-        GLog.s( GLog.I, "Stabilizing reference %s, already merged into %s" % (srcsha,tb.getShortRef()) )
+        GLog.s( GLog.I, "\tStabilizing reference %s, already merged into %s" % (srcsha,tb.getShortRef()) )
 
 
   # Only 1 STB per DROP 
@@ -485,7 +632,7 @@ def check(options):
 
   tbcTag = Tag( to_be_created_tag )
   if tbcTag.isValid():
-    GLog.f( GLog.E, "Already exists a tag named '%s'" % to_be_created_tag )
+    GLog.f( GLog.E, "\tAlready exists a tag named '%s'" % to_be_created_tag )
     return 1 
 
   ret = 0
@@ -518,13 +665,59 @@ def check_liv( options ):
 
 
 ########################
-# STABILIZE
+# GENERIC EXECUTE
 ########################
-def stabilize( lblName, src_str, mergeOntoBr = None ):
+def execute( options ):
 
-  lblType  = SWCFG_TAG_STB
+  # mail exec #####
+  if options.showmailcfg:
+
+    om = ObjMailStabilize()
+    print om.dump()
+    print om.show_config_options()
+    print ""
+    return 0
+
+  elif options.testmail:
+
+    GLog.s( GLog.S, "Sending test mail" )
+
+    om = ObjMailStabilize()
+    out, err = om.sendmail( "SWGIT STABILIZE TEST MAIL", debug = False )
+    if out[:-1] != "":
+      GLog.f( GLog.E, indentOutput( out[:-1], 1 ) )
+    GLog.logRet( err )
+    return err
+  # mail exec END #####
+
+  #output cfg ####
+  if options.showcfg:
+    return show_chglogs_cfg()
+  #output cfg END
+
+  if options.preview:
+    return show_preview( options )
+
+  if options.stb:
+    ret = execute_stb( options )
+    if ret != 0:
+      return 1
+
+  if options.liv:
+    ret = execute_liv( options )
+    if ret != 0:
+      return 1
+
+  return ret
+ 
+
+########################
+# STB EXECUTE
+########################
+def execute_stb( options ):
+
   cb       = Branch.getCurrBr()
-  startref = g_srcoptions_map[ "./" ]
+  startref = g_srcoptions_map[ "." ]
 
   str_begin = ""
   err, beginning_sha = getSHAFromRef( "HEAD" )
@@ -534,12 +727,11 @@ def stabilize( lblName, src_str, mergeOntoBr = None ):
     str_begin = "%s" % beginning_sha
 
 
-  #strout = "Stabilizing reference '%s', onto branch '%s', into '%s' repo ... " % ( startref, mergeOntoBr, dumpRepoName("local") )
   strout  = "Stabilizing contributes:\n"
   strout += "\tlabel              : %s\n" % g_labelname
   strout += "\tinto repository    : %s\n" % (dumpRepoName("local"))
   strout += "\treporting reference: %s\n" % (startref)
-  strout += "\ton target branch   : %s\n" % (mergeOntoBr)
+  strout += "\ton target branch   : %s\n" % (g_targetbr)
   strout += "\tstarting from      : %s\n" % (str_begin)
   GLog.s( GLog.S, strout )
 
@@ -547,7 +739,7 @@ def stabilize( lblName, src_str, mergeOntoBr = None ):
   #
   # Switch on target branch
   #
-  cmd_goto_stb = "%s branch --switch %s" % (SWGIT,mergeOntoBr)
+  cmd_goto_stb = "%s branch --switch %s" % (SWGIT,g_targetbr)
   out, errCode = myCommand( cmd_goto_stb )
   if errCode != 0:
     GLog.f( GLog.E, indentOutput(out[:-1],1) )
@@ -583,17 +775,24 @@ def stabilize( lblName, src_str, mergeOntoBr = None ):
     return 1 
   GLog.logRet( 0, indent="\t" )
 
+  #
+  # Inside a project, after merge update subrepos according to new .gitmodules
+  #
+  if Env.is_aproj():
+    cmd_resethead = "SWINDENT=%d %s proj --reset HEAD" % ( GLog.tab+1, SWGIT )
+    errCode = os.system( cmd_resethead )
+    if errCode != 0 :
+      return 1
 
   #
-  # If you are a proj, move on src input references inside subrepos
+  # Inside a project, move on src input references inside subrepos
   #   and comit proj to freeze repos alignment
   #
   if Env.is_aproj():
 
-    for currentry in src_str.split( ',' ):
-      dir, ref = currentry.split(':')
-      if dir == "./":
-        continue
+    srcoptions_map_noroot = g_srcoptions_map
+    del srcoptions_map_noroot['.']
+    for (dir, ref) in srcoptions_map_noroot.items():
 
       cmd_selectref_subrepo = "cd %s && %s branch --switch %s" % ( dir, SWGIT, ref )
       out, errCode = myCommand( cmd_selectref_subrepo )
@@ -601,25 +800,36 @@ def stabilize( lblName, src_str, mergeOntoBr = None ):
         GLog.f( GLog.E, out )
         return 1
 
-    # now commit repositories changes
-    cmd_commitmodules = "git commit -a -m \"Submodules commit\" --allow-empty"
-    out, errCode = myCommand( cmd_commitmodules )
-    if errCode != 0 :
-      GLog.f( GLog.E, out )
-      return 1
+    # commit repositories changes only if any
+    if len( srcoptions_map_noroot ) > 0:
+
+      maxlen = len( max( srcoptions_map_noroot.keys(), key = len ) )
+
+      cmt_body = ""
+      for (dir, ref) in srcoptions_map_noroot.items():
+        cmt_body += ("%s" % dir).ljust( maxlen )
+        cmt_body += " : %s\n" % ref
+
+      comment = "'Submodules commit - rel: %s - drop: %s_%s\n\n%s'" % \
+                ( cb.getRel().replace( "/","." ), 
+                  SWCFG_TAG_LIV, g_labelname, 
+                  cmt_body
+                )
+      cmd_commitmodules = "git commit -a --allow-empty -m %s" % comment
+      out, errCode = myCommand( cmd_commitmodules )
+      if errCode != 0 :
+        GLog.f( GLog.E, out )
+        return 1
 
 
   #
-  # Create Tag on mergeOntoBr
+  # Create Tag on g_targetbr
   #
-  fullTagName_target = "%s/%s/%s" % ( cb.getShortRef(), lblType, lblName )
-  #cmd_chk_back       = "%s branch --quiet -s %s" % (SWGIT, cb.getShortRef())
-  cmd_tag_create     = "SWINDENT=%d %s tag -m \"%s\" %s %s" % (GLog.tab+1, SWGIT, fullTagName_target, lblType, lblName)
-  #cmd_create_tag_target = "%s && %s" % ( cmd_chk_back, cmd_tag_create )
-  #errCode = os.system( cmd_create_tag_target )
+  fullTagName_target = "%s/%s/%s" % ( cb.getShortRef(), SWCFG_TAG_STB, g_labelname )
+  cmd_tag_create     = "SWINDENT=%d %s tag -m \"%s\" %s %s" % (GLog.tab+1, SWGIT, fullTagName_target, SWCFG_TAG_STB, g_labelname)
   errCode = os.system( cmd_tag_create )
   if errCode != 0:
-    GLog.f( GLog.E, "\tError while creating label %s on branch %s" % ( lblName, cb.getShortRef() ) )
+    GLog.f( GLog.E, "\tError while creating label %s on branch %s" % ( g_labelname, cb.getShortRef() ) )
     GLog.logRet(errCode)
     return 1 
 
@@ -630,78 +840,33 @@ def stabilize( lblName, src_str, mergeOntoBr = None ):
   #
   if cb.isStable(): #this tag only when stabilizing develop
 
-    devShortRef = cb.getShortRef().replace( "stable", "develop" )
-    fullTagName_dev    = "%s/%s/%s" % ( devShortRef,      lblType, lblName )
+    if options.start_point_label:
 
-    cmd_chk_startref   = "%s branch --quiet -s %s" % (SWGIT, startref)
-    cmd_tag_create     = "SWINDENT=%d %s tag -m \"%s\" %s %s" % (GLog.tab+1, SWGIT, fullTagName_dev, lblType, lblName)
-    cmd_create_tag_dev = "%s && %s" % ( cmd_chk_startref, cmd_tag_create )
-    errCode = os.system( cmd_create_tag_dev )
-    if errCode != 0:
-      GLog.f( GLog.E, "\tError creating label %s on branch %s, not critical." % ( lblName, cb.getShortRef() ) )
+      devShortRef = cb.getShortRef().replace( "stable", "develop" )
+      fullTagName_dev    = "%s/%s/%s" % ( devShortRef,      SWCFG_TAG_STB, g_labelname )
 
-    cmd_chk_back       = "%s branch --quiet -s %s" % (SWGIT, cb.getShortRef())
-    errCode = os.system( cmd_chk_back )
-    if errCode != 0:
-      GLog.f( GLog.E, "\tError while coming back on %s" % ( cb.getShortRef() ) )
-      GLog.logRet(errCode)
-      return 1 
+      cmd_chk_startref   = "%s branch --quiet -s %s" % (SWGIT, startref)
+      cmd_tag_create     = "SWINDENT=%d %s tag -m \"%s\" %s %s" % (GLog.tab+1, SWGIT, fullTagName_dev, SWCFG_TAG_STB, g_labelname)
+      cmd_create_tag_dev = "%s && %s" % ( cmd_chk_startref, cmd_tag_create )
+      errCode = os.system( cmd_create_tag_dev )
+      if errCode != 0:
+        GLog.f( GLog.E, "\tError creating label %s on branch %s, not critical." % ( g_labelname, cb.getShortRef() ) )
+
+      cmd_chk_back       = "%s branch --quiet -s %s" % (SWGIT, cb.getShortRef())
+      errCode = os.system( cmd_chk_back )
+      if errCode != 0:
+        GLog.f( GLog.E, "\tError while coming back on %s" % ( cb.getShortRef() ) )
+        GLog.logRet(errCode)
+        return 1 
 
   GLog.logRet( 0 )
   return 0
-
-
-########################
-# GENERIC EXECUTE
-########################
-def execute( options ):
-
-  # mail exec #####
-  if options.showmailcfg == True:
-
-    om = ObjMailStabilize()
-    print om.dump()
-    print om.show_config_options()
-    print ""
-    return 0
-
-  elif options.testmail:
-
-    GLog.s( GLog.S, "Sending test mail" )
-
-    om = ObjMailStabilize()
-    out, err = om.sendmail( "SWGIT STABILIZE TEST MAIL", debug = False )
-    if out[:-1] != "":
-      GLog.f( GLog.E, indentOutput( out[:-1], 1 ) )
-    GLog.logRet( err )
-    return err
-  # mail exec END #####
-
-  if options.stb:
-    ret = tag_drop_stb( options )
-    if ret != 0:
-      return 1
-
-  if options.liv:
-    ret = tag_drop_liv( options )
-    if ret != 0:
-      return 1
-
-  return ret
- 
-
-########################
-# STB EXECUTE
-########################
-def tag_drop_stb( options ):
-
-  return stabilize( g_labelname, options.src, g_targetbr )
   
 
 ########################
 # LIV EXECUTE
 ########################
-def tag_drop_liv( options ):
+def execute_liv( options ):
 
   output_opt = getOutputOpt(options)
 
@@ -728,6 +893,15 @@ def tag_drop_liv( options ):
     strout += "         last stable label   : %s\n" % ( labels[-1] )
   else:
     strout += "         last stable label   : Not existing any STB, using %s\n" % tb.getNewBrRef()
+
+  tb_repo, tb_repo_errcode = tb.branch_to_remote()
+  if tb_repo_errcode != 0:
+    strerr  = "\tError while retrieving remote for pushing everthing:\n"
+    strerr += indentOutput( tb_repo, 2 )
+    GLog.f( GLog.E, strerr )
+    GLog.logRet(errCode)
+    return 1 
+  strout += "         pushing to remote   : %s\n" % (tb_repo)
 
   GLog.s( GLog.S, strout )
 
@@ -762,14 +936,45 @@ def tag_drop_liv( options ):
   else: 
     GLog.s( GLog.S, "\tLast LIV Label is %s" % lastbutone_liv )
 
-
   #
   # Eval logs
   #
-  ret = eval_create_commit_logs( lastbutone_liv )
-  if ret != 0:
-    GLog.logRet(1)
-    return 1
+  if not options.no_chglogs:
+
+    ret = eval_create_add_logs( lastbutone_liv )
+    if ret != 0:
+      GLog.logRet(1)
+      return 1
+
+  #
+  # hook pre commit
+  #
+  obj_prelivcommit_hook = ObjCfgStabilize_PreLivCommit_Hook()
+  if obj_prelivcommit_hook.isValid():
+
+    out, errCode = execute_pre_liv_commit_hook()
+    if errCode != 0:
+      GLog.f( GLog.E, out )
+      GLog.logRet(1)
+      return 1
+
+  #
+  # liv commit, create it only if necessary
+  #
+  if not options.no_chglogs or obj_prelivcommit_hook.isValid():
+
+    GLog.s( GLog.S, "\tCreating LIV commit" )
+
+    cmd_liv_commit = "git commit -a --allow-empty -m \"rel: %s - drop: %s_%s\"" % \
+                     (cb.getRel().replace( "/","." ), SWCFG_TAG_LIV, g_labelname )
+
+    out, errCode = myCommand( cmd_liv_commit )
+    if errCode != 0:
+      GLog.f( GLog.E, "Error while creating LIV commit" )
+      GLog.logRet(out)
+      GLog.logRet(errCode)
+      return 1 
+    GLog.logRet( 0, indent="\t" )
 
 
   #
@@ -784,17 +989,16 @@ def tag_drop_liv( options ):
     GLog.logRet(errCode)
     return 1 
 
-
   #
   # push on origin stable
   #
-  GLog.s( GLog.S, "\tPushing %s on origin ... " % ( sb.getShortRef() ))
+  GLog.s( GLog.S, "\tPushing %s on '%s' ... " % ( sb.getShortRef(), tb_repo ))
 
   mail_opt = "--no-mail"
   if options.sendmail:
     mail_opt = ""
 
-  cmd_push_stable = "SWINDENT=%d %s push %s %s" % ( GLog.tab+2, SWGIT, output_opt, mail_opt )
+  cmd_push_stable = "SWINDENT=%d %s push %s %s %s" % ( GLog.tab+2, SWGIT, output_opt, mail_opt, tb_repo )
   errCode = os.system( cmd_push_stable )
   if errCode != 0 :
     GLog.logRet( errCode )
@@ -805,7 +1009,8 @@ def tag_drop_liv( options ):
   #
   # prepare and send mail
   #
-  if options.sendmail == True:
+  if options.sendmail:
+
     GLog.s( GLog.S, "\tSending mail" )
 
     #
@@ -827,7 +1032,7 @@ def tag_drop_liv( options ):
   # Custom branch liv has finished here
   # no-merge-back, has finished here
   #
-  if options.no_merge_back or cb.getType() == SWCFG_BR_CST:
+  if ( not options.merge_back ) or cb.getType() == SWCFG_BR_CST:
     GLog.logRet( 0 )
     return 0
 
@@ -870,9 +1075,9 @@ def tag_drop_liv( options ):
       sys.exit( 1 )
 
   # 3. push on origin develop
-  GLog.s( GLog.S, "\tPushing %s on origin ... " % ( devBr.getShortRef() ))
+  GLog.s( GLog.S, "\tPushing %s on '%s' ... " % ( devBr.getShortRef(), tb_repo ))
 
-  cmd_push_dev = "SWINDENT=%d %s push %s %s" % ( GLog.tab+2, SWGIT, output_opt, mail_opt )
+  cmd_push_dev = "SWINDENT=%d %s push %s %s %s" % ( GLog.tab+2, SWGIT, output_opt, mail_opt, tb_repo )
   errCode = os.system( cmd_push_dev )
   if errCode != 0 :
     GLog.logRet( errCode )
@@ -885,59 +1090,16 @@ def tag_drop_liv( options ):
 
 
 
-#def perform_recurse( options ):
-#  
-#  ret, src_str = src_reference_check( options.src )
-#  if ret != 0:
-#    return 1, src_str
-#
-#  # deepest repo, execust true stabilize
-#  if options.src.find( ',' ) == -1:
-#    options.src = options.src[ options.src.find( ':' ) + 1 : ]
-#    return 0, ""
-#
-#  err_str ""
-#  children = submod_list_repos( firstLev = True )
-#  for r in children:
-#    src_subtree = ""
-#    subtree_begin = "./%s" % r
-#
-#    for currentry in src_str.split( ',' ):
-#      dir = currentry.split(':')[0]
-#      ref = currentry.split(':')[1]
-#      if dir .find( subtree_begin ) == 0:
-#        src_subtree += "%s:%s," % ( dir.replace( src_subtree, "./" ), ref )
-#
-#    if len( src_subtree ) > 0:
-#      src_subtree = src_subtree[ : -1] #eliminate last comma
-#
-#    input_without_src = input_eliminate_option( [ "--src", "--src-reference" ], optionWithParam = True )
-#
-#    cmd_stabilize_subtree = "cd %s && SWCHECK=ONLY %s --src %s" % ( dir, input_without_src, src_subtree )
-#    errCode = os.system( cmd_stabilize_subtree )
-#    if errCode != 0:
-#      err_str += dir + " "
-#
-#  # after children, process containing project
-#  options.src.find( '.'
-#  cmd_stabilize_subtree = "SWCHECK=ONLY %s --src %s" % ( dir, input_without_src, src_subtree )
-#  errCode = os.system( cmd_stabilize_subtree )
-#  if errCode != 0:
-#    err_str += dir + " "
-#
-#
-#  if err_str != ""
-#    return 1, err_str
-
-    
-
-
+#########
+#  MAIN #
+#########
 def main():
   usagestr =  """\
-Usage: swgit stabilize [--force] --stb [--src <startpoint>] <label> [<dst-br>]
-       swgit stabilize [--force] --liv <label> [<dst-br>]
-       swgit stabilize [--force] --stb --liv --src <startpoint> <label> [<dst-br>]
-       swgit stabilize --show-mail-cfg|--test-mail-cfg"""
+Usage: swgit stabilize --stb [-f] [-S <ref>] <label> [<dst-br>]
+       swgit stabilize --stb [-f] [-S <ref>] <label> [<dst-br>] --preview [-- <diff options>...]
+       swgit stabilize --liv [-f] <label> [<dst-br>]
+       swgit stabilize --stb --liv [-f] [-S <ref>] <label> [<dst-br>]
+       swgit stabilize --show-mail-cfg|--test-mail-cfg|--show-cfg"""
 
   parser       = OptionParser( usage = usagestr,
                                description='>>>>>>>>>>>>>> swgit - Stabilize Management <<<<<<<<<<<<<<' )
@@ -953,13 +1115,16 @@ Usage: swgit stabilize [--force] --stb [--src <startpoint>] <label> [<dst-br>]
   parser.add_option_group( mail_group )
   parser.add_option_group( output_group )
   (options, args)  = parser.parse_args()
+  args = parser.largs
 
   help_mac( parser )
 
   global g_labelname
   global g_targetbr
+  global _g_rargs
+  _g_rargs = parser.rargs
 
-  if options.showmailcfg or options.testmail:
+  if options.showmailcfg or options.testmail or options.showcfg:
     if len( args ) != 0:
       parser.error("Testing mail do not requires arguments.")
   else:
@@ -1004,12 +1169,12 @@ gitstabilize_mgt_options = [
         "action"  : "store_true",
         "dest"    : "stb",
         "default" : False,
-        "help"    : 'Reports --src argument on \"/INT/stable\" or \"/CST/customer\" branches according to starting branch. Labelize merge boundaries with STB label.'
+        "help"    : 'Reports --source argument on \"/INT/stable\" or \"/CST/customer\" branches according to starting branch. Labelize merge boundaries with STB label.'
         }
       ],
     [
-      "--src",
-      "--src-reference",
+      "-S",
+      "--source",
       {
         "nargs"   : 1,
         "type"    : "string",
@@ -1031,6 +1196,16 @@ gitstabilize_mgt_options = [
         }
       ],
     [
+      "-p",
+      "--preview",
+      {
+        "action"  : "store_true",
+        "dest"    : "preview",
+        "default" : False,
+        "help"    : 'With --stb. Only makes checks and shows differences between current target branch and current stabilizing sources.'
+        }
+      ],
+    [
       "-f",
       "--force",
       {
@@ -1041,12 +1216,30 @@ gitstabilize_mgt_options = [
         }
       ],
     [
-      "--no-merge-back",
+      "--merge-back",
       {
         "action"  : "store_true",
-        "dest"    : "no_merge_back",
+        "dest"    : "merge_back",
         "default" : False,
-        "help"    : 'Do not report INT/stable on INT/develop after liv creation.'
+        "help"    : 'Force reporting INT/stable onto INT/develop after LIV creation.'
+        }
+      ],
+    [
+      "--no-chglogs",
+      {
+        "action"  : "store_true",
+        "dest"    : "no_chglogs",
+        "default" : False,
+        "help"    : 'Jump changelog, fixlog, ticketlog evaluation.'
+        }
+      ],
+    [
+      "--start-point-label",
+      {
+        "action"  : "store_true",
+        "dest"    : "start_point_label",
+        "default" : False,
+        "help"    : 'Also create start point label when stabilizing onto /INT/stable (usually tag will be created on /INT/develop).'
         }
       ],
     [
@@ -1056,6 +1249,15 @@ gitstabilize_mgt_options = [
         "dest"    : "batch",
         "default" : False,
         "help"    : 'No answers, useful with scripts'
+        }
+      ],
+    [
+      "--show-cfg",
+      {
+        "action"  : "store_true",
+        "dest"    : "showcfg",
+        "default" : False,
+        "help"    : 'Show how chglog and fixlog outputr will be formatted both for file and mail.'
         }
       ]
    ]

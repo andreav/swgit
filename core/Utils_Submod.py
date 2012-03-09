@@ -115,10 +115,11 @@ def src_reference_check_parse_file( filename, batch = False ):
   for origline in lines:
     numline += 1
     line = origline
-    if len( line ) == 0:
-      continue
     line = line.replace(' ', '')
     line = line.replace('\t', '')
+    line = line.split('#')[0] #throw away comments
+    if len( line ) == 0:
+      continue
 
     if line.count( ':' ) != 1:
       return 1, "\tWrong formatted line %d (%s) into file %s" % ( numline, origline, filename )
@@ -183,16 +184,25 @@ def submod_check_hasrepo_configured( reponame, dir = "." ):
 # SUBMOD RETRIEVING #
 #####################
 #given proj and its ref => return version stored for rname at that reference
+#pref = None => current position
 def submod_getrepover_atref( proot, rname, pref ):
   rname = del_slash( rname )
-  cmd_get_commit = "cd %s && git ls-tree %s %s | cut -f 1 | cut -d ' ' -f 3" % ( proot, pref, rname )
+
+  if pref != None:
+
+    cmd_get_commit = "cd %s && git ls-tree %s %s | cut -f 1 | cut -d ' ' -f 3" % ( proot, pref, rname )
+
+  else:
+
+    cmd_get_commit = "cd %s && git submodule %s | cut -c 2- | cut -d ' ' -f 1" % ( proot, rname )
+
   #print cmd_get_commit
   c, e = myCommand( cmd_get_commit )
   #print c, e
   c = c[:-1]
   if c == "":
-    return "Not fount valid version for subrepo %s at project commit %s" % ( rname, pref ), 1
-  return c[:-1], e
+    return "Not found valid version for subrepo %s at project commit %s" % ( rname, pref ), 1
+  return c, e
 
 
 def submod_list_all_default( dir = "." ):
@@ -254,7 +264,14 @@ def submod_list_notinitialized_notsnapshot( dir = "." ):
       notinited.append( a )
   return notinited
 
-
+def submod_list_initialized_notsnapshot( dir = "." ):
+  inited = submod_list_initialized( dir )
+  snap   = submod_list_snapshot( dir )
+  inited_notsnap = []
+  for a in inited:
+    if a not in snap:
+      inited_notsnap.append( a )
+  return inited_notsnap
 
 
 

@@ -28,7 +28,7 @@ two command:
       By this command user can see every tag defined in current
       repository and its configuration
 
-   1. "swgit tag --custom-tag-show <TagType>"
+   1. "swgit tag --show-cfg <TagType>"
 
       Given one TagType (like DEV, FIX or any user-defined one), user
       can see:
@@ -62,6 +62,8 @@ In order to modify any allowed tag parameter, user can choose among:
         In this case user would override, for FIX tag, matched regexp
         at creation time.
 
+   Please refer to "configure" for a more detailed description.
+
 
 Modifying built-in tags behavior
 ================================
@@ -72,7 +74,7 @@ Configurable fields change according to the tag.
 
 In order to discover which ones, please run:
 
-   "swgit tag --custom-tag-show-cfg {LIV|STB|NGT|DEV|FIX|RDY}"
+   "swgit tag --show-cfg {LIV|STB|NGT|DEV|FIX|RDY}"
 
 
 Creating a new tag
@@ -112,7 +114,7 @@ We will give it a *REL* type.
    * Named tags requires the user provides another input parameter
      when creating tag:
 
-        "swgit tag REL meaningful_information_here"
+        "swgit tag REL <val>"
 
      Tags fall into one or another category according to **regexp**
      field.
@@ -129,20 +131,17 @@ We will give it a *REL* type.
 
         immediately under [REL] section, add this row:
 
-           "regexp = ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ &@&
-           ^[a-zA-Z]{0,15}$"
+              regexp    = ^[0-9]{4}-[0-9]{2}-[0-9]{2}$
+              regexp-01 = ^[a-zA-Z]{0,15}$
 
    * Volatile way:
 
         Issue this command:
 
-           "swgit config swgit.REL.regexp
-           '^[0-9]{4}-[0-9]{2}-[0-9]{2}$ &@& ^[a-zA-Z]{0,15}$'"
+              swgit config swgit.REL.regexp '^[0-9]{4}-[0-9]{2}-[0-9]{2}$
+              swgit config swgit.REL.regexp '^[a-zA-Z]{0,15}$'
 
-   Warning: When you need to specify a list of fields, you must separator
-     fields with this token:
-
-        " &@& " (i.e. <space>&@&<space>)
+   To configure list values, please refer to *lbl_configure_values*
 
 3. Configure mandatory fields:
 
@@ -155,7 +154,7 @@ We will give it a *REL* type.
       2. **one-x-commit**:
             Determines if more than 1 label can be put on same commit.FIX labels behave in this way.DEV label no.
 
-      3. **only-on-trackall**:
+      3. **only-on-integrator-repo**:
             Determines if this tag can be created only on *integrator
             repository* (like LIV or STB tags)
 
@@ -217,7 +216,7 @@ Pre- and post- tag hooks
            $1 = tag name to be created$2 = commit on which tag will be put
 
            Script output will be used as tag comment, in addition to -m argument
-           (if provided)If the return value if different from 0, tag creation will fail.
+           (if provided)If return value if different from 0, tag creation will fail.
 
       * **hook-pretag-sshuser**:
 

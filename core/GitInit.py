@@ -28,7 +28,6 @@ from ObjMail import *
 from ObjSnapshotRepo import *
 from ObjLog import *
 from Utils_Submod import *
-import GitSsh
 
 g_newrepo = False
 
@@ -248,8 +247,8 @@ def create_cst_branch_exec( options ):
 def main():
   usagestr =  """\
 Usage: swgit init -r <x.y.z.t> [-u <user>] [-l <label>] [-c <int-br-name>] 
-   or: swgit init -r <x.y.z.t> [-u <user>] [-l <label>] --src <startpoint> [-c <int-br-name>]
-   or: swgit init -r <x.y.z.t> [-u <user>] [-l <label>] --cst -c <int-br-name> --src <startpoint>"""
+   or: swgit init -r <x.y.z.t> [-u <user>] [-l <label>] --source <startpoint> [-c <int-br-name>]
+   or: swgit init -r <x.y.z.t> [-u <user>] [-l <label>] --cst -c <int-br-name> --source <startpoint>"""
 
   parser       = OptionParser( usage = usagestr,
                                description='>>>>>>>>>>>>>> swgit - Init repository <<<<<<<<<<<<<<' )
@@ -261,6 +260,7 @@ Usage: swgit init -r <x.y.z.t> [-u <user>] [-l <label>] [-c <int-br-name>]
   parser.add_option_group( output_group )
     
   (options, args)  = parser.parse_args()
+  args = parser.largs
   help_mac( parser )
 
   if len(args) != 0:
@@ -308,7 +308,7 @@ Usage: swgit init -r <x.y.z.t> [-u <user>] [-l <label>] [-c <int-br-name>]
       strerr  = "ERROR - In order to create a starting LIV label,\n"
       strerr += "        please enter -l argument respecting '%s' regular expression\n" % livDsc.get_regexp()
       strerr += "        If you don't like this regexp, you can overwrite it.\n"
-      strerr += "        Try 'swgit tag --custom-tag-show-cfg LIV' to investigate."
+      strerr += "        Try 'swgit tag --show-cfg LIV' to investigate."
       print strerr
       sys.exit( 1 )
 
@@ -473,7 +473,8 @@ Usage: swgit init -r <x.y.z.t> [-u <user>] [-l <label>] [-c <int-br-name>]
   if os.path.exists( genericcfg_file ) == False:
     GLog.s( GLog.S, "\tCreating file %s" % genericcfg_file )
     file = open( genericcfg_file, 'w+' )
-    file.write( GitSsh.DEFAULT_SSH_CFG )
+    file.write( DEFAULT_SSH_CFG )
+    file.write( DEFAULT_STAB_CFG )
     file.close()
     add_and_commit = True
 
@@ -676,12 +677,12 @@ init_mgt_options = [
         "callback": check_input,
         "dest"    : "drop",
         "metavar" : "<label_name>",
-        "help"    : "Create initial LIV tags after creating develop/stable. Must match default regexp '%s' or customized version (see 'swgit tag --custom-tag-show-cfg LIV' )" % SWCFG_TAG_LIVREGEXP
+        "help"    : "Create initial LIV tags after creating develop/stable. Must match default regexp '%s' or customized version (see 'swgit tag --show-cfg LIV' )" % SWCFG_TAG_LIVREGEXP
         }
       ],
     [ 
-        "--src",
-        "--source-reference",
+        "-S",
+        "--source",
         {
           "nargs"   : 1,
           "type"    : "string",

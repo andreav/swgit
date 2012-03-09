@@ -41,7 +41,7 @@ def log_clone_dbg( any ):
 
 def main():
   usagestr =  """\
-Usage: swgit clone [-b <intbr>] [--integrator] [-recurse] <src-url> [<dst-path>]"""
+Usage: swgit clone [-b <intbr>] [--integrator] [--recursive] <src-url> [<dst-path>]"""
 
   parser = OptionParser( usage = usagestr,
                          description='>>>>>>>>>>>>>> swgit - Cloning repository <<<<<<<<<<<<<<' )
@@ -55,6 +55,7 @@ Usage: swgit clone [-b <intbr>] [--integrator] [-recurse] <src-url> [<dst-path>]
   parser.add_option_group( output_group )
 
   (options, args)  = parser.parse_args()
+  args = parser.largs
 
   global dbg
   help_mac( parser )
@@ -128,7 +129,7 @@ Usage: swgit clone [-b <intbr>] [--integrator] [-recurse] <src-url> [<dst-path>]
 
   #
   # SUB repos
-  if options.recurse == True:
+  if options.recursive:
 
     if os.path.exists( "%s/%s" % (dest, SWFILE_PROJMAP) ) == True :
 
@@ -217,11 +218,11 @@ gitclone_options = [
         }
       ],
     [ 
-      "-r",
-      "--recurse",
+      "-R",
+      "--recursive",
       {
         "action"  : "store_true",
-        "dest"    : "recurse",
+        "dest"    : "recursive",
         "default" : False,
         "help"    : 'Also initialize/clone all project contained repositories. Same as cloning and issueing swgit proj --init.'
         }

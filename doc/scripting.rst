@@ -19,9 +19,9 @@
 
 .. _lbl_scripting:
 
-#########
-Scripting
-#########
+################
+Script mechanism
+################
 
 swgit is a bunch of python scripts trying to build useful functionalities 
 around git tool.
@@ -35,11 +35,15 @@ swgit functionalities and implement swgit workflows.
 
 So, for instance, ``git log`` or ``git diff`` are left untouched.
 
-You can issue::
+You can issue:
+
+  ::
 
     git log -1
 
-or::
+or:
+
+  ::
 
     swgit log -1
 
@@ -68,20 +72,28 @@ swgit introduces also any new commands:
       a ``git log`` friend, a place where to put useful swgit 
       specific retrieve operations
 
-  * key
+      Please refer to :doc:`infocmd` for some information.
+
+  * ssh
       ssh management
+
+      Please refer to :doc:`ssh` for some information.
 
   .. * lock
       No more used, was intended to lock remote repositories during push
 
   * proj
-      This is a ``git submodule`` friend. By this command, user should 
-      return loving git submodules
+      This is a ``git submodule`` friend. By this command, user can 
+      leverage git submodules in a simpler (though similar) form.
+
+      Please refer to :doc:`projects` for some information.
 
   * stabilize
       This command manages 'stable branch matters'. User reports onto `stable` branch
       contributes candidate to be delivered, creates STB and LIV labels (see :ref:`lbl_references_tags`),
       creates changelogs and fixlogs.
+
+      Please refer to :doc:`stabilizing` for some information.
 
 
 

@@ -60,7 +60,7 @@ def del_slash( str ):
   return str[:-1]
 
 
-def check_allowed_options( checkopt, allowmap, alias_short2long ):
+def check_allowed_options( checkopt, allowmap, alias_short2long, input = sys.argv ):
 
   str_print = checkopt
 
@@ -72,7 +72,6 @@ def check_allowed_options( checkopt, allowmap, alias_short2long ):
       break
 
   #un-alias input
-  input = sys.argv
   for (pos,val) in enumerate( input ):
     if len( val ) > 0 and val[0] != "-":
       continue
@@ -99,14 +98,14 @@ def check_allowed_options( checkopt, allowmap, alias_short2long ):
   return "", 0
 
 
-def check_allowed_options_p( checkopt, allowmap, parser ):
+def check_allowed_options_p( checkopt, allowmap, parser, input = sys.argv ):
 
   alias_short2long = {}
   for s in parser._short_opt.keys():
     l = parser._short_opt[s]._long_opts[0] #take only first
     alias_short2long[s] = l
 
-  return check_allowed_options( checkopt, allowmap, alias_short2long )
+  return check_allowed_options( checkopt, allowmap, alias_short2long, input )
 
 
 ################################################

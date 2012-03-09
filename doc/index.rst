@@ -15,18 +15,10 @@
    You should have received a copy of the GNU General Public License
    along with swgit.  If not, see <http://www.gnu.org/licenses/>.
 
-.. swgit documentation master file, created by
-   sphinx-quickstart on Thu Jan 26 09:02:24 2012.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
 
 ################
 Welcome to swgit
 ################
-
-..
-  Structured Workflows with git
-  -----------------------------
 
 .. hidden toctree because I want toc only on sidebar
 .. toctree::
@@ -44,6 +36,7 @@ Welcome to swgit
    Developers Mailing List <http://groups.google.com/group/swgit-dev>
    Bug / Feature Request <https://github.com/andreav/swgit/issues>
    glossary.rst
+   faq.rst
 
 .. todo.rst
 

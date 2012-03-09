@@ -36,9 +36,9 @@ Collaborative Development Model
 -------------------------------
 
 swgit first goal is speeding up contributes development and 
-integartion into 'origin' repository.
+integration into 'origin' repository.
 
-Every developer, in this context, covers also integartor role, 
+Every developer, in this context, covers also integrator role, 
 meaning that he/she will be responsible for merging its contributes 
 into :doc:`intbr`.
 
@@ -64,32 +64,46 @@ We know two popular Collaborative Development Models exists
      | Everyone is granted push access to a single shared repository 
        and topic branches are used to isolate changes.
 
-**swgit chooses `Shared Repository Model` as its collaboartive model**
+**swgit chooses `Shared Repository Model` as its collaborative model**
 
 
 Cloning repository
 ------------------
 
-   Only ssh and file system urls are supported.
+   Cloning repositories operation is very similar to native git one.
+   However, when you specify `-b` option, you will automatically set 
+   that branch as :doc:`intbr`.
 
-   If this is the first time, and ssh url is specified, ssh management will occur. (:doc:`ssh`)
 
    ::
 
-    swgit clone ssh://user@addr/path/to/repo -b 1/0/0/0/andreav/INT/develop
-
-   or::
-
-    $> swgit clone /path/to/repo -b 1/0/0/0/andreav/INT/develop
+    swgit clone <any_git_url> -b 1/0/0/0/andreav/INT/develop
 
    or::
 
     swgit clone ssh://user@addr/path/to/repo
-    swgit branch --set-integartion-br 1/0/0/0/andreav/INT/develop
+    cd repo
+    swgit branch --set-integration-br 1/0/0/0/andreav/INT/develop
     
    .. note::
 
      :doc:`intbr` is set once, and will speed up other operations.
+
+   `swgit clone` also supports these parameters:
+
+   -i/--integrator
+                    for creating an :term:`integrator repository` repository
+
+   -R/--recursive
+                    useful only when cloning projects, to initialize them
+                    transparently.
+
+   -s/--snapshot
+                    for downloading also :ref:`lbl_proj_snapshot_repositories` 
+                    when cloning.
+
+
+
 
 Creating a topic branch
 -----------------------
@@ -106,7 +120,7 @@ Creating a topic branch
     DONE
 
    | A **NEW/BRANCH** tag will be put on the commit where the branch starts from.
-   | This tag reveals usefull in many cases, above all after
+   | This tag reveals useful in many cases, above all after
      criss-cross merges. 
      To retrieve all differences introduced by this branch:
 
@@ -115,8 +129,8 @@ Creating a topic branch
          swgit info -z/--zero-diff 
 
 
-Committing/labelling
---------------------
+Committing/labeling
+-------------------
 
    * one shot::
 
@@ -167,7 +181,7 @@ Merging
        DONE
 
 
-     | This command leverages integartion branch. 
+     | This command leverages integration branch. 
      | It is called :ref:`side merge <lbl_repo_sidemerge>`
      | It looks for last DEV tag on your topic branch and 
        will merge that reference into integration branch.
@@ -185,10 +199,10 @@ Merging
 
    This is not mandatory for any other branch type.
 
-   | swgit assures user always merges on integartion branch HEAD.
-   | This is accomplished by issueing an 
+   | swgit assures user always merges on integration branch HEAD.
+   | This is accomplished by issuing an 
    
-      **integartion branch pull before merging**
+      **integration branch pull before merging**
 
    This does not happen when merging into another branch.
 
@@ -196,7 +210,7 @@ Merging
 Pushing
 -------
 
-   From integartion branch, after merging on it, user should test
+   From integration branch, after merging on it, user should test
    its contributes against integration branch HEAD.
 
    Eventually he/she will push on 'origin'.
@@ -209,7 +223,7 @@ Pushing
 
       Check swgitdemo-clone repository push ...
       	WARNING cannot send mail due to wrong configuration.
-      	Try issueing 'swgit push --show-mail-cfg' to investigate.
+      	Try issuing 'swgit push --show-mail-cfg' to investigate.
       DONE
       Push swgitdemo-clone contributes on origin ...
       	First update swgitdemo-clone repository. Pulling 1/0/0/0/andreav/INT/develop from origin ... 
@@ -231,24 +245,24 @@ Pushing
       DONE
 
 
-   | swgit assures user always pushes on integartion branch HEAD, i.e. 
+   | swgit assures user always pushes on integration branch HEAD, i.e. 
      every push is Fast-Forward.
-   | This is accomplished by issueing an 
+   | This is accomplished by issuing an 
    
-      **integartion branch pull before pushing**.
+      **integration branch pull before pushing**.
 
    There is a big difference with native git:
 
     **You cannot directly push on 'origin' any branch but integration branch**.
 
-   This behaviour can be workarounded like in :doc:`workflow_team_feature`, but
+   This behavior can be workarounded like in :doc:`workflow_team_feature`, but
    is useful to:
    
     * keep 'origin' as much clean as possible
      
     * assure only few HEADs exist in repository. Every HEAD has a precise role:
 
-        #. develop/stabel branches
+        #. develop/stable branches
 
         #. team feature branches
 
@@ -258,18 +272,18 @@ Pushing
 Merging and pushing in one shot
 -------------------------------
 
-   From a topic branch, user can join merge and push operations toghether::
+   From a topic branch, user can join merge and push operations together::
 
       swgit push -I
 
    | This is called :ref:`side push <lbl_repo_sidepush>`
    | Issued directly from topic branch, this command will:
 
-      * pull integartion branch
+      * pull integration branch
 
       * merge last topic DEV tag
 
-      * push everithing onto 'origin'
+      * push everything onto 'origin'
 
 
 Pulling 
@@ -282,7 +296,7 @@ Pulling
         swgit pull
 
       This operation is a plain ``git pull``, but is allowed 
-      ONLY on integartion branches.
+      ONLY on integration branches.
 
     * from a topic branch::
 
@@ -291,8 +305,8 @@ Pulling
      | This is called :ref:`side pull <lbl_repo_sidepull>`
      | Issued directly from topic branch, this command will:
 
-        * pull integartion branch
+        * pull integration branch
   
-        * merge integartion branch on current topic branch
+        * merge integration branch on current topic branch
 
 

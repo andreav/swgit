@@ -37,26 +37,26 @@ Glossary
     in order to see those `commit` elements
 
   integrator repository
-  track-all repository
     | It is a repository crated to manage releases and execute builds or deliveries.
     | It is a repository with both INT/develop and INT/stable local branches.
     | The most quickly way to obtain this, is cloning repository with option:
 
         ``--integrator``
 
-    | Otherwise you can track it locally by issuing:
+    Otherwise you can track it locally by issuing:
 
         | ``swgit branch --track <.../INT/stable>``
         | ``swgit config --bool swgit.integrator True``
+
+    This repository must be created if wanting to issue `swgit stabilize` operations
+    (:doc:`stabilizing`)
 
 
   named tag
     | A tag with `regexp` field set.
     | swgit will match user input against that/those regexp
-    | When configuring a regexp list, a string must be provided where 
-      entries are separed by this field:
-
-        |subs_txt_regexpseparator|
+    | When configuring a regexp list, multiple values must be configured as specified 
+      at :ref:`lbl_configure_values`.
 
   numbered tag
     | A tag without `regexp` field set.
