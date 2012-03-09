@@ -57,6 +57,8 @@ Repository modularization
    :maxdepth: 2
 
    projects
+   local_submodules
+   snapshot_submodules
    stabilizing_projects.rst
 
 Repository configurability

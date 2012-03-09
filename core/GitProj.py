@@ -1293,27 +1293,27 @@ Usage: swgit proj --add-repo [-b branch] [--snapshot] <url> [<localname>]
     if len( args ) == 0:
       pass
     if len( args ) == 1:
-      errCode, sha = getSHAFromRef( args[0] )
+      errCode, sha = getSHAFromRef( args[0], map.getDir() )
       if errCode == 0:
         args_submod = args[1:]
         ref1 = args[0]
     if len( args ) >= 2:
-      errCode, sha = getSHAFromRef( args[0] )
+      errCode, sha = getSHAFromRef( args[0], map.getDir() )
       if errCode == 0:
         args_submod = args[1:]
         ref1 = args[0]
-        errCode, sha = getSHAFromRef( args[1] )
+        errCode, sha = getSHAFromRef( args[1], map.getDir() )
         if errCode == 0:
           args_submod = args[2:]
           ref2 = args[1]
 
     if ref1 != "":
-      errCode, sha = getSHAFromRef( ref1 )
+      errCode, sha = getSHAFromRef( ref1, map.getDir() )
       if errCode != 0:
         GLog.f( GLog.E, "Reference '%s' not existing into project %s." % ( ref1, map.getDir() ) )
         sys.exit( 1 )
     if ref2 != "":
-      errCode, sha = getSHAFromRef( ref2 )
+      errCode, sha = getSHAFromRef( ref2, map.getDir() )
       if errCode != 0:
         GLog.f( GLog.E, "Reference '%s' not existing into project %s." % ( ref2, map.getDir() ) )
         sys.exit( 1 )

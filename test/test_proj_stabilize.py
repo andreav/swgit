@@ -39,6 +39,9 @@ class Test_ProjStabilize( Test_ProjBase ):
 
   PROJSTABILIZE_CLONE_DIR = SANDBOX + "TEST_PROJ_STABILIZE_CLONE"
 
+  LBL_O = "Drop.O"
+  LBL_B = "Drop.B"
+
   DEVTDM_LBL_B = "Drop.B"
   DEVTDM_CREATED_STBDEV_B = "%s/STB/%s" % ( REPO_TDM__DEVBRANCH, DEVTDM_LBL_B )
   DEVTDM_CREATED_STBSTB_B = "%s/STB/%s" % ( REPO_TDM__STBBRANCH, DEVTDM_LBL_B )
@@ -49,6 +52,17 @@ class Test_ProjStabilize( Test_ProjBase ):
   DEVTDM_TKTLOG_B = "%s/%s/%s/changelog/%s/%s/LIV_%s.tkt" % ( PROJSTABILIZE_CLONE_DIR, tss100_name2path("DEVTDM"), SWREPO_DIR, REPO_TDM__REL, REPO_TDM__SREL, DEVTDM_LBL_B )
 
   DEVTDM_LBL_C = "Drop.C"
+
+  DEVPLAT_LBL_B = "Drop.B"
+  DEVPLAT_CREATED_STBDEV_B = "%s/STB/%s" % ( REPO_PLAT__DEVBRANCH, DEVPLAT_LBL_B )
+  DEVPLAT_CREATED_STBSTB_B = "%s/STB/%s" % ( REPO_PLAT__STBBRANCH, DEVPLAT_LBL_B )
+  DEVPLAT_CREATED_STBFTR_B = "%s/STB/%s" % ( FULL_BRANCH_NAME, DEVPLAT_LBL_B )
+  DEVPLAT_CREATED_LIV_B    = "%s/LIV/%s" % ( REPO_PLAT__STBBRANCH, DEVPLAT_LBL_B )
+  DEVPLAT_CHGLOG_B = "%s/%s/%s/changelog/%s/%s/LIV_%s.chg" % ( PROJSTABILIZE_CLONE_DIR, tss100_name2path("DEVPLAT"), SWREPO_DIR, REPO_PLAT__REL, REPO_PLAT__SREL, DEVPLAT_LBL_B )
+  DEVPLAT_FIXLOG_B = "%s/%s/%s/changelog/%s/%s/LIV_%s.fix" % ( PROJSTABILIZE_CLONE_DIR, tss100_name2path("DEVPLAT"), SWREPO_DIR, REPO_PLAT__REL, REPO_PLAT__SREL, DEVPLAT_LBL_B )
+  DEVPLAT_TKTLOG_B = "%s/%s/%s/changelog/%s/%s/LIV_%s.tkt" % ( PROJSTABILIZE_CLONE_DIR, tss100_name2path("DEVPLAT"), SWREPO_DIR, REPO_PLAT__REL, REPO_PLAT__SREL, DEVPLAT_LBL_B )
+
+  DEVPLAT_LBL_C = "Drop.C"
 
   TSS100_LBL_B = "Drop.B"
   TSS100_CREATED_STBDEV_B = "%s/STB/%s" % ( REPO_TSS100__DEVBRANCH, TSS100_LBL_B )
@@ -1718,10 +1732,129 @@ class Test_ProjStabilize( Test_ProjBase ):
   #  Here we stabilize inside DEVPLAT and then inside TSS100
   # 
   def test_ProjStabilize_02_04_STB_DEVproj_DEVrepo( self ):
-    self.assertEqual( 1, 0, "TODO" )
+    self.util_createAndCheck_TSS100_FULL_withbkp_andclonedefbr( self.PROJSTABILIZE_CLONE_DIR, f_integrator = True )
+
+    ori_hm       = self.util_get_TSS10FULL_helper_map_orig()
+    clo_valle_hm = self.util_get_TSS10FULL_helper_map_clone( self.PROJSTABILIZE_CLONE_DIR )
+
+    shamap_intbr_va_clonetime = self.util_map2_tss100intbrshas( clo_valle_hm )
+
+    out, errCode = clo_valle_hm["TSS100"].set_cfg( self.CFG_ANYREF, "True" )
+    out, errCode = clo_valle_hm["DEVTDM"].set_cfg( self.CFG_ANYREF, "True" )
+    out, errCode = clo_valle_hm["DEVFS"].set_cfg( self.CFG_ANYREF, "True" )
+    out, errCode = clo_valle_hm["DEVPLAT"].set_cfg( self.CFG_ANYREF, "True" )
+
+    #stabilize first time all submodules into DEVPLAT
+    strlist = "%s:%s" % ( plat_name2path("DEVFS"), tss100_name2intbr("DEVFS") )
+    out, errCode = clo_valle_hm["DEVPLAT"].stabilize_both( self.LBL_O, strlist, force = True, f_preview = True )
+    self.util_check_DENY_scenario( out, errCode, "Not found valid version for subrepo", "stabilize DEVPLAT" )
+    out, errCode = clo_valle_hm["DEVPLAT"].stabilize_both( self.LBL_O, strlist, force = True, f_preview = False )
+    self.util_check_SUCC_scenario( out, errCode, "", "stabilize DEVPLAT" )
+
+    #stabilize first time all submodules into TSS100 (DEVPLAT not mentioned into srclist)
+    out, errCode = clo_valle_hm["TSS100"].stabilize_stb( self.LBL_O, "" )
+    self.util_check_SUCC_scenario( out, errCode, "", "stabilize project" )
+
+    shamap_intbr_va_afterO = self.util_map2_tss100intbrshas( clo_valle_hm )
+    shamap_heads_va_afterO = self.util_map2_currshas( clo_valle_hm )
+
+    # check from TSS100 by specifying DEVFS -> error because is depth2
+    #
+    out, errCode = clo_valle_hm["TSS100"].stabilize_stb( self.LBL_O, "%s:HEAD" % tss100_name2path("DEVFS"), force = True, f_preview = True )
+    self.util_check_DENY_scenario( out, errCode,
+                                   "is not directly contained into current project", 
+                                   "stabilize modifiedcontent into TSS100 submod PREVIEW" )
+
+    out, errCode = clo_valle_hm["TSS100"].stabilize_stb( self.LBL_O, "%s:HEAD" % tss100_name2path("DEVFS"), f_preview = False )
+    self.util_check_DENY_scenario( out, errCode, 
+                                   "is not directly contained into current project.", 
+                                   "stabilize modifiedcontent into TSS100 submod PREVIEW" )
 
 
 
+    # DEVrepo d2 (depth2) contribute
+    CONTENT = "a content"
+    out, errCode = clo_valle_hm["DEVFS"].branch_switch_to_int()
+    self.util_check_SUCC_scenario( out, errCode, "", "swith to int br" )
+    out, errCode = clo_valle_hm["DEVFS"].branch_create( self.BRANCH_NAME )
+    self.util_check_SUCC_scenario( out, errCode, "", "create br" )
+    out, errCode = clo_valle_hm["DEVFS"].modify_file( tss100_name2file("DEVFS"), msg = CONTENT )
+    self.util_check_SUCC_scenario( out, errCode, "", "modify file" )
+    out, errCode = clo_valle_hm["DEVFS"].commit_minusA_dev_fix( self.DDTS )
+    self.util_check_SUCC_scenario( out, errCode, "", "commit dev fix" )
+    out, errCode = clo_valle_hm["DEVFS"].merge_on_int()
+    self.util_check_SUCC_scenario( out, errCode, "", "merged on INT" )
+
+    devfs_ftrbr_beforeB_sha, devfs_ftrbr_beforeB_err = clo_valle_hm["DEVFS"].ref2sha( self.DEVFS_FULL_BRANCH_NAME )
+    self.util_check_EQUAL( devfs_ftrbr_beforeB_err, 0, "must exists" )
+
+
+    #
+    #stabilize DEVFS int DEVPLAT
+    #
+    out, errCode = clo_valle_hm["DEVPLAT"].branch_switch_to_int()
+    self.util_check_SUCC_scenario( out, errCode, "", "swith to int br" )
+
+    strlist = "%s:%s" % ( plat_name2path("DEVFS"), tss100_name2intbr("DEVFS") )
+    out, errCode = clo_valle_hm["DEVPLAT"].stabilize_both( self.LBL_B, strlist, force = True, f_preview = True )
+    self.util_check_SUCC_scenario( out, errCode, "", "stabilize DEVPLAT" )
+    self.assertTrue( "+%s" % CONTENT in out, "stabilizing contribute into DEVFS" )
+
+    ####################################
+    out, errCode = clo_valle_hm["DEVPLAT"].stabilize_both( self.LBL_B, strlist, force = True, f_preview = False )
+    ####################################
+    self.util_check_SUCC_scenario( out, errCode, "", "stabilize DEVPLAT" )
+
+    liv_after_platB_sha, liv_after_platB_err = clo_valle_hm["DEVPLAT"].ref2sha( self.DEVPLAT_CREATED_LIV_B )
+    self.util_check_EQUAL( liv_after_platB_err, 0, "must exists" )
+
+    shamap_intbr_va_after_platB = self.util_map2_tss100intbrshas( clo_valle_hm )
+    shamap_heads_va_after_platB = self.util_map2_currshas( clo_valle_hm )
+
+    self.util_assert_EQ_UNEQ_maps( shamap_heads_va_afterO, 
+                                   shamap_heads_va_after_platB, 
+                                   [], # empty => all
+                                   [ "DEVPLAT", "DEVFS" ],
+                                   "FAILED stabilize inside DEVPLAT to freeze DEFVS"
+                                 )
+
+    #
+    #stabilize TSS100 referring DEVPLAT just created label
+    #
+    out, errCode = clo_valle_hm["TSS100"].branch_switch_to_int()
+    self.util_check_SUCC_scenario( out, errCode, "", "swith to int br" )
+
+    strlist = "%s:%s" % (tss100_name2path("DEVPLAT"), self.DEVPLAT_CREATED_LIV_B)
+
+    ####################################
+    out, errCode = clo_valle_hm["TSS100"].stabilize_stb( self.LBL_B, strlist, force = True, f_preview = True )
+    ####################################
+    self.util_check_SUCC_scenario( out, errCode, "", "stabilize tss100 with DEVFS upgrage (by upgrading DEVPLAT)" )
+    self.assertTrue( "+%s" % CONTENT in out, "stabilizing DEVFS contribute into TSS100" )
+
+    submod_upgrade = "+Subproject commit %s" % shamap_intbr_va_after_platB["DEVFS"]
+    self.assertTrue( submod_upgrade in out, "stabilizing DEVFS contribute into TSS100" )
+
+    shamap_intbr_va_after_tss100B = self.util_map2_tss100intbrshas( clo_valle_hm )
+    shamap_heads_va_after_tss100B = self.util_map2_currshas( clo_valle_hm )
+
+    self.util_assert_EQ_UNEQ_maps( shamap_heads_va_after_platB, 
+                                   shamap_heads_va_after_tss100B, 
+                                   [], # empty => all
+                                   [ "TSS100" ],
+                                   "FAILED stabilize inside TSS100 to freeze DEFVS passing by DEVPLAT"
+                                 )
+
+    ####################################
+    out, errCode = clo_valle_hm["TSS100"].stabilize_liv( self.LBL_B )
+    ####################################
+    self.util_check_SUCC_scenario( out, errCode, "", "stabilize LIV tss100 with DEVFS upgrage (by upgrading DEVPLAT)" )
+
+
+
+  #
+  # LIV is identical to any plain repo, all work is done during --stb.
+  #
   def test_ProjStabilize_03_00_LIV( self ):
     self.util_createAndCheck_TSS100_FULL_withbkp_andclonedefbr( self.PROJSTABILIZE_CLONE_DIR, f_integrator = True )
 
@@ -1735,19 +1868,35 @@ class Test_ProjStabilize( Test_ProjBase ):
     srcstrlist = self.SRCOBJ_2_STRLIST( self.srcobj_1_depth )
 
     out, errCode = clo_valle_hm["TSS100"].stabilize_stb( self.TSS100_LBL_B, srcstrlist )
-    self.util_check_SUCC_scenario( out, errCode, 
-                                   "",
-                                   "stabilize modifiedcontent into sub submod" )
+    self.util_check_SUCC_scenario( out, errCode, "", "stabilize superproj" )
 
     out, errCode = clo_valle_hm["TSS100"].stabilize_liv( self.TSS100_LBL_B )
     self.util_check_SUCC_scenario( out, errCode, 
                                    "",
                                    "stabilize modifiedcontent into sub submod" )
 
+    liv_afterB_sha, liv_afterB_err = clo_valle_hm["TSS100"].ref2sha( self.TSS100_CREATED_LIV_B )
+    self.util_check_EQUAL( liv_afterB_err, 0, "must exists" )
 
 
-  def test_ProjStabilize_04_00_STBLIV( self ):
-    self.assertEqual( 1, 0, "TODO" )
+  def test_ProjStabilize_04_00_BOTH( self ):
+    self.util_createAndCheck_TSS100_FULL_withbkp_andclonedefbr( self.PROJSTABILIZE_CLONE_DIR, f_integrator = True )
+
+    ori_hm       = self.util_get_TSS10FULL_helper_map_orig()
+    clo_valle_hm = self.util_get_TSS10FULL_helper_map_clone( self.PROJSTABILIZE_CLONE_DIR )
+
+    out, errCode = clo_valle_hm["TSS100"].set_cfg( self.CFG_ANYREF, "True" )
+    out, errCode = clo_valle_hm["DEVTDM"].set_cfg( self.CFG_ANYREF, "True" )
+    out, errCode = clo_valle_hm["DEVPLAT"].set_cfg( self.CFG_ANYREF, "True" )
+
+    srcstrlist = self.SRCOBJ_2_STRLIST( self.srcobj_1_depth )
+
+    out, errCode = clo_valle_hm["TSS100"].stabilize_both( self.TSS100_LBL_B, srcstrlist )
+    self.util_check_SUCC_scenario( out, errCode, "", "stabilize superproj" )
+
+    liv_afterB_sha, liv_afterB_err = clo_valle_hm["TSS100"].ref2sha( self.TSS100_CREATED_LIV_B )
+    self.util_check_EQUAL( liv_afterB_err, 0, "must exists" )
+
 
     
   #

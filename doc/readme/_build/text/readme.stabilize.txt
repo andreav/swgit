@@ -101,7 +101,7 @@ Reporting on *INT/stable* (STB labels)
      *INT/stable* arrival point.
 
    Note: By default, --source argument must be a NGT tag.
-     This encourages continuous testing agile principle.If you need to stabilize any reference, please issue inside you repository:
+     This encourages continuous testing agile principle.If you need to stabilize any reference, please issue inside your repository:
 
         **swgit config swgit.stabilize-anyref True**
 

@@ -74,8 +74,8 @@ def tss100_name2intbr( name ):
   if name == "CSTTDM":  return CST_BRANCH_FULLNAME
   if name == "DEVFS":   return REPO_FS__DEVBRANCH
   if name == "DEVAPP":  return REPO_APP__DEVBRANCH
-  #if name == "CSTFS":   return 
-  #if name == "CSTAPP":  return 
+  if name == "CSTFS":   return ""
+  if name == "CSTAPP":  return ""
   return "NOTFOUND"
 
 
