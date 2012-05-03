@@ -787,9 +787,9 @@ Usage: swgit proj --add-repo [-b branch] [--snapshot] <url> [<localname>]
       if not on_ori:
         cmd_remote_repo_is_localized = "test -e \"%s/%s/.git\" && echo %s || echo %s" % \
                                         ( projRemote.getRoot(), rn, RESPONSE_LOCALIZED, RESPONSE_REMOTIZED )
-        GLog.f( GLog.D, "onto\n%s\ncmd:\n %s" % ( projRemote, cmd_remote_repo_is_localized ) )
+        GLog.f( GLog.I, "onto\n%s\ncmd:\n %s" % ( projRemote, cmd_remote_repo_is_localized ) )
         out, retcode = projRemote.remote_command( cmd_remote_repo_is_localized )
-        GLog.f( GLog.D, "response: %s" % out[:-1] )
+        GLog.f( GLog.I, "response: %s" % out[:-1] )
         if retcode != 0:
           GLog.f( GLog.E, "FAILED - Cannot contact \"origin\" at %s (user: %s)" % (projRemote.getAddress(), projRemote.getUser()) )
           sys.exit(1)
