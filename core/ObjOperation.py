@@ -488,7 +488,9 @@ class SwOp_ProjConfSpec( SwOperation ):
     return self.res_list_
   def getFormattedOutput( self ):
     paths = [ l.split(":")[0] for l in self.res_list_ ]
-    maxlen = len( max( paths, key = len ) )
+    #only on python > 2.5
+    #maxlen = len( max( paths, key = len ) )
+    maxlen = max( len(x) for x in paths )
     retval = []
     for r in self.res_list_:
       (path, ver) = r.split(':')
@@ -678,7 +680,9 @@ class SwOp_ProjDiff( SwOperation ):
     row2 = str_tit2 + diffref2
     if diffref2 == "":
       row2 = str_tit2 + "working dir"
-    maxlen = len( max( row0, row1, row2, str_cmd, key=len ) )
+    #only on python > 2.5
+    #maxlen = len( max( row0, row1, row2, str_cmd, key=len ) )
+    maxlen = max( len(x) for x in [row0, row1, row2, str_cmd] )
     bound = "="*maxlen
     strout = "\n%s" % "\n".join( (bound,row0, row1, row2, str_cmd, bound) )
 

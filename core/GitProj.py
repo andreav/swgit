@@ -1368,7 +1368,9 @@ Usage: swgit proj --add-repo [-b branch] [--snapshot] <url> [<localname>]
       row2 = row2_skel % ref2
       if ref2 == "":
         row2 = row2_skel % "working dir"
-      maxlen = len( max( row0, row1, row2, row_cmd, key=len ) )
+      #only on python > 2.5
+      #maxlen = len( max( row0, row1, row2, row_cmd, key=len ) )
+      maxlen = max( len(x) for x in [ row0, row1, row2, row_cmd ] )
       bound = "="*maxlen
       strout = "\n%s" % "\n".join( (bound,row0, row1, row2, row_cmd, bound) )
 
@@ -1413,7 +1415,9 @@ Usage: swgit proj --add-repo [-b branch] [--snapshot] <url> [<localname>]
       row2 = row2_skel % smodref_2
       if smodref_2 == "":
         row2 = row2_skel % "working dir"
-      maxlen = len( max( row0, row1, row2, row_cmd, key=len ) )
+      #only on python > 2.5
+      #maxlen = len( max( row0, row1, row2, row_cmd, key=len ) )
+      maxlen = max( len(x) for x in [ row0, row1, row2, row_cmd ] )
       bound = "="*maxlen
       strout = "\n%s" % "\n".join( (bound,row0, row1, row2, row_cmd, bound) )
 

@@ -172,7 +172,9 @@ def show_preview( options ):
       cmd_diff = "cd %s && git diff %s %s %s" % ( dir, prev_ref, tbs_ref, " ".join( _g_rargs ) )
       out, errCode = myCommand( cmd_diff )
 
-      maxlen = len( max( row0, row1, row2, row_cmd, key=len ) )
+      #only on python > 2.5
+      #maxlen = len( max( row0, row1, row2, row_cmd, key=len ) )
+      maxlen = max( len(x) for x in [ row0, row1, row2, row_cmd ] )
       bound = "="*maxlen
       strout = "\n%s\n\n" % "\n".join( (bound,row0, row1, row2, row_cmd, bound) )
 
@@ -803,7 +805,9 @@ def execute_stb( options ):
     # commit repositories changes only if any
     if len( srcoptions_map_noroot ) > 0:
 
-      maxlen = len( max( srcoptions_map_noroot.keys(), key = len ) )
+      #only on python > 2.5
+      #maxlen = len( max( srcoptions_map_noroot.keys(), key = len ) )
+      maxlen = max( len(x) for x in srcoptions_map_noroot.keys() )
 
       cmt_body = ""
       for (dir, ref) in srcoptions_map_noroot.items():
