@@ -105,8 +105,8 @@ def check( options ):
     Status.getFile( ignoreSubmod = False )
 
   #add only submod modified
-  fileModified = fileConflict + fileChangedNotAdded + fileChangedAdded + fileUntrack + fileRemoved
-  smodModified   = modConflict + modChangedNotAdded + modChangedAdded + modUntrack + modRemoved
+  fileModified = fileConflict + fileChangedNotAdded + fileChangedAdded + fileRemoved
+  smodModified   = modConflict + modChangedNotAdded + modChangedAdded + modRemoved
   if options.add_all_repos == True:
     g_args = smodModified
 
