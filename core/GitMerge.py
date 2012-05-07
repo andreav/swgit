@@ -38,9 +38,10 @@ def merge( fullref_dev, options ):
   #  return err, errstr
 
   if not options.squash:
-    cmd="git merge --no-ff %s" % fullref_dev
+    cmd="git merge %s --no-ff %s" % ( FIX_MERGE_EDIT, fullref_dev )
+    #cmd="git merge %s %s^0" % ( FIX_MERGE_EDIT, fullref_dev )
   else:
-    cmd="git merge --squash %s" % fullref_dev
+    cmd="git merge %s --squash %s" % ( FIX_MERGE_EDIT, fullref_dev )
  
   out,errCode = myCommand( cmd )
 
@@ -239,7 +240,8 @@ def execute( options ):
     #   => jump pull if intbr not on remote
     rem_logib = logib.branch_to_remote_obj()
     if not rem_logib.isValid():
-      GLog.f( GLog.E, rem_logib.getNotValidReason() )
+      if rem_logib.getNotValidReason() != "":
+        GLog.f( GLog.E, rem_logib.getNotValidReason() )
     else:
       GLog.s( GLog.S, "First update %s repository. Pulling branch %s ... " % ( dumpRepoName("local"), logib.getShortRef() ) )
       errCode = GitPull.pull( options.noStat, GLog.tab+1 )

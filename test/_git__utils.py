@@ -47,7 +47,7 @@ class git__utils:
     return myCommand( cmd )
 
   def merge( self, ref ):
-    cmd = "cd %s; git merge --no-ff %s" % ( self.repodir_, ref )
+    cmd = "cd %s; git merge %s --no-ff %s" % ( self.repodir_, FIX_MERGE_EDIT, ref )
     return myCommand( cmd )
 
   # Here must switch before.
