@@ -1024,15 +1024,15 @@ Usage: swgit proj --add-repo [-b branch] [--snapshot] <url> [<localname>]
 
     if options.update_repo_yesmerge:
 
-      cmd_reset = "SWINDENT=%s %s pull --merge-from-int" % ( GLog.tab + 1, SWGIT )
+      cmd_reset = "cd %s && SWINDENT=%s %s pull --merge-from-int" % ( map.getDir(), GLog.tab + 1, SWGIT )
       errCode = os.system( cmd_reset )
 
     else:
 
       #cmd_reset = "SWINDENT=%s %s branch -i && SWINDENT=%s %s proj --reset HEAD && SWINDENT=%s %s pull" % \
       #    ( GLog.tab + 1, SWGIT, GLog.tab + 1, SWGIT, GLog.tab + 1, SWGIT )
-      cmd_reset = "SWINDENT=%s %s branch -i && SWINDENT=%s %s pull" % \
-          ( GLog.tab + 1, SWGIT, GLog.tab + 1, SWGIT )
+      cmd_reset = "cd %s && SWINDENT=%s %s branch -i && SWINDENT=%s %s pull" % \
+          ( map.getDir(), GLog.tab + 1, SWGIT, GLog.tab + 1, SWGIT )
       errCode = os.system( cmd_reset )
 
     GLog.logRet( errCode )
@@ -1045,7 +1045,7 @@ Usage: swgit proj --add-repo [-b branch] [--snapshot] <url> [<localname>]
     #  CST always submodule update
     #  INT pull develop and/or side merge
     #
-    repos = submod_list_repos( map.getDir(), firstLev = True, excludeRoot = True, localpaths = True )
+    repos = submod_list_repos( firstLev = True, excludeRoot = True, localpaths = True )
     if len( repos ) == 0:
       sys.exit( 0 )
 
@@ -1083,7 +1083,7 @@ Usage: swgit proj --add-repo [-b branch] [--snapshot] <url> [<localname>]
 
       if not repoib.isValid(): #INT, no intbr
 
-        GLog.s( GLog.S, "No integration branch set, just download new commits without merging ... " % (repo) )
+        GLog.s( GLog.S, "No integration branch set into %s, just download new commits without merging ... " % (repo) )
 
         cmd_update_cst  = "cd %s && git submodule update --recursive -- %s" % ( map.getDir(), repo )
         out, errCode = myCommand( cmd_update_cst )
