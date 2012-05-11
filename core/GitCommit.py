@@ -265,7 +265,8 @@ def execute( options ):
 
   # REMOVE SUBMODULES
   cmd_rm_modules = ""
-  localrepos = submod_list_repos( firstLev = True, excludeRoot = True, localpaths = True )
+  #localrepos = submod_list_repos( firstLev = True, excludeRoot = True, localpaths = True )
+  localrepos = submod_list_all_default()
   #print "subrepos %s" % localrepos
   for r in localrepos:
     #print "curr subrepo %s" % r
