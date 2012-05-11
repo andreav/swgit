@@ -280,6 +280,12 @@ def submod_list_repos( dir = ".", firstLev = False, excludeRoot = False, localpa
   proot = Env.getProjectRoot( dir )
   if proot == "":
     # not inside repo
+    if not excludeRoot:
+      absroot = os.path.abspath( dir )
+      if localpaths:
+        return absroot
+      else:
+        return os.path.relpath( absroot, dir )
     return []
 
   if firstLev == True:
