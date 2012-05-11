@@ -576,14 +576,15 @@ def check(options):
         GLog.f( GLog.E, "\tPlease specify a valid source reference inside repo: %s" % rn )
         return 1
 
-      # stabilize anyref
+      # stabilize anyref (only root project is actually stabilizing, no need to check other src values
       if get_repo_cfg_bool( SWCFG_STABILIZE_ANYREF, rn ) == False:
-        if ref.find( "/NGT/" ) == -1:
-          strerr  = "Inside repository %s, only NGT labels are allowed to be stabilized.\n" % rn
-          strerr += "You can change this behaviour by issueing:\n"
-          strerr += "    git config --bool swgit.stabilize-anyref True"
-          GLog.f( GLog.E, indentOutput( strerr,1 ) )
-          return 1
+        if rn == ".":
+          if ref.find( "/NGT/" ) == -1:
+            strerr  = "Inside repository %s, only NGT labels are allowed to be stabilized.\n" % rn
+            strerr += "You can change this behaviour by issueing:\n"
+            strerr += "    git config --bool swgit.stabilize-anyref True"
+            GLog.f( GLog.E, indentOutput( strerr,1 ) )
+            return 1
 
 
   # generic checks
@@ -796,6 +797,7 @@ def execute_stb( options ):
     del srcoptions_map_noroot['.']
     for (dir, ref) in srcoptions_map_noroot.items():
 
+      GLog.f( GLog.E, "\tAccording to --source param, moving %s onto %s" % (dir,ref) )
       cmd_selectref_subrepo = "cd %s && %s branch --switch %s" % ( dir, SWGIT, ref )
       out, errCode = myCommand( cmd_selectref_subrepo )
       if errCode != 0 :
@@ -804,6 +806,8 @@ def execute_stb( options ):
 
     # commit repositories changes only if any
     if len( srcoptions_map_noroot ) > 0:
+
+      GLog.f( GLog.E, "\tCommitting actual project status" )
 
       #only on python > 2.5
       #maxlen = len( max( srcoptions_map_noroot.keys(), key = len ) )
