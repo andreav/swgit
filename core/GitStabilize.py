@@ -380,6 +380,59 @@ def eval_body_mail():
 
   return body_mail_tickets + "\n" + body_mail_devs
 
+
+def apply_src_map():
+  #
+  # Inside a project, move on src input references inside subrepos
+  #
+  srcoptions_map_noroot = g_srcoptions_map
+  if "." in srcoptions_map_noroot.keys(): del srcoptions_map_noroot['.']
+  for (dir, ref) in srcoptions_map_noroot.items():
+
+    GLog.f( GLog.E, "\tAccording to --source param, moving %s onto %s" % (dir,ref) )
+    cmd_selectref_subrepo = "cd %s && %s branch --switch %s" % ( dir, SWGIT, ref )
+    out, errCode = myCommand( cmd_selectref_subrepo )
+    if errCode != 0 :
+      GLog.f( GLog.E, out )
+      return 1
+
+  return 0
+
+
+def commit_proj( tagtype ):
+  GLog.f( GLog.E, "\tCommitting actual project status" )
+
+  srcoptions_map_noroot = g_srcoptions_map
+  if "." in srcoptions_map_noroot.keys(): del srcoptions_map_noroot['.']
+
+  #only on python > 2.5
+  #maxlen = len( max( srcoptions_map_noroot.keys(), key = len ) )
+  cmt_body = ""
+  if len( srcoptions_map_noroot.keys() ) > 0:
+    maxlen = max( len(x) for x in srcoptions_map_noroot.keys() )
+    cmt_body = ""
+    for (dir, ref) in srcoptions_map_noroot.items():
+      cmt_body += ("%s" % dir).ljust( maxlen )
+      cmt_body += " : %s\n" % ref
+
+  cb = Branch.getCurrBr()
+  comment = "'rel: %s - drop: %s_%s\n\n%s'" % \
+      ( cb.getRel().replace( "/","." ), 
+        tagtype, g_labelname, 
+        cmt_body
+      )
+  cmd_commitmodules = "git commit -a --allow-empty -m %s" % comment
+  out, errCode = myCommand( cmd_commitmodules )
+  if errCode != 0 :
+    GLog.f( GLog.E, out )
+    return 1
+
+  GLog.logRet( 0, indent="\t" )
+  return 0
+
+
+
+
 def show_chglogs_cfg():
 
   objs = []
@@ -793,40 +846,16 @@ def execute_stb( options ):
   #
   if Env.is_aproj():
 
+    apply_src_map()
+    if errCode != 0 :
+      return 1
+
     srcoptions_map_noroot = g_srcoptions_map
-    del srcoptions_map_noroot['.']
-    for (dir, ref) in srcoptions_map_noroot.items():
-
-      GLog.f( GLog.E, "\tAccording to --source param, moving %s onto %s" % (dir,ref) )
-      cmd_selectref_subrepo = "cd %s && %s branch --switch %s" % ( dir, SWGIT, ref )
-      out, errCode = myCommand( cmd_selectref_subrepo )
-      if errCode != 0 :
-        GLog.f( GLog.E, out )
-        return 1
-
+    if "." in srcoptions_map_noroot.keys(): del srcoptions_map_noroot['.']
     # commit repositories changes only if any
     if len( srcoptions_map_noroot ) > 0:
-
-      GLog.f( GLog.E, "\tCommitting actual project status" )
-
-      #only on python > 2.5
-      #maxlen = len( max( srcoptions_map_noroot.keys(), key = len ) )
-      maxlen = max( len(x) for x in srcoptions_map_noroot.keys() )
-
-      cmt_body = ""
-      for (dir, ref) in srcoptions_map_noroot.items():
-        cmt_body += ("%s" % dir).ljust( maxlen )
-        cmt_body += " : %s\n" % ref
-
-      comment = "'Submodules commit - rel: %s - drop: %s_%s\n\n%s'" % \
-                ( cb.getRel().replace( "/","." ), 
-                  SWCFG_TAG_LIV, g_labelname, 
-                  cmt_body
-                )
-      cmd_commitmodules = "git commit -a --allow-empty -m %s" % comment
-      out, errCode = myCommand( cmd_commitmodules )
+      commit_proj( SWCFG_TAG_STB )
       if errCode != 0 :
-        GLog.f( GLog.E, out )
         return 1
 
 
@@ -955,6 +984,16 @@ def execute_liv( options ):
       return 1
 
   #
+  # Inside a project, move on src input references inside subrepos
+  #   and commit proj to freeze repos alignment
+  #
+  if Env.is_aproj():
+
+    apply_src_map()
+    if errCode != 0 :
+      return 1
+
+  #
   # hook pre commit
   #
   obj_prelivcommit_hook = ObjCfgStabilize_PreLivCommit_Hook()
@@ -969,17 +1008,15 @@ def execute_liv( options ):
   #
   # liv commit, create it only if necessary
   #
-  if not options.no_chglogs or obj_prelivcommit_hook.isValid():
+  srcoptions_map_noroot = g_srcoptions_map
+  if "." in srcoptions_map_noroot.keys(): del srcoptions_map_noroot['.']
+  if (len( srcoptions_map_noroot ) > 0) or (not options.no_chglogs) or obj_prelivcommit_hook.isValid():
 
     GLog.s( GLog.S, "\tCreating LIV commit" )
 
-    cmd_liv_commit = "git commit -a --allow-empty -m \"rel: %s - drop: %s_%s\"" % \
-                     (cb.getRel().replace( "/","." ), SWCFG_TAG_LIV, g_labelname )
-
-    out, errCode = myCommand( cmd_liv_commit )
-    if errCode != 0:
+    commit_proj( SWCFG_TAG_LIV )
+    if errCode != 0 :
       GLog.f( GLog.E, "Error while creating LIV commit" )
-      GLog.logRet(out)
       GLog.logRet(errCode)
       return 1 
     GLog.logRet( 0, indent="\t" )

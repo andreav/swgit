@@ -409,8 +409,8 @@ class Test_ProjStabilize( Test_ProjBase ):
     out, errCode = clo_valle_hm["TSS100"].set_cfg( self.CFG_ANYREF, "True" )
 
     out, errCode = clo_valle_hm["TSS100"].stabilize_stb( self.TSS100_LBL_B, srcstrlist )
-    self.util_check_DENY_scenario( out, errCode, 
-                                   "only NGT labels are allowed to be stabilized",
+    self.util_check_SUCC_scenario( out, errCode, 
+                                   "",
                                    "stabilize src strlist wrong val" )
 
 
@@ -425,6 +425,16 @@ class Test_ProjStabilize( Test_ProjBase ):
     out, errCode = clo_valle_hm["DEVPLAT"].set_cfg( self.CFG_ANYREF, "True" )
 
     out, errCode = clo_valle_hm["TSS100"].stabilize_stb( self.TSS100_LBL_B, srcstrlist )
+    self.util_check_DENY_scenario( out, errCode, 
+                                   "please provide --force option.",
+                                   "stabilize src strlist wrong val" )
+
+    out, errCode = clo_valle_hm["TSS100"].stabilize_stb( self.TSS100_LBL_B, srcstrlist, force = True )
+    self.util_check_DENY_scenario( out, errCode, 
+                                   "Already exists a tag named",
+                                   "stabilize src strlist wrong val" )
+
+    out, errCode = clo_valle_hm["TSS100"].stabilize_stb( self.TSS100_LBL_B + "_1", srcstrlist, force = True )
     self.util_check_SUCC_scenario( out, errCode, 
                                    "",
                                    "stabilize src strlist wrong val" )
