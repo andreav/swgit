@@ -25,12 +25,15 @@ objSsh = ObjCfg.ObjCfgSsh()
 ssh_elem_list = objSsh.eval_git_ssh_envvar_list()
 
 args = [ "dummy_argv0" ]
+#args.append( '-v' )
 args += ssh_elem_list[1:]
 args += sys.argv[1:]
 
 
 #debug
-#print >> sys.stderr, args
+#print >> sys.stderr, ssh_elem_list
+#print >> sys.stderr, ssh_elem_list
+#print >> sys.stderr, sys.argv
 
 # v => variable list of argument
 # p => uses $PATH
