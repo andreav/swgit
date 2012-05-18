@@ -32,7 +32,7 @@ class ObjMailBase( ObjCfgMail ):
 #   swgit --tutorial-mailcfg
 # for more informations
 #
-#[stabilize]
+#[%s]
 #mailserver-sshuser = 
 #mailserver-sshaddr = 
 #from               = 
@@ -49,7 +49,7 @@ class ObjMailBase( ObjCfgMail ):
 #body-header        = 
 #body-footer        = 
 #
-#[push]
+#[%s]
 #mailserver-sshuser = 
 #mailserver-sshaddr = 
 #from               = 
@@ -65,7 +65,7 @@ class ObjMailBase( ObjCfgMail ):
 #subject            = 
 #body-header        = 
 #body-footer        = 
-"""
+""" % ( SWCFG_STABILIZE_SECT, SWCFG_MAIL_PUSH_SECT )
 
   def __init__( self, file, section ):
     super(ObjMailBase, self ).__init__( file, section )
