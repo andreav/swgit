@@ -310,6 +310,21 @@ def is_valid_swgit_tag( ref ):
   return False
 
 def is_valid_swgit_branch( ref ):
+  """
+  Checks syntactically if ref is a valid swgit branch
+    ref(str)
+
+  >>> is_valid_swgit_branch( "1/2/3/4/andreav/INT/develop" )
+  True
+  >>> is_valid_swgit_branch( "refs/heads/1/2/3/4/andreav/INT/develop" )
+  True
+  >>> is_valid_swgit_branch( "refs/remotes/origin/1/2/3/4/andreav/INT/develop" )
+  True
+  >>> is_valid_swgit_branch( "refs/remotes/1/2/3/4/andreav/INT/develop" )
+  False
+  >>> is_valid_swgit_branch( "refs/tags/1/2/3/4/andreav/INT/develop" )
+  False
+  """
 
   num = -1
   if ref.find( "refs/" ) == 0:
@@ -321,6 +336,8 @@ def is_valid_swgit_branch( ref ):
       num = SWCFG_BR_NUM_SLASHES_REMOTE_FULL
   else:
     num = SWCFG_BR_NUM_SLASHES_LOCAL
+  #print >> sys.stderr, num
+  #print >> sys.stderr, ref.count( "/" )
 
   if ref.count( "/" ) == num:
     return True
@@ -448,6 +465,33 @@ def br_2_name( r ):
     return ""
   return r[ rfindnth( r, '/', 1 ) + 1 : ]
 
+def br_2_shortref( r ):
+  """
+  >>> br_2_shortref("1/2/3/4/andreav/FTR/testbr")
+  '1/2/3/4/andreav/FTR/testbr'
+  >>> br_2_shortref("refs/remotes/origin/1/2/3/4/andreav/FTR/testbr")
+  '1/2/3/4/andreav/FTR/testbr'
+  """
+  if not is_valid_swgit_branch( r ):
+    return ""
+  relslash = rfindnth( r, '/', 7 ) + 1
+  #print >> sys.stderr, relslash
+  if relslash != 0:
+    return r[ relslash : ]
+  return r
+
+def br_2_newtag( r ):
+  """
+  >>> br_2_newtag("1/2/3/4/andreav/FTR/testbr")
+  '1/2/3/4/andreav/FTR/testbr/NEW/BRANCH'
+  >>> br_2_newtag("refs/remotes/origin/1/2/3/4/andreav/FTR/testbr")
+  '1/2/3/4/andreav/FTR/testbr/NEW/BRANCH'
+  """
+  if not is_valid_swgit_branch( r ):
+    return ""
+  shortref = br_2_shortref( r )
+  return "%s/%s/%s" % (shortref, SWCFG_TAG_NEW, SWCFG_TAG_NEW_NAME)
+
 
 def tag_2_rel ( r ):
   if not is_valid_swgit_tag( r ):
@@ -513,6 +557,8 @@ def main():
 
 
 if __name__ == "__main__":
+  import doctest
+  doctest.testmod()
   main()
   
  

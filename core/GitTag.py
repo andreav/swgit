@@ -29,7 +29,7 @@ import Utils_All
 
 g_tag_type    = None
 g_tag_value   = None
-g_cb_sr       = ""
+g_cb_str      = ""
 g_cb          = None
 g_cb_strerr   = ""
 g_tag_in_past = False
@@ -47,7 +47,7 @@ def intToChar(num):
 
 
 def getLastNumber(type):
-  brname = g_cb.getShortRef()
+  brname = br_2_shortref( g_cb_str )
   cmd="git for-each-ref --format='%(refname:short)' refs/tags/"+brname+"/"+type+"/ "
   out,errCode = myCommand( cmd, GLog.D )
   if errCode != 0:
@@ -69,9 +69,9 @@ def getLastNumber(type):
 def check( options ):
 
   global g_tag_in_past
-  global g_cb_sr, g_cb, g_cb_strerr
-  g_cb_sr, g_cb_strerr = Utils.eval_curr_branch_shortref( "HEAD" )
-  g_cb = Branch( g_cb_sr )
+  global g_cb_str, g_cb, g_cb_strerr
+  g_cb_str, g_cb_strerr = Utils.eval_curr_branch_shortref( "HEAD" )
+  g_cb = Branch( g_cb_str ) #maybe branch has been deleted, but it is stilla valid swgit branch
 
   if options.list == True or options.rel != None or options.user != None or \
      options.typeB != None or options.nameB != None or options.typeL != None or options.nameL != None or \
@@ -181,7 +181,7 @@ def check( options ):
       strerr += "        Issue 'swgit tag --show-cfg %s' to investigate" % tagDsc.get_type()
       GLog.f( GLog.E, strerr )
       return 1
-    if not g_cb.isValid():
+    if not is_valid_swgit_branch( g_cb_str ):
       strerr  = "ERROR - Tagging in detached head:\n"
       strerr += indentOutput( g_cb_strerr, 1 )
       GLog.f( GLog.E, strerr )
@@ -200,14 +200,16 @@ def check( options ):
     return 1
 
   if len( tagDsc.get_allowed_brtypes() ) > 0:
-    if g_cb.getType() not in tagDsc.get_allowed_brtypes():
+    brtype = br_2_type( g_cb_str )
+    if brtype not in tagDsc.get_allowed_brtypes():
       GLog.f( GLog.E, "FAILED - Label %s cannot be put on branch type %s, but only on %s" % 
-              ( tagDsc.get_type(), g_cb.getType(), tagDsc.get_allowed_brtypes()) )
+              ( tagDsc.get_type(), brtype, tagDsc.get_allowed_brtypes()) )
       return 1
   if len( tagDsc.get_denied_brtypes() ) > 0:
-    if g_cb.getType() in tagDsc.get_denied_brtypes():
+    brtype = br_2_type( g_cb_str )
+    if brtype in tagDsc.get_denied_brtypes():
       GLog.f( GLog.E, "FAILED - Label %s cannot be put on branch type %s, (list of denies: %s)" % 
-              ( tagDsc.get_type(), g_cb.getType(), tagDsc.get_denied_brtypes()) )
+              ( tagDsc.get_type(), brtype, tagDsc.get_denied_brtypes()) )
       return 1
   
   if g_tag_value != None:
@@ -216,12 +218,12 @@ def check( options ):
               ( tagDsc.get_type(), " or ".join( tagDsc.get_regexp() ) ) )
       return 1
 
-  errCode, dev, num = find_describe_label( g_cb.getNewBrRef() )
+  errCode, dev, num = find_describe_label( br_2_newtag( g_cb_str ) )
   if errCode == 0 and num == "0":
     GLog.f( GLog.E, "FAILED - You must have a new commit to tag" )
     return 1
  
-  errCode, dev, num = find_describe_label("%s/%s/*" % ( g_cb.getShortRef(), g_tag_type) )
+  errCode, dev, num = find_describe_label("%s/%s/*" % ( br_2_shortref( g_cb_str ), g_tag_type) )
   if errCode == 0:
     if num == "0" and tagDsc.get_one_x_commit():
       GLog.f( GLog.E, "FAILED - Only 1 '%s' label per-commit allowed." % ( g_tag_type ) )
@@ -255,7 +257,7 @@ def check( options ):
 
 def calculateLblName( replace ):
   
-  brname = g_cb.getShortRef()
+  brname = br_2_shortref( g_cb_str )
   tagDsc = create_tag_dsc( g_tag_type )
   if tagDsc.has_numeral_name() == True:
 
@@ -459,16 +461,18 @@ def execute( options ):
     typeL = "*"
     nameL = "*"
 
-    myb = Branch.getCurrBr()
-    if g_cb.isValid():
-      myb = g_cb
+    myb_str = ""
+    if Branch.getCurrBr().isValid():
+      myb_str = Branch.getCurrBr().getShortRef()
+    if is_valid_swgit_branch( g_cb_str ):
+      myb_str = br_2_shortref( g_cb_str )
 
     if options.list == True:
-      if myb.isValid(): #-l and on br
-        rel   = myb.getRel()
-        user  = myb.getUser()
-        typeB = myb.getType()
-        nameB = myb.getName()
+      if myb_str != "": #-l and on br
+        rel   = br_2_rel( g_cb_str )
+        user  = br_2_user( g_cb_str )
+        typeB = br_2_type( g_cb_str )
+        nameB = br_2_name( g_cb_str )
       else: #-l and detached
         user  = Env.getCurrUser()
 

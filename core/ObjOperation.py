@@ -488,12 +488,32 @@ class SwOp_ProjConfSpec( SwOperation ):
     return self.res_list_
   def getFormattedOutput( self ):
     paths = [ l.split(":")[0] for l in self.res_list_ ]
-    maxlen = len( max( paths, key = len ) )
+    #only on python > 2.5
+    #maxlen = len( max( paths, key = len ) )
+    maxlen = max( len(x) for x in paths )
     retval = []
     for r in self.res_list_:
       (path, ver) = r.split(':')
       retval.append( "%s : %s" % (path.ljust(maxlen), ver.strip()) )
     return retval
+
+  def describe_exact_sha( self, swComp, repover ):
+    labels = ( SWCFG_TAG_LIV, SWCFG_TAG_STB, SWCFG_TAG_NGT, SWCFG_TAG_FIX, SWCFG_TAG_DEV, SWCFG_TAG_RDY )
+
+    for t in labels:
+      cmd_describe_commit = "cd %s && git describe --tags --long --exact-match %s --match '*/*/*/*/*/*/*/%s/*'" % ( swComp.getRootDir(), repover, t )
+      lbl, errCode = myCommand_fast( cmd_describe_commit )
+      if errCode == 0:
+        #in case we have:  warning: tag ... is really ... here
+        if lbl.find( "warning: tag" ) == 0 and lbl.find( "' is really '" ) != -1:
+          #['warning: tag ', 'PAST/4/1/1/0/hudson/INT/develop/STB/Drop.D', ' is really ', '4/1/1/0/hudson/INT/develop/STB/Drop.D', ' here']
+          return "%s" % lbl.split( "'" )[3]
+        else:
+          #lbl: label-0-g2bab7e0
+          return "%s" % lbl[:-1].split('-')[0]
+
+    return ""
+
 
   def visit_int( self, swComp ):
 
@@ -504,8 +524,12 @@ class SwOp_ProjConfSpec( SwOperation ):
       prootref = "HEAD"
       if self.start_ref_ != None:
         prootref = self.start_ref_
-      errCode, currsha =  getSHAFromRef( prootref )
-      self.res_list_.append( "./ : %s" % ( currsha ) )
+      errCode, currsha =  getSHAFromRef( prootref, root = swComp.getRootDir() )
+      topline = "./ : %s" % ( currsha )
+      descr = self.describe_exact_sha( swComp, currsha )
+      if descr != "":
+        topline += " # %s" % descr
+      self.res_list_.append( topline )
 
     father = swComp.getFatherDir()
     if father in self.ref_map_.keys(): #already processed father proj 
@@ -528,16 +552,9 @@ class SwOp_ProjConfSpec( SwOperation ):
       relpath2root = os.path.relpath( swComp.getRootDir(), self.base_dir_ )
       aline = "%s : %s" % (relpath2root, repover )
 
-      labels = ( SWCFG_TAG_LIV, SWCFG_TAG_STB, SWCFG_TAG_NGT, SWCFG_TAG_FIX, SWCFG_TAG_DEV, SWCFG_TAG_RDY )
-
-      for t in labels:
-        cmd_describe_commit = "cd %s && git describe --tags --long --exact-match %s --match '*/*/*/*/*/*/*/%s/*'" % ( swComp.getRootDir(), repover, t )
-        lbl, errCode = myCommand_fast( cmd_describe_commit )
-        if errCode == 0:
-          #lbl: label-0-g2bab7e0
-          aline += " # %s" % lbl[:-1].split('-')[0]
-          break
-
+      descr = self.describe_exact_sha( swComp, repover )
+      if descr != "":
+        aline += " # %s" % descr
       self.res_list_.append( aline )
 
     return
@@ -678,7 +695,9 @@ class SwOp_ProjDiff( SwOperation ):
     row2 = str_tit2 + diffref2
     if diffref2 == "":
       row2 = str_tit2 + "working dir"
-    maxlen = len( max( row0, row1, row2, str_cmd, key=len ) )
+    #only on python > 2.5
+    #maxlen = len( max( row0, row1, row2, str_cmd, key=len ) )
+    maxlen = max( len(x) for x in [row0, row1, row2, str_cmd] )
     bound = "="*maxlen
     strout = "\n%s" % "\n".join( (bound,row0, row1, row2, str_cmd, bound) )
 

@@ -92,8 +92,8 @@ def tss100_name2intbr( name ):
 
 def print_defines():
   print ""
-  print "GIT_VERSION              " + GIT_VERSION
-  print "GIT_VERSION_SUBMODCHANGE " + GIT_VERSION_SUBMODCHANGE
+  print "GIT_VERSION              " + " ".join( map(str,GIT_VERSION) )
+  print "GIT_VERSION_SUBMODCHANGE " + " ".join( map(str,GIT_VERSION_SUBMODCHANGE) )
   print ""
   print "TESTDIR             " + TESTDIR
   print "REPOS_DIR           " + REPOS_DIR

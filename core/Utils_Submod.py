@@ -277,10 +277,21 @@ def submod_list_initialized_notsnapshot( dir = "." ):
 
 #return downloaded repos
 def submod_list_repos( dir = ".", firstLev = False, excludeRoot = False, localpaths = False ):
+  proot = Env.getProjectRoot( dir )
+  if proot == "":
+    # not inside repo
+    if not excludeRoot:
+      absroot = os.path.abspath( dir )
+      if localpaths:
+        return absroot
+      else:
+        return os.path.relpath( absroot, dir )
+    return []
+
   if firstLev == True:
-    cmd_submod_list = "cd %s && git submodule foreach --quiet 'echo $PWD'" % Env.getLocalRoot( dir )
+    cmd_submod_list = "cd %s && git submodule foreach --quiet 'echo $PWD'" % proot
   else:
-    cmd_submod_list = "cd %s && git submodule foreach --recursive --quiet 'echo $PWD'" % Env.getLocalRoot( dir )
+    cmd_submod_list = "cd %s && git submodule foreach --recursive --quiet 'echo $PWD'" % proot
 
   out, errCode = myCommand_fast( cmd_submod_list )
   if errCode != 0:
@@ -472,6 +483,28 @@ def main():
   print ""
 
   submod_apply_all( sys.argv[1], swop_dump )
+
+
+  print "submod_list_all_default():"
+  print submod_list_all_default()
+  print "submod_list_snapshot():"
+  print submod_list_snapshot()
+  print "submod_list_initialized():"
+  print submod_list_initialized()
+  print "submod_list_not_initialized():"
+  print submod_list_not_initialized()
+  print "submod_list_notinitialized_notsnapshot():"
+  print submod_list_notinitialized_notsnapshot()
+  print "submod_list_initialized_notsnapshot():"
+  print submod_list_initialized_notsnapshot()
+  print "submod_list_repos():"
+  print submod_list_repos()
+  print "submod_list_projs():"
+  print submod_list_projs()
+  print "submod_list_repos_byType( INT ):"
+  print submod_list_repos_byType( "INT", "." )
+  print "submod_list_repos_byType( CST ):"
+  print submod_list_repos_byType( "CST", "." )
 
 if __name__ == "__main__":
   main()

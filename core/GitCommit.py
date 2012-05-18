@@ -105,8 +105,8 @@ def check( options ):
     Status.getFile( ignoreSubmod = False )
 
   #add only submod modified
-  fileModified = fileConflict + fileChangedNotAdded + fileChangedAdded + fileUntrack + fileRemoved
-  smodModified   = modConflict + modChangedNotAdded + modChangedAdded + modUntrack + modRemoved
+  fileModified = fileConflict + fileChangedNotAdded + fileChangedAdded + fileRemoved
+  smodModified   = modConflict + modChangedNotAdded + modChangedAdded + modRemoved
   if options.add_all_repos == True:
     g_args = smodModified
 
@@ -265,7 +265,8 @@ def execute( options ):
 
   # REMOVE SUBMODULES
   cmd_rm_modules = ""
-  localrepos = submod_list_repos( firstLev = True, excludeRoot = True, localpaths = True )
+  #localrepos = submod_list_repos( firstLev = True, excludeRoot = True, localpaths = True )
+  localrepos = submod_list_all_default()
   #print "subrepos %s" % localrepos
   for r in localrepos:
     #print "curr subrepo %s" % r

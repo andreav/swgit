@@ -99,11 +99,14 @@ def myCommand( cmd, lvl=GLog.I):
 
   beforeInfo = describeCurrentSha()
 
+  #GLog.f( lvl, "\n\ncommand: %s\n\n" % ( cmd ) )
+  GLog.f( lvl, "\n\nbefore: %s\n\ncommand: %s\n\n" % ( beforeInfo, cmd ) )
+
   out, retcode = myCommand_fast( cmd )
 
   afterInfo = describeCurrentSha()
 
-  GLog.f( lvl, "\n\nbefore: %s\n\ncommand: %s\n\noutput:\n%s\n\nAfter: %s\n\n%s\n" % ( beforeInfo, cmd, out, afterInfo, "#"*50 ) )
+  GLog.f( lvl, "\n\noutput:\n%s\n\nAfter: %s\n\n%s\n" % ( out, afterInfo, "#"*50 ) )
   return ( out, retcode )
 
 

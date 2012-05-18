@@ -132,7 +132,15 @@ def main():
         for elem in tests._tests:
           for t in elem._tests:
             cname = t.__class__.__name__
-            strr = "%s./%s.py -vc %s.%s --debug" % ( strenv, tests_map[opnum].__name__, cname, t._testMethodName )
+
+            if hasattr( t, '_TestCase__testMethodName' ): #older python
+              m_name = t._TestCase__testMethodName
+              py_opt = "-v"
+            elif hasattr( t, '_testMethodName' ): #newer python
+              m_name = t._testMethodName
+              py_opt = "-vc"
+
+            strr = "%s./%s.py %s %s.%s --debug" % ( strenv, tests_map[opnum].__name__, py_opt, cname, m_name )
             print strr
 
         sys.exit( 0 )

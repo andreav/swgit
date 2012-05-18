@@ -127,6 +127,12 @@ def getCurrUser( ):
 GIT_VERSION              = map( int, myCommand_fast( "git --version | cut -d ' ' -f 3" )[0].split('.') )
 # I do not know, i testes against this one, as perceived the difference (against 1.7.4.1)
 GIT_VERSION_SUBMODCHANGE = [1,7,5,4]
+GIT_VERSION_MERGE_CHANGE = [1,7,8,0]
+
+FIX_MERGE_EDIT = ""
+if GIT_VERSION >= GIT_VERSION_MERGE_CHANGE:
+  FIX_MERGE_EDIT = "--no-edit"
+
 
 TEST_USER          = getCurrUser()
 TEST_USER_SSH      = pwd.getpwuid( os.getuid() )[0]

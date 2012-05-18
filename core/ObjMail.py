@@ -32,7 +32,7 @@ class ObjMailBase( ObjCfgMail ):
 #   swgit --tutorial-mailcfg
 # for more informations
 #
-#[stabilize]
+#[%s]
 #mailserver-sshuser = 
 #mailserver-sshaddr = 
 #from               = 
@@ -49,7 +49,7 @@ class ObjMailBase( ObjCfgMail ):
 #body-header        = 
 #body-footer        = 
 #
-#[push]
+#[%s]
 #mailserver-sshuser = 
 #mailserver-sshaddr = 
 #from               = 
@@ -65,7 +65,9 @@ class ObjMailBase( ObjCfgMail ):
 #subject            = 
 #body-header        = 
 #body-footer        = 
-"""
+""" % ( SWCFG_STABILIZE_SECT, SWCFG_MAIL_PUSH_SECT )
+
+  CMD_SEND_MAIL_TEMPL = "echo -e \"%s\" | /bin/mail \"%s\" -s \"%s\" %s %s %s"
 
   def __init__( self, file, section ):
     super(ObjMailBase, self ).__init__( file, section )
@@ -85,38 +87,62 @@ class ObjMailBase( ObjCfgMail ):
     return mess
 
 
-  def sendmail( self, body, debug ):
-
-    if self.isValid_ == False:
-      return self.dump(), 1
-
-    from_opt = "" 
-    if self.from_ != "":
-      from_opt = " -- -f \"%s\" " % ( self.from_ )
-
-    cc_opt = "" 
-    if self.cc_ != "":
-      cc_opt = " -c \"%s\" " % ( ",".join(self.cc_) )
-
-    bcc_opt = "" 
-    if self.bcc_ != "":
-      bcc_opt = " -b \"%s\" " % ( ",".join(self.bcc_) )
-
+  def get_all_body( self, body ):
     allbody = self.sanitize_message( self.bodyH_ )
     if self.bodyH_ != "":
       allbody += "\n"
     allbody += body
     if self.bodyF_ != "":
       allbody += "\n" + self.sanitize_message( self.bodyF_ )
+    return allbody
 
-    cmd_send_mail = "echo -e \"%s\" | /bin/mail \"%s\" -s \"%s\" %s %s %s" % \
-                    ( allbody,
-                      ",".join(self.to_),
-                      self.subj_,
-                      cc_opt,
-                      bcc_opt,
-                      from_opt
-                     )
+  def get_cc_opt( self ):
+    cc_opt = "" 
+    if self.cc_ != "":
+      cc_opt = " -c \"%s\" " % ( ",".join(self.cc_) )
+    return cc_opt
+
+  def get_bcc_opt( self ):
+    bcc_opt = "" 
+    if self.bcc_ != "":
+      bcc_opt = " -b \"%s\" " % ( ",".join(self.bcc_) )
+    return bcc_opt
+
+  def get_from_opt( self ):
+    from_opt = "" 
+    if self.from_ != "":
+      from_opt = " -- -f \"%s\" " % ( self.from_ )
+    return from_opt
+
+  def get_mail_cmd( self ):
+    if self.isValid_ == False:
+      return ""
+
+    cmd_send_mail = self.CMD_SEND_MAIL_TEMPL % \
+                     ( self.get_all_body( "BODY_HERE" ),
+                       ",".join(self.to_),
+                       "SUBJECT_HERE",
+                       self.get_cc_opt(),
+                       self.get_bcc_opt(),
+                       self.get_from_opt()
+                      )
+    if self.sshaddr_ != "":
+      return "ssh %s@%s '%s'" % (self.sshuser_, self.sshaddr_, cmd_send_mail )
+    return cmd_send_mail
+
+  def sendmail( self, body, debug ):
+
+    if self.isValid_ == False:
+      return self.dump(), 1
+
+    cmd_send_mail = CMD_SEND_MAIL_TEMPL % \
+                     ( self.get_all_body( body ),
+                       ",".join(self.to_),
+                       "SUBJECT_HERE",
+                       self.get_cc_opt(),
+                       self.get_bcc_opt(),
+                       self.get_from_opt()
+                      )
 
     if self.sshaddr_ != "":
       if debug == True:

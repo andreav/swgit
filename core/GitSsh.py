@@ -73,7 +73,7 @@ def test_remote_access( user, addr ):
 def test_remote_reachability( user, addr ):
   #ssh_options  = "-oBatchMode=yes -oConnectTimeout=%s" % ( Defines.SWCFG_SSH_TESTACCESS_TIMEOUT )
   ssh_options  = "-oConnectTimeout=%s" % ( Defines.SWCFG_SSH_TESTACCESS_TIMEOUT )
-  out, errCode = MyCmd.mySSHCommand_fast( "", user, addr, ssh_options )
+  out, errCode = MyCmd.mySSHCommand_fast( "exit 0", user, addr, ssh_options )
   if errCode != 0:
     return 1
   return 0
