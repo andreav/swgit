@@ -227,6 +227,10 @@ def execute( options ):
     print om.dump()
     print om.show_config_options()
     print ""
+    if om.isValid():
+      print "Under the wood, swgit will execute this command:"
+      print "\t", om.get_mail_cmd()
+      print ""
     return 0
 
   if options.testmail:
