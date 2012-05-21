@@ -138,7 +138,7 @@ class ObjMailBase( ObjCfgMail ):
     cmd_send_mail = self.CMD_SEND_MAIL_TEMPL % \
                      ( self.get_all_body( body ),
                        ",".join(self.to_),
-                       "SUBJECT_HERE",
+                       self.subj_,
                        self.get_cc_opt(),
                        self.get_bcc_opt(),
                        self.get_from_opt()
