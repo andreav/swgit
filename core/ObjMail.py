@@ -135,7 +135,7 @@ class ObjMailBase( ObjCfgMail ):
     if self.isValid_ == False:
       return self.dump(), 1
 
-    cmd_send_mail = CMD_SEND_MAIL_TEMPL % \
+    cmd_send_mail = self.CMD_SEND_MAIL_TEMPL % \
                      ( self.get_all_body( body ),
                        ",".join(self.to_),
                        "SUBJECT_HERE",
