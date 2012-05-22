@@ -787,9 +787,9 @@ Usage: swgit proj --add-repo [-b branch] [--snapshot] <url> [<localname>]
       if not on_ori:
         cmd_remote_repo_is_localized = "test -e \"%s/%s/.git\" && echo %s || echo %s" % \
                                         ( projRemote.getRoot(), rn, RESPONSE_LOCALIZED, RESPONSE_REMOTIZED )
-        GLog.f( GLog.D, "onto\n%s\ncmd:\n %s" % ( projRemote, cmd_remote_repo_is_localized ) )
+        GLog.f( GLog.I, "onto\n%s\ncmd:\n %s" % ( projRemote, cmd_remote_repo_is_localized ) )
         out, retcode = projRemote.remote_command( cmd_remote_repo_is_localized )
-        GLog.f( GLog.D, "response: %s" % out[:-1] )
+        GLog.f( GLog.I, "response: %s" % out[:-1] )
         if retcode != 0:
           GLog.f( GLog.E, "FAILED - Cannot contact \"origin\" at %s (user: %s)" % (projRemote.getAddress(), projRemote.getUser()) )
           sys.exit(1)
@@ -1024,15 +1024,15 @@ Usage: swgit proj --add-repo [-b branch] [--snapshot] <url> [<localname>]
 
     if options.update_repo_yesmerge:
 
-      cmd_reset = "SWINDENT=%s %s pull --merge-from-int" % ( GLog.tab + 1, SWGIT )
+      cmd_reset = "cd %s && SWINDENT=%s %s pull --merge-from-int" % ( map.getDir(), GLog.tab + 1, SWGIT )
       errCode = os.system( cmd_reset )
 
     else:
 
       #cmd_reset = "SWINDENT=%s %s branch -i && SWINDENT=%s %s proj --reset HEAD && SWINDENT=%s %s pull" % \
       #    ( GLog.tab + 1, SWGIT, GLog.tab + 1, SWGIT, GLog.tab + 1, SWGIT )
-      cmd_reset = "SWINDENT=%s %s branch -i && SWINDENT=%s %s pull" % \
-          ( GLog.tab + 1, SWGIT, GLog.tab + 1, SWGIT )
+      cmd_reset = "cd %s && SWINDENT=%s %s branch -i && SWINDENT=%s %s pull" % \
+          ( map.getDir(), GLog.tab + 1, SWGIT, GLog.tab + 1, SWGIT )
       errCode = os.system( cmd_reset )
 
     GLog.logRet( errCode )
@@ -1045,7 +1045,7 @@ Usage: swgit proj --add-repo [-b branch] [--snapshot] <url> [<localname>]
     #  CST always submodule update
     #  INT pull develop and/or side merge
     #
-    repos = submod_list_repos( map.getDir(), firstLev = True, excludeRoot = True, localpaths = True )
+    repos = submod_list_repos( firstLev = True, excludeRoot = True, localpaths = True )
     if len( repos ) == 0:
       sys.exit( 0 )
 
@@ -1083,7 +1083,7 @@ Usage: swgit proj --add-repo [-b branch] [--snapshot] <url> [<localname>]
 
       if not repoib.isValid(): #INT, no intbr
 
-        GLog.s( GLog.S, "No integration branch set, just download new commits without merging ... " % (repo) )
+        GLog.s( GLog.S, "No integration branch set into %s, just download new commits without merging ... " % (repo) )
 
         cmd_update_cst  = "cd %s && git submodule update --recursive -- %s" % ( map.getDir(), repo )
         out, errCode = myCommand( cmd_update_cst )
@@ -1368,7 +1368,9 @@ Usage: swgit proj --add-repo [-b branch] [--snapshot] <url> [<localname>]
       row2 = row2_skel % ref2
       if ref2 == "":
         row2 = row2_skel % "working dir"
-      maxlen = len( max( row0, row1, row2, row_cmd, key=len ) )
+      #only on python > 2.5
+      #maxlen = len( max( row0, row1, row2, row_cmd, key=len ) )
+      maxlen = max( len(x) for x in [ row0, row1, row2, row_cmd ] )
       bound = "="*maxlen
       strout = "\n%s" % "\n".join( (bound,row0, row1, row2, row_cmd, bound) )
 
@@ -1413,7 +1415,9 @@ Usage: swgit proj --add-repo [-b branch] [--snapshot] <url> [<localname>]
       row2 = row2_skel % smodref_2
       if smodref_2 == "":
         row2 = row2_skel % "working dir"
-      maxlen = len( max( row0, row1, row2, row_cmd, key=len ) )
+      #only on python > 2.5
+      #maxlen = len( max( row0, row1, row2, row_cmd, key=len ) )
+      maxlen = max( len(x) for x in [ row0, row1, row2, row_cmd ] )
       bound = "="*maxlen
       strout = "\n%s" % "\n".join( (bound,row0, row1, row2, row_cmd, bound) )
 

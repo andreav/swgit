@@ -131,11 +131,11 @@ Usage: swgit clone [-b <intbr>] [--integrator] [--recursive] <src-url> [<dst-pat
   # SUB repos
   if options.recursive:
 
-    if os.path.exists( "%s/%s" % (dest, SWFILE_PROJMAP) ) == True :
+    if os.path.exists( SWFILE_PROJMAP ):
 
       GLog.s( GLog.S, "Managing contained repositories ... " )
 
-      errCode = os.system( "SWINDENT=%s %s proj --init" % (1, SWGIT ) )
+      errCode = os.system( "SWINDENT=%s && %s proj --init" % (1, SWGIT ) )
       if errCode != 0:
         GLog.logRet( 1 )
         sys.exit( 1 )

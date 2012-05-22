@@ -180,3 +180,12 @@ def set_repo_cfg( key, value, dir = ".", type = "" ):
     cmd = "cd %s && git config %s %s %s" % ( dir, type, key, value )
   return myCommand_fast( cmd )
 
+
+
+GIT_VERSION              = map( int, myCommand_fast( "git --version | cut -d ' ' -f 3" )[0].split('.') )
+GIT_VERSION_MERGE_CHANGE = [1,7,8,0]
+
+FIX_MERGE_EDIT = ""
+if GIT_VERSION >= GIT_VERSION_MERGE_CHANGE:
+  FIX_MERGE_EDIT = "--no-edit"
+

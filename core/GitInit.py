@@ -515,7 +515,7 @@ Usage: swgit init -r <x.y.z.t> [-u <user>] [-l <label>] [-c <int-br-name>]
 
   ignore_file = open( dotgitignore, 'r' )
   gitignore_cont = ignore_file.read()
-  ignore_files = [ "%s*" % SWDIR_LOG, "!%s.placeholder" % SWDIR_LOG,
+  ignore_files = [ "%s*" % SWDIR_LOG, SWFILE_BRANCH_LAST, "!%s.placeholder" % SWDIR_LOG,
     "*~", "*.swp", "*.pyc", "!.gitattributes" ]
 
   for ign in ignore_files:

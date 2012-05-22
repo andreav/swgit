@@ -182,12 +182,7 @@ class SshRemote( Remote ):
 
 
   def remote_command( self, cmd ):
-    git_ssh = "$HOME/.ssh/swgit_sshKey"
-    cmd = "ssh -i %s %s@%s '%s'" % ( git_ssh, self.getUser(), self.getAddress(), cmd )
-    out, errCode = myCommand_fast( cmd )
-    return (out, errCode)
-  
-
+    return mySSHCommand_fast( cmd, self.getUser(), self.getAddress() )
 
 
 

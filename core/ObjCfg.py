@@ -246,6 +246,8 @@ class ObjCfg( object ):
   def read_file_field( self, key, mandatory ):
 
     #print "read_file_field:", key, mandatory
+    if not self.config_.has_option( self.section_, key ):
+      return "No config present", 1
 
     try:
       val =  self.config_.get( self.section_, key ) #this will raise exception if not exists
@@ -287,6 +289,8 @@ class ObjCfg( object ):
 
     try:
       list_options=[x for x in self.config_.options(self.section_) if x.lower().startswith('%s' % key) ]
+      if len( list_options ) == 0:
+        return "No config present", 1
     except Exception, e:
       return "No config present", 1
 
