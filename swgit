@@ -36,8 +36,8 @@ def checkVersions():
     return 1
 
   gitVer = map(int, out[:-1].split('.'))
-  if gitVer < [1,7,1]:
-    print "Mininum git version supported is: 1.7.1"
+  if gitVer <= [1,7,1]:
+    print "Mininum git version supported is: 1.7.2"
     return 1
 
   return 0
