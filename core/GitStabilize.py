@@ -302,7 +302,7 @@ def eval_create_add_logs( upstream ):
   out, errCode = myCommand( cmd_add )
   if errCode != 0:
     GLog.f( GLog.E, "Error while adding Changelog, Fixlog and Ticketlog" )
-    GLog.logRet(out)
+    GLog.f( GLog.E, out )
     GLog.logRet(errCode)
     return 1 
   GLog.logRet( 0, indent="\t" )
@@ -825,10 +825,38 @@ def execute_stb( options ):
   # We cannot tag before issuing merge, in order to the let user resolving conflicts.
   # We will create INT/develop/STB label only once, after successful merge
   cmd_merge_stblbl = "SWINDENT=%d SWCHECK=NO %s merge %s" % ( GLog.tab+2, SWGIT, startref )
-  errCode = os.system( cmd_merge_stblbl )
+  out, errCode = myCommand( cmd_merge_stblbl )
   if errCode != 0:
-    GLog.logRet(errCode)
-    return 1 
+      if not Env.is_aproj() or options.stop_on_smod_conflict:
+          GLog.f( GLog.E, out )
+          GLog.logRet(errCode)
+          return 1 
+      #proj
+      srcoptions_map_noroot = g_srcoptions_map
+      if "." in srcoptions_map_noroot.keys(): del srcoptions_map_noroot['.']
+      #no --source => error in root repo
+      if len( srcoptions_map_noroot ) == 0: #no submod stabilize => true conflict
+          GLog.f( GLog.E, out )
+          GLog.logRet(errCode)
+          return 1 
+      #yes --source => choose theirs for submodule provided
+      GLog.s( GLog.S, "\tMerge conflict, selecting '--source' references for provided submodules" )
+      cmd_checkout_theirs = "git add %s" % ( " ".join(srcoptions_map_noroot.keys()) )
+      out, errCode = myCommand( cmd_checkout_theirs )
+      #re-check now and exit only if you have conflicts now
+      #err, errstr = Status.checkLocalStatus_rec( ignoreSubmod = True )
+      #if err != 0:
+      #    GLog.f( GLog.E, indentOutput( errstr, 1 ) )
+      #    return 1
+      #no more conflicts..finish merge
+      GLog.s( GLog.S, "\tCommitting everithing (resolved merge)" )
+      cmd_checkout_theirs = ("SWINDENT=%d %s commit -a -m \"Automatic merge conflict resolution\"" 
+                             % ( GLog.tab+1, SWGIT, ))
+      out, errCode = myCommand( cmd_checkout_theirs )
+      if errCode != 0:
+          GLog.f( GLog.E, indentOutput( out, 1 ) )
+          return 1
+
   GLog.logRet( 0, indent="\t" )
 
   #
@@ -1294,6 +1322,16 @@ gitstabilize_mgt_options = [
         "dest"    : "batch",
         "default" : False,
         "help"    : 'No answers, useful with scripts'
+        }
+      ],
+    [
+      "--stop-on-submod-conflict",
+      {
+        "action"  : "store_true",
+        "dest"    : "stop_on_smod_conflict",
+        "default" : False,
+        "help"    : 'When stabilizing, stop if ther is a conflict on submodules. '
+                    '(default is `checkout --theirs` on submodules files)'
         }
       ],
     [
