@@ -3,6 +3,7 @@
 #
 .swdir/log/*
 !.swdir/log/.placeholder
+.swdir/swgit_last_br
 *~
 *.swp
 *.pyc
