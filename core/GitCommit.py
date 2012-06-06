@@ -133,21 +133,22 @@ def check( options ):
   #
   # nothing to be committed
   #
-  if len( fileModified ) == 0 and len( smodModified ) == 0:
-    if not Status.pendingMerge(): #maybe nothing but pending merge (conflict only into submodules) plus git add submod
-      GLog.f( GLog.E, "FAILED - Nothing to be committed" )
-      return 1
-  if len( fileModified ) == 0 and not Status.pendingMerge(): #but submod changes
-    if options.add_all_modified:
-      GLog.f( GLog.E, "FAILED - Nothing to be committed inside local repository. Please remove -a option." )
-      return 1
-    if len( g_args ) == 0:
-      GLog.f( GLog.E, "FAILED - Nothing to be committed inside local repository. But if you want to commit any submodules upgrade, please specify it/them on input" )
-      return 1
-  if len( smodModified ) == 0: #but file changes
-    if options.add_all_repos:
-      GLog.f( GLog.E, "FAILED - Nothing to be committed inside submodules. Please remove -A option." )
-      return 1
+  if not options.allow_empty:
+    if len( fileModified ) == 0 and len( smodModified ) == 0:
+      if not Status.pendingMerge(): #maybe nothing but pending merge (conflict only into submodules) plus git add submod
+        GLog.f( GLog.E, "FAILED - Nothing to be committed" )
+        return 1
+    if len( fileModified ) == 0 and not Status.pendingMerge(): #but submod changes
+      if options.add_all_modified:
+        GLog.f( GLog.E, "FAILED - Nothing to be committed inside local repository. Please remove -a option." )
+        return 1
+      if len( g_args ) == 0:
+        GLog.f( GLog.E, "FAILED - Nothing to be committed inside local repository. But if you want to commit any submodules upgrade, please specify it/them on input" )
+        return 1
+    if len( smodModified ) == 0: #but file changes
+      if options.add_all_repos:
+        GLog.f( GLog.E, "FAILED - Nothing to be committed inside submodules. Please remove -A option." )
+        return 1
 
   #
   # removed files
@@ -167,7 +168,7 @@ def check( options ):
   #
   if len( g_args ) > 0:
     for sm in g_args:
-      if sm not in smodModified:
+      if sm not in smodModified and not options.allow_empty:
         GLog.f( GLog.E, "FAILED - Nothing to be committed for submodule %s, try eliminating this param." % sm )
         return 1
 
@@ -208,7 +209,7 @@ def check( options ):
   #
   # -a option
   #
-  if not options.add_all_modified and len( fileChangedAdded ) == 0:
+  if not options.add_all_modified and len( fileChangedAdded ) == 0 and not options.allow_empty:
     if len( g_args ) == 0:
       GLog.f( GLog.E, "FAILED - Nothing added to the index. Try using -a option." )
       return 1
@@ -217,7 +218,7 @@ def check( options ):
   # Forgotten files
   #
   if len( fileChangedNotAdded ) > 0 and not options.add_all_modified:
-    GLog.f( GLog.E, "\nWARNING\n\tWithout -a option these files will not commit: \n\t" + "\n\t".join( fileChangedNotAdded ))
+    GLog.f( GLog.E, "\nWARNING\n\tWithout -a option these files will not be committed: \n\t" + "\n\t".join( fileChangedNotAdded ))
 
   #
   # untracked files
@@ -267,7 +268,7 @@ def execute( options ):
   cmd_rm_modules = ""
   #localrepos = submod_list_repos( firstLev = True, excludeRoot = True, localpaths = True )
   localrepos = submod_list_all_default()
-  #print "subrepos %s" % localrepos
+  #print "subrepos %s" % localreposspeed_norm
   for r in localrepos:
     #print "curr subrepo %s" % r
     if r in g_args:
@@ -292,7 +293,10 @@ def execute( options ):
 
 
   # COMMIT
-  cmd_commit = "git commit -m \"%s\"" % options.msg
+  opt_allow_empty = ""
+  if options.allow_empty: opt_allow_empty = "--allow-empty"
+
+  cmd_commit = "git commit -m \"%s\" %s" % (options.msg, opt_allow_empty)
   out,errCode = myCommand( cmd_commit  )
   if errCode != 0:
     GLog.f( GLog.E, out )
@@ -432,6 +436,15 @@ gitcommit_options = [
         "dest"    : "add_all_repos",
         "default" : False,
         "help"    : "Commit also all repositories (as passing all initialized repositories on command line)"
+        }
+      ],
+    [ 
+      "--allow-empty",
+      {
+        "action"  : "store_true",
+        "dest"    : "allow_empty",
+        "default" : False,
+        "help"    : "Create a commit also if nothing ahs to be committed"
         }
       ],
 #    [ 

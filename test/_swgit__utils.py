@@ -406,12 +406,21 @@ class swgit__utils:
   #
   # Commit
   #
-  def commit( self, msg="default commit message", all="" ):
-    cmd = "cd %s && %s commit -m \"%s\" %s" % ( self.repodir_, SWGIT, msg, all )
+  def commit( self, msg="default commit message", all="", allow_empty = False ):
+    opt_allow_empty = ""
+    if allow_empty:
+        opt_allow_empty = "--allow-empty"
+    cmd = "cd %s && %s commit -m \"%s\" %s %s" % ( self.repodir_, SWGIT, msg,
+                                                  all, opt_allow_empty )
     return myCommand( cmd )
 
-  def commit_repolist( self, repolist, msg="default commit message" ):
-    cmd = "cd %s && %s commit -m \"%s\" %s" % ( self.repodir_, SWGIT, msg, repolist )
+  def commit_repolist( self, repolist, msg="default commit message",
+                      allow_empty = False  ):
+    opt_allow_empty = ""
+    if allow_empty:
+        opt_allow_empty = "--allow-empty"
+    cmd = "cd %s && %s commit -m \"%s\" %s %s" % ( self.repodir_, SWGIT, msg,
+                                                  repolist, opt_allow_empty )
     return myCommand( cmd )
 
   def commit_dev_repolist( self, repolist, msg="default commit message", all = "" ): 
@@ -422,8 +431,14 @@ class swgit__utils:
     cmd = "cd %s && %s commit -a -m \"%s\" %s " % ( self.repodir_, SWGIT, msg, all )
     return myCommand( cmd )
 
-  def commit_minusA_repolist( self, msg="default commit message", all="", repolist = "" ):
-    cmd = "cd %s && %s commit -a -m \"%s\" %s %s" % ( self.repodir_, SWGIT, msg, all, repolist )
+  def commit_minusA_repolist( self, msg="default commit message", all="",
+                             repolist = "", allow_empty = False ):
+    opt_allow_empty = ""
+    if allow_empty:
+        opt_allow_empty = "--allow-empty"
+    cmd = "cd %s && %s commit -a -m \"%s\" %s %s %s" % ( self.repodir_, SWGIT,
+                                                        msg, all, repolist,
+                                                        opt_allow_empty )
     return myCommand( cmd )
 
   def commit_minusA_dev_repolist( self, msg="default commit message", all="", repolist = "" ):

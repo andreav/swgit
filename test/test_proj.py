@@ -921,7 +921,7 @@ class Test_Proj( Test_ProjBase ):
                               "Committing your contributes",
                               "MUST FAIL commit new-commits-sub-sub-repo with -a and -A" )
 
-  def test_Proj_03_07_Commit_onlyfile( self ):
+  def test_Proj_03_07_00_Commit_onlyfile( self ):
     self.util_createAndCheck_TSS100_FULL_withbkp_andclonedefbr( self.REPO_TSS100__CLO2_DIR )
 
     clo2_hm   = self.util_get_TSS10FULL_helper_map_clone( self.REPO_TSS100__CLO2_DIR )
@@ -948,7 +948,17 @@ class Test_Proj( Test_ProjBase ):
                                    "Not existing repository",
                                    "MUST FAIL commit no-changes with reponame not existing" )
 
+    out, errCode = clo2_hm["TSS100"].commit_repolist( msg = "no mod", repolist = tss100_name2path( "DEVFS"), allow_empty = True )
+    self.util_check_DENY_scenario( out, errCode, 
+                                   "Not existing repository",
+                                   "MUST FAIL commit no-changes with reponame not existing" )
+
     out, errCode = clo2_hm["TSS100"].commit_repolist( msg = "no mod", repolist = "./" )
+    self.util_check_DENY_scenario( out, errCode, 
+                                   "Not existing repository '.'",
+                                   "MUST FAIL commit no-changes with reponame exisitng" )
+
+    out, errCode = clo2_hm["TSS100"].commit_repolist( msg = "no mod", repolist = "./", allow_empty = True )
     self.util_check_DENY_scenario( out, errCode, 
                                    "Not existing repository '.'",
                                    "MUST FAIL commit no-changes with reponame exisitng" )
@@ -967,6 +977,85 @@ class Test_Proj( Test_ProjBase ):
     self.util_check_SUCC_scenario( out, errCode, 
                               "Committing your contributes",
                               "MUST FAIL commit no-changes with -a" )
+
+  def test_Proj_03_07_01_Commit_onlyfile_allow_empty( self ):
+    self.util_createAndCheck_TSS100_FULL_withbkp_andclonedefbr( self.REPO_TSS100__CLO2_DIR )
+
+    clo2_hm   = self.util_get_TSS10FULL_helper_map_clone( self.REPO_TSS100__CLO2_DIR )
+    va_sha_map_clonetime = self.util_map2_currshas( clo2_hm )
+
+
+    ###############
+    #only file mod
+    ###############
+    #create branch
+    out, errCode = clo2_hm["TSS100"].branch_create( self.MOD_BRANCH )
+    self.assertEqual( errCode, 0, "FAILED creating branch for adding repo to proj %s - \n%s\n" % ( self.REPO_PROJ_ABC_CLONE_DIR, out) )
+
+    out, errCode = clo2_hm["TSS100"].modify_file( tss100_name2file( "TSS100" ), msg = "modification" )
+
+    sha_before, errCode = clo2_hm["TSS100"].get_currsha()
+    self.assertEqual( errCode, 0, "get_currsha FAILED - \n%s\n" % out )
+
+    out, errCode = clo2_hm["TSS100"].commit_minusA_repolist( msg = "no mod", repolist = "-A" )
+    self.util_check_DENY_scenario( out, errCode, 
+                                   "Please remove -A option.",
+                                   "MUST FAIL commit no-changes with -a and -A" )
+
+    out, errCode = clo2_hm["TSS100"].commit_minusA_repolist( msg = "no mod",
+                                                            repolist = "-A",
+                                                            allow_empty = True )
+    self.util_check_SUCC_scenario( out, errCode, 
+                                   "",
+                                   "FAILED commit no-changes with -a and -A and allow-empty" )
+
+    sha_after, errCode = clo2_hm["TSS100"].get_currsha()
+    self.assertEqual( errCode, 0, "get_currsha FAILED - \n%s\n" % out )
+    sha_after_minus1, errCode = clo2_hm["TSS100"].get_currsha( "HEAD~1" )
+    self.assertEqual( errCode, 0, "get_currsha FAILED - \n%s\n" % out )
+
+    self.assertNotEqual( sha_before, sha_after, "commit FAILED - after commit no-op, not same sha as before\n%s\n" % out )
+    self.assertEqual( sha_before, sha_after_minus1, "commit FAILED - after commit no-op, not same sha as before\n%s\n" % out )
+
+
+  def test_Proj_03_07_02_Commit_noadded_allow_empty( self ):
+    self.util_createAndCheck_TSS100_FULL_withbkp_andclonedefbr( self.REPO_TSS100__CLO2_DIR )
+
+    clo2_hm   = self.util_get_TSS10FULL_helper_map_clone( self.REPO_TSS100__CLO2_DIR )
+    va_sha_map_clonetime = self.util_map2_currshas( clo2_hm )
+
+
+    ###############
+    #only file mod
+    ###############
+    #create branch
+    out, errCode = clo2_hm["TSS100"].branch_create( self.MOD_BRANCH )
+    self.assertEqual( errCode, 0, "FAILED creating branch for adding repo to proj %s - \n%s\n" % ( self.REPO_PROJ_ABC_CLONE_DIR, out) )
+
+    out, errCode = clo2_hm["TSS100"].modify_file( tss100_name2file( "TSS100" ), msg = "modification" )
+
+    sha_before, errCode = clo2_hm["TSS100"].get_currsha()
+    self.assertEqual( errCode, 0, "get_currsha FAILED - \n%s\n" % out )
+
+
+    out, errCode = clo2_hm["TSS100"].commit( msg = "no mod" )
+    self.util_check_DENY_scenario( out, errCode, 
+                                   "Nothing added to the index. Try using -a option.",
+                                   "MUST FAIL commit no-changes" )
+
+    out, errCode = clo2_hm["TSS100"].commit( msg = "no mod", allow_empty = True )
+    self.util_check_SUCC_scenario( out, errCode, 
+                                   "Without -a option these files will not be committed:",
+                                   "FAILED commit nothing added" )
+
+    sha_after, errCode = clo2_hm["TSS100"].get_currsha()
+    self.assertEqual( errCode, 0, "get_currsha FAILED - \n%s\n" % out )
+    sha_after_minus1, errCode = clo2_hm["TSS100"].get_currsha( "HEAD~1" )
+    self.assertEqual( errCode, 0, "get_currsha FAILED - \n%s\n" % out )
+
+    self.assertNotEqual( sha_before, sha_after, "commit FAILED - after commit no-op, not same sha as before\n%s\n" % out )
+    self.assertEqual( sha_before, sha_after_minus1, "commit FAILED - after commit no-op, not same sha as before\n%s\n" % out )
+
 
 
   def test_Proj_03_08_Commit_both_file_submod( self ):
