@@ -559,6 +559,7 @@ def main():
 
     info_eval_diff( newbr, ref, options.stat, file = filename, cbc = options.cbc, onlyme = options.my )
 
+  return 0
 
 def check_info_ref(option, opt_str, value, parser):
   check_input( option, opt_str, value, parser )

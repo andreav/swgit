@@ -68,7 +68,7 @@ class Test_Commit( Test_Base ):
 
 
 
-  def test_Commit_01_00_nothing( self ):
+  def test_Commit_01_00_00_nothing( self ):
     # clone
     out, errCode = swgit__utils.clone_scripts_repo( self.COMMIT_DIR )
     self.assertEqual( errCode, 0, "SWGIT clone FAILED - swgit__utils.clone_scripts_repo" )
@@ -99,8 +99,42 @@ class Test_Commit( Test_Base ):
     self.assertNotEqual( errCode, 0, "gitUtil_.tag_get( FIX ) MUST FAILED - \n%s\n" % tag )
 
 
+  def test_Commit_01_00_01_nothing_allow_empty( self ):
+    # clone
+    out, errCode = swgit__utils.clone_scripts_repo( self.COMMIT_DIR )
+    self.assertEqual( errCode, 0, "SWGIT clone FAILED - swgit__utils.clone_scripts_repo" )
 
-  def test_Commit_01_01_noAdd( self ):
+    # create branch
+    out, errCode = self.swgitUtil_.branch_create( self.BRANCH_NAME )
+    self.assertEqual( errCode, 0, "swgitUtil_.branch_create FAILED - \n%s\n" % out )
+
+    # getsha before commit
+    sha_before, errCode = self.gitUtil_.get_currsha()
+    self.assertEqual( errCode, 0, "gitUtil_.get_currsha FAILED - \n%s\n" % out )
+
+    # commit nothing
+    out, errCode = self.swgitUtil_.commit( allowempty = True)
+    self.assertEqual( errCode, 0, "commit allowempty FAILED - \n%s\n" % out )
+
+    # getsha after commit
+    sha_after, errCode = self.gitUtil_.get_currsha()
+    self.assertEqual( errCode, 0, "gitUtil_.get_currsha FAILED - \n%s\n" % out )
+    sha_after_minus1, errCode = self.gitUtil_.get_currsha( "HEAD~1" )
+    self.assertEqual( errCode, 0, "gitUtil_.get_currsha FAILED - \n%s\n" % out )
+
+    self.assertNotEqual( sha_before, sha_after, "commit FAILED - after commit no-op, not same sha as before\n%s\n" % out )
+    self.assertEqual( sha_before, sha_after_minus1, "commit FAILED - after commit no-op, not same sha as before\n%s\n" % out )
+
+    # check TAG MUST NOT exists on HEAD
+    tag, errCode = self.gitUtil_.tag_get( "DEV" )
+    self.assertNotEqual( errCode, 0, "gitUtil_.tag_get( DEV ) MUST FAILED - \n%s\n" % tag )
+
+    tag, errCode = self.gitUtil_.tag_get( "FIX" )
+    self.assertNotEqual( errCode, 0, "gitUtil_.tag_get( FIX ) MUST FAILED - \n%s\n" % tag )
+
+
+
+  def test_Commit_01_01_00_noAdd( self ):
     self.createBr_modifyFile()
 
     # getsha before commit
@@ -116,6 +150,37 @@ class Test_Commit( Test_Base ):
     self.assertEqual( errCode, 0, "gitUtil_.get_currsha FAILED - \n%s\n" % sha_after )
 
     self.assertEqual( sha_before, sha_after, "swgitUtil_.commit FAILED - after commit no-op, not same sha as before\n%s\n" % sha_after )
+
+    # check TAG MUST NOT exists on HEAD
+    tag, errCode = self.gitUtil_.tag_get( "DEV" )
+    self.assertNotEqual( errCode, 0, "gitUtil_.tag_get( DEV ) MUST FAILED - \n%s\n" % tag )
+
+    tag, errCode = self.gitUtil_.tag_get( "FIX" )
+    self.assertNotEqual( errCode, 0, "gitUtil_.tag_get( FIX ) MUST FAILED - \n%s\n" % tag )
+
+
+  def test_Commit_01_01_00_noAdd_allow_empty( self ):
+    self.createBr_modifyFile()
+
+    # getsha before commit
+    sha_before, errCode = self.gitUtil_.get_currsha()
+    self.assertEqual( errCode, 0, "gitUtil_.get_currsha FAILED - \n%s\n" % sha_before )
+
+    # commit but not added
+    out, errCode = self.swgitUtil_.commit(allowempty=True)
+    self.util_check_SUCC_scenario( out, errCode, 
+                                  "Without -a option these files will not be committed", 
+                                  "FAILED committing" )
+
+    # getsha after commit
+    sha_after, errCode = self.gitUtil_.get_currsha()
+    self.assertEqual( errCode, 0, "gitUtil_.get_currsha FAILED - \n%s\n" % sha_after )
+    sha_after_minus1, errCode = self.gitUtil_.get_currsha( "HEAD~1" )
+    self.assertEqual( errCode, 0, "gitUtil_.get_currsha FAILED - \n%s\n" % out )
+
+    self.assertNotEqual( sha_before, sha_after, "commit FAILED - after commit no-op, not same sha as before\n%s\n" % out )
+    self.assertEqual( sha_before, sha_after_minus1, "commit FAILED - after commit no-op, not same sha as before\n%s\n" % out )
+
 
     # check TAG MUST NOT exists on HEAD
     tag, errCode = self.gitUtil_.tag_get( "DEV" )
