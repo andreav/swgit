@@ -113,8 +113,8 @@ class Test_Commit( Test_Base ):
     self.assertEqual( errCode, 0, "gitUtil_.get_currsha FAILED - \n%s\n" % out )
 
     # commit nothing
-    out, errCode = self.swgitUtil_.commit( allowempty = True)
-    self.assertEqual( errCode, 0, "commit allowempty FAILED - \n%s\n" % out )
+    out, errCode = self.swgitUtil_.commit( allow_empty = True)
+    self.assertEqual( errCode, 0, "commit allow_empty FAILED - \n%s\n" % out )
 
     # getsha after commit
     sha_after, errCode = self.gitUtil_.get_currsha()
@@ -167,7 +167,7 @@ class Test_Commit( Test_Base ):
     self.assertEqual( errCode, 0, "gitUtil_.get_currsha FAILED - \n%s\n" % sha_before )
 
     # commit but not added
-    out, errCode = self.swgitUtil_.commit(allowempty=True)
+    out, errCode = self.swgitUtil_.commit(allow_empty=True)
     self.util_check_SUCC_scenario( out, errCode, 
                                   "Without -a option these files will not be committed", 
                                   "FAILED committing" )
