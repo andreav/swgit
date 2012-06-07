@@ -42,7 +42,7 @@ def find_new( ref ):
   if bornfrom.find("remotes/") == 0:
     bornfrom = getFromSlash(bornfrom,2)
   
-  return trunch_describe_output(bornfrom) + "%s/%s" % ( SWCFG_TAG_NEW, SWCFG_TAG_NEW_NAME )
+  return trunch_describe_output(bornfrom) + "/%s/%s" % ( SWCFG_TAG_NEW, SWCFG_TAG_NEW_NAME )
 
 
 def info_describe_by_tagtype( ref, tagtype ):
