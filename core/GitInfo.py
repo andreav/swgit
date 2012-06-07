@@ -190,7 +190,7 @@ def info_eval_ticketlog( upstream, downstream, rel ):
   if len( tickets ) == 0:
       return "", 0
 
-  return "\n".join( tickets )
+  return "\n".join( tickets ), 0
 
 
 def info_eval_diff( upstreamRef, downstreamRef, stat = False, file = "", cbc = False , onlyme = False ):
@@ -519,7 +519,8 @@ def main():
     if options.tkt == True:
       out, err = info_eval_ticketlog( options.upstream, dw, cb.getRel() )
 
-    GLog.f( GLog.E, out )
+    if len( out ):
+        GLog.f( GLog.E, out )
     if err != 0:
       GLog.logRet(1)
 
