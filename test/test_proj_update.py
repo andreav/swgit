@@ -159,6 +159,27 @@ class Test_ProjUpdate( Test_ProjBase ):
                                    "FAILED modify_repo inside %s" % clo_helpmap["TSS100"].getDir()
                                  )
 
+  def test_ProjUpdate_00_02_CrossPull( self ):
+    self.util_createAndCheck_TSS100_FULL_withbkp_andclonedefbr( self.REPO_TSS100__CLO2_DIR )
+    ori_helpmap = self.util_get_TSS10FULL_helper_map_orig()
+    clo_helpmap = self.util_get_TSS10FULL_helper_map_clone( self.REPO_TSS100__CLO2_DIR )
+    clo_sha_map_clonetime = self.util_map2_currshas( clo_helpmap )
+    #make a modif into repo A, exec a pull into repo B
+    clo_helpmap["DEVTDM"].branch_create( self.MOD_DEVTDM_BR )
+    clo_helpmap["DEVTDM"].modify_file( tss100_name2file("DEVTDM"), msg = "modified a side repository" )
+    out, errCode = clo_helpmap["DEVPLAT"].pull()
+    self.util_check_SUCC_scenario( out, errCode, "", "Should be possible pulling from another repo under same project" )
+
+    out, errCode = clo_helpmap["TSS100"].proj_update()
+    self.util_check_DENY_scenario( out, errCode, 
+                                  "Locally modified file(s) detected.", 
+                                  "Should NOT be possible updating whole proj" )
+
+    out, errCode = clo_helpmap["DEVPLAT"].proj_update()
+    self.util_check_SUCC_scenario( out, errCode, "", "Should be possible updating a contained proj" )
+
+
+
   # Test:
   #   va works into subrepo and committed
   #   ca works and push subrepo
