@@ -236,10 +236,14 @@ class Status:
     #inside repo
     root = Env.getLocalRoot( root )
 
-    for d in submod_list_repos( root ):
-      ret, errstr = Status.checkLocalStatus( d, ignoreSubmod )
-      if ret != 0:
-        return ret, "Error inside repository %s\n%s" % ( d, errstr )
+    repos = [ root ]
+    if Env.is_aproj( root ):
+        repos = submod_list_repos( root )
+
+    for d in repos:
+        ret, errstr = Status.checkLocalStatus( d, ignoreSubmod )
+        if ret != 0:
+            return ret, "Error inside repository %s\n%s" % ( d, errstr )
 
     return 0, ""
 
