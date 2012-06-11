@@ -48,8 +48,11 @@ def find_new( ref ):
 def info_describe_by_tagtype( ref, tagtype ):
   print "reference :\t%s" % ref
 
-  cb = Branch.getCurrBr()
-  rel = cb.getRel()
+  myb_str, myb_strerr = eval_curr_branch_shortref( ref )
+  if myb_str == "":
+      GLog.f( GLog.E, myb_strerr )
+      GLog.logRet(1)
+  rel = br_2_rel( myb_str )
 
   cmd_describe = "git describe %s --tags --long  --match \"%s/*/*/*/%s/*\"" % ( ref, rel, tagtype )
 
@@ -357,7 +360,6 @@ def main():
 
 
   cb = Branch.getCurrBr()
-  rel = cb.getRel()
   user = "*"
   if options.user_filter != None:
     user = options.user_filter
@@ -512,12 +514,17 @@ def main():
   # log infos
   #
   if options.chg or options.fix or options.tkt:
+    myb_str, myb_strerr = eval_curr_branch_shortref( "HEAD" )
+    if myb_str == "":
+        GLog.f( GLog.E, myb_strerr )
+        GLog.logRet(1)
+    rel = br_2_rel( myb_str )
     if options.chg == True:
-      out, err = info_eval_changelog( options.upstream, dw, cb.getRel() )
+      out, err = info_eval_changelog( options.upstream, dw, rel )
     if options.fix == True:
-      out, err = info_eval_fixlog( options.upstream, dw, cb.getRel() )
+      out, err = info_eval_fixlog( options.upstream, dw, rel )
     if options.tkt == True:
-      out, err = info_eval_ticketlog( options.upstream, dw, cb.getRel() )
+      out, err = info_eval_ticketlog( options.upstream, dw, rel )
 
     if len( out ):
         GLog.f( GLog.E, out )
